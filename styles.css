@@ -1,0 +1,377 @@
+:root {
+  --bg: #121821;
+  --ink: #f0f2f7;
+  --muted: #58627f;
+  --soft: #9ca0aa;
+  --green: #59e36d;
+  --blue: #1e9bff;
+  --pink: #dc72ff;
+  --panel: #321000;
+  --panel-line: #b87c42;
+  --panel-text: #b9855f;
+  --max: 1800px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+}
+
+a {
+  color: inherit;
+}
+
+.home-shell {
+  width: min(100%, var(--max));
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: clamp(24px, 3.5vw, 64px);
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: clamp(32px, 5vw, 92px);
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.intro-block p {
+  margin: 0;
+  font-size: clamp(17px, 1.55vw, 26px);
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.name-token {
+  color: var(--pink);
+}
+
+.age-token {
+  color: #17baff;
+}
+
+.status-line {
+  color: var(--green);
+}
+
+.link-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  color: var(--soft);
+  font-size: clamp(16px, 1.45vw, 26px);
+  font-weight: 700;
+}
+
+.link-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  opacity: .86;
+}
+
+.link-nav a:hover,
+.link-nav a:focus-visible {
+  opacity: 1;
+  color: var(--ink);
+  outline: none;
+}
+
+.link-nav img {
+  width: 32px;
+  height: 32px;
+}
+
+.credential-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(32px, 8vw, 116px);
+}
+
+.credential {
+  display: grid;
+  grid-template-columns: 58px auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.credential img {
+  display: block;
+  object-fit: contain;
+}
+
+.matlab-logo {
+  width: 56px;
+  height: 56px;
+}
+
+.umich-logo {
+  width: 64px;
+  height: 50px;
+}
+
+.credential p {
+  margin: 0 0 4px;
+  color: var(--soft);
+  font-size: clamp(15px, 1.25vw, 23px);
+  font-weight: 800;
+}
+
+.credential h2 {
+  margin: 0;
+  font-size: clamp(18px, 1.55vw, 27px);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.project-stage {
+  min-height: 58vh;
+  display: grid;
+  grid-template-columns: minmax(330px, .76fr) minmax(520px, 1.1fr);
+  gap: clamp(36px, 5.3vw, 96px);
+  align-items: center;
+}
+
+.project-list {
+  display: grid;
+  gap: clamp(24px, 3.1vw, 52px);
+  align-content: center;
+}
+
+.project-link,
+.project-more {
+  display: block;
+  margin: 0;
+  font-size: clamp(42px, 4.4vw, 72px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-decoration-thickness: 4px;
+  text-underline-offset: 8px;
+}
+
+.project-link {
+  text-decoration-line: none;
+}
+
+.project-link.active {
+  width: fit-content;
+  color: var(--blue);
+  text-decoration-line: underline;
+}
+
+.project-link.muted,
+.project-more {
+  color: var(--muted);
+}
+
+.project-link:hover,
+.project-link:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.feature-window {
+  align-self: center;
+  overflow: hidden;
+  min-height: 48vh;
+  border: 1.5px solid var(--panel-line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.window-link {
+  min-height: inherit;
+  display: grid;
+  grid-template-rows: minmax(140px, 26%) 1fr;
+  text-decoration: none;
+}
+
+.feature-window h1 {
+  margin: 0;
+  padding: 26px clamp(24px, 2.4vw, 36px);
+  color: var(--panel-text);
+  font-size: clamp(17px, 1.55vw, 28px);
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.feature-window img {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  display: block;
+  object-fit: cover;
+  object-position: top left;
+}
+
+.project-page {
+  min-height: 100svh;
+  color: var(--ink);
+}
+
+.project-shell {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 72px);
+}
+
+.project-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: clamp(48px, 8vw, 96px);
+  color: var(--soft);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.project-topbar a {
+  text-decoration: none;
+}
+
+.project-topbar a:hover,
+.project-topbar a:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.project-hero {
+  display: grid;
+  gap: 28px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--green);
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 800;
+}
+
+.project-hero h1 {
+  max-width: 920px;
+  margin: 0;
+  color: var(--blue);
+  font-size: clamp(48px, 8vw, 112px);
+  line-height: .95;
+  letter-spacing: 0;
+}
+
+.project-hero p {
+  max-width: 820px;
+  margin: 0;
+  color: #c9ced9;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.55;
+}
+
+.project-preview {
+  width: 100%;
+  margin: clamp(40px, 7vw, 84px) 0;
+  border: 1px solid #394152;
+  border-radius: 8px;
+  display: block;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.project-fact {
+  min-height: 150px;
+  padding: 20px;
+  border: 1px solid #394152;
+  border-radius: 8px;
+}
+
+.project-fact h2 {
+  margin: 0 0 16px;
+  color: var(--soft);
+  font-size: 17px;
+}
+
+.project-fact p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+@media (max-width: 920px) {
+  .home-shell {
+    gap: 52px;
+  }
+
+  .site-header,
+  .project-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .site-header {
+    display: grid;
+  }
+
+  .link-nav {
+    justify-content: flex-start;
+  }
+
+  .project-stage {
+    display: grid;
+    min-height: unset;
+  }
+
+  .feature-window {
+    min-height: unset;
+  }
+
+  .project-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .home-shell {
+    padding: 22px;
+  }
+
+  .credential {
+    grid-template-columns: 48px auto;
+    gap: 14px;
+  }
+
+  .matlab-logo,
+  .umich-logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .project-link,
+  .project-more {
+    font-size: clamp(34px, 12vw, 54px);
+  }
+
+  .window-link {
+    grid-template-rows: auto 1fr;
+  }
+
+  .feature-window h1 {
+    padding: 18px;
+  }
+}

@@ -1,0 +1,23 @@
+<svg width="1160" height="640" viewBox="0 0 1160 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Performance panel preview</title>
+  <desc id="desc">A stylized performance dashboard with charts and trace panels.</desc>
+  <rect width="1160" height="640" fill="#101720"/>
+  <rect x="56" y="56" width="1048" height="528" rx="12" fill="#171F2B" stroke="#536071"/>
+  <rect x="96" y="104" width="284" height="154" rx="8" fill="#0E141C"/>
+  <rect x="438" y="104" width="284" height="154" rx="8" fill="#0E141C"/>
+  <rect x="780" y="104" width="284" height="154" rx="8" fill="#0E141C"/>
+  <path d="M116 218c40-70 72-8 112-72 46 90 86-44 132 44" stroke="#1E9BFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M464 212c36-28 74-28 110-74 50 90 84 48 126 8" stroke="#59E36D" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M806 212c30-76 74-62 112-20 46 50 80-24 126-70" stroke="#F16E42" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <rect x="96" y="318" width="626" height="210" rx="8" fill="#0E141C"/>
+  <rect x="780" y="318" width="284" height="210" rx="8" fill="#0E141C"/>
+  <g fill="#4D5B72">
+    <rect x="124" y="354" width="540" height="14" rx="2"/>
+    <rect x="124" y="396" width="486" height="14" rx="2"/>
+    <rect x="124" y="438" width="560" height="14" rx="2"/>
+    <rect x="124" y="480" width="386" height="14" rx="2"/>
+    <rect x="812" y="354" width="188" height="14" rx="2"/>
+    <rect x="812" y="396" width="136" height="14" rx="2"/>
+    <rect x="812" y="438" width="210" height="14" rx="2"/>
+  </g>
+</svg>

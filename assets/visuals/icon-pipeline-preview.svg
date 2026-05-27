@@ -1,0 +1,43 @@
+<svg width="1160" height="640" viewBox="0 0 1160 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Icon pipeline preview</title>
+  <desc id="desc">A stylized icon production board with source, review, and shipped columns.</desc>
+  <rect width="1160" height="640" fill="#0F141D"/>
+  <rect x="54" y="58" width="1052" height="524" rx="14" fill="#151C27" stroke="#47546B"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="26" font-weight="700">
+    <text x="94" y="116" fill="#8A93A6">source</text>
+    <text x="430" y="116" fill="#8A93A6">review</text>
+    <text x="766" y="116" fill="#8A93A6">shipped</text>
+  </g>
+  <g stroke="#2A3444">
+    <path d="M386 154v370"/>
+    <path d="M722 154v370"/>
+  </g>
+  <g>
+    <rect x="96" y="168" width="92" height="92" rx="10" fill="#192332" stroke="#5D708C"/>
+    <path d="M142 192v44M120 214h44" stroke="#1E9BFF" stroke-width="10" stroke-linecap="round"/>
+    <rect x="220" y="168" width="92" height="92" rx="10" fill="#192332" stroke="#5D708C"/>
+    <circle cx="266" cy="214" r="24" stroke="#59E36D" stroke-width="10"/>
+    <rect x="96" y="300" width="92" height="92" rx="10" fill="#192332" stroke="#5D708C"/>
+    <path d="m119 344 23-28 24 28-24 28-23-28Z" stroke="#FFCB05" stroke-width="8"/>
+    <rect x="220" y="300" width="92" height="92" rx="10" fill="#192332" stroke="#5D708C"/>
+    <path d="M245 328h42v32h-42z" stroke="#F16E42" stroke-width="8"/>
+  </g>
+  <g>
+    <rect x="432" y="168" width="236" height="70" rx="8" fill="#21170F" stroke="#A36B3A"/>
+    <text x="462" y="213" fill="#C99A73" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="24">contrast pass</text>
+    <rect x="432" y="270" width="236" height="70" rx="8" fill="#132317" stroke="#4A8D55"/>
+    <text x="462" y="315" fill="#83D18D" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="24">naming pass</text>
+    <rect x="432" y="372" width="236" height="70" rx="8" fill="#151B2E" stroke="#5169B8"/>
+    <text x="462" y="417" fill="#879BFF" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="24">export pass</text>
+  </g>
+  <g>
+    <rect x="788" y="172" width="92" height="92" rx="20" fill="#0D1118" stroke="#6A778B"/>
+    <path d="M814 218h40M834 198v40" stroke="#D9DDE6" stroke-width="8" stroke-linecap="round"/>
+    <rect x="914" y="172" width="92" height="92" rx="20" fill="#0D1118" stroke="#6A778B"/>
+    <path d="m940 218 18 18 26-40" stroke="#59E36D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="788" y="306" width="92" height="92" rx="20" fill="#0D1118" stroke="#6A778B"/>
+    <path d="M814 350h40" stroke="#1E9BFF" stroke-width="8" stroke-linecap="round"/>
+    <rect x="914" y="306" width="92" height="92" rx="20" fill="#0D1118" stroke="#6A778B"/>
+    <path d="M942 334h36v36h-36z" stroke="#FFCB05" stroke-width="8"/>
+  </g>
+</svg>

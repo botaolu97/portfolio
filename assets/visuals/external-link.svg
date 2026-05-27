@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title">
+  <title id="title">External link</title>
+  <path d="M13 7H7v18h18v-6" stroke="#9CA0AA" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 6h8v8" stroke="#9CA0AA" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12.5 19.5 25 7" stroke="#9CA0AA" stroke-width="2.8" stroke-linecap="round"/>
+</svg>
