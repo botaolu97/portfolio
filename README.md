@@ -4,7 +4,9 @@ A local editor for a portfolio published as read-only snapshots through Git/GitH
 
 ## Current milestone: foundation
 
-The sidebar and main area support creating, opening, renaming, and deleting mood-board and document files. File records survive reloads in IndexedDB. Canvas and document surfaces are explicitly marked placeholders: content editing is the next milestone.
+The sidebar and main area support creating, opening, renaming, and deleting mood-board and document files. File records survive reloads in IndexedDB. Canvas and document surfaces are empty placeholders: content editing is the next milestone.
+
+The UI follows the supplied Figma concept: an `about`/`work` file tree, JetBrains Mono typography, a thin file tab, and a dotted board canvas. Use the `+` beside `work` to create a file, and the `···` menu on an open file to rename or delete it. Closing a tab leaves the file saved. `Welcome!` is the default empty canvas; sample project names and blue cards in the concept are not inserted into drafts.
 
 The previous static portfolio has been removed from this branch as requested. It remains recoverable in the repository history.
 
@@ -32,7 +34,7 @@ npm run test:e2e
 - `src/files`: shared file types, validation, repository interface, and workspace operations.
 - `src/persistence`: IndexedDB adapter; UI components do not access the database directly.
 - `src/navigation`: sidebar and file navigation.
-- `src/app`: routing, overview, and file-management dialogs.
+- `src/app`: routing, file tabs, and file-management dialogs.
 - `src/editors`: lazy-loaded surfaces, ready for the board and document features.
 - `src/ui`: reusable primitives and visual tokens, with component-scoped CSS Modules.
 

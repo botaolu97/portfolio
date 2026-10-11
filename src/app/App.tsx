@@ -5,8 +5,8 @@ import { useWorkspace } from '../files/useWorkspace'
 import { normalizeTitle, type FileKind, type FileRepository, type WorkspaceFile } from '../files/types'
 import { Sidebar } from '../navigation/Sidebar'
 import { Dialog } from '../ui/Dialog'
-import { Icon } from '../ui/Icon'
-import { Overview } from './Overview'
+import { WorkspaceTabs } from './WorkspaceTabs'
+import canvasStyles from '../editors/EditorPlaceholder.module.css'
 import styles from './App.module.css'
 
 const EditorPlaceholder = lazy(() => import('../editors/EditorPlaceholder'))
@@ -33,11 +33,11 @@ export function App({ repository = localRepository }: { repository?: FileReposit
     <a className={styles.skipLink} href="#main-content" onClick={event => { event.preventDefault(); document.getElementById('main-content')?.focus() }}>Skip to main content</a>
     <Sidebar files={workspace.files} loading={workspace.loading} onCreate={create} onNavigate={() => setSidebarOpen(false)} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
     <main id="main-content" className={styles.main} tabIndex={-1}>
-      <header className={styles.topbar}><div><button className={styles.menu} aria-label="Open navigation" onClick={() => setSidebarOpen(true)}><Icon name="menu" /></button><span>WORKSPACE</span><span className={styles.breadcrumb}>/</span><span>Personal portfolio</span></div><span className={styles.localBadge}><span />Local editor</span></header>
       {workspace.error && <div role="alert" className={styles.errorBanner}>{workspace.error}<button onClick={() => void workspace.refresh()}>Retry</button></div>}
       <Routes>
-        <Route path="/" element={<Overview files={workspace.files} loading={workspace.loading} onCreate={create} />} />
-        <Route path="/files/:id" element={<FileSurface repository={repository} revision={workspace.revision} onAction={setAction} />} />
+        <Route path="/" element={<><WorkspaceTabs title="Welcome!" onOpenNavigation={() => setSidebarOpen(true)} /><section className={`${canvasStyles.canvas} ${canvasStyles.board}`} aria-label="Welcome canvas" /></>} />
+        <Route path="/empty" element={<><WorkspaceTabs onOpenNavigation={() => setSidebarOpen(true)} /><section className={canvasStyles.canvas} aria-label="Empty workspace" /></>} />
+        <Route path="/files/:id" element={<FileSurface repository={repository} revision={workspace.revision} onAction={setAction} onOpenNavigation={() => setSidebarOpen(true)} />} />
         <Route path="*" element={<MissingFile onHome={() => navigate('/')} />} />
       </Routes>
     </main>
@@ -45,7 +45,7 @@ export function App({ repository = localRepository }: { repository?: FileReposit
   </div>
 }
 
-function FileSurface({ repository, revision, onAction }: { repository: FileRepository; revision: number; onAction(action: FileAction): void }) {
+function FileSurface({ repository, revision, onAction, onOpenNavigation }: { repository: FileRepository; revision: number; onAction(action: FileAction): void; onOpenNavigation(): void }) {
   const { id } = useParams()
   const navigate = useNavigate()
   const [state, setState] = useState<{ file?: WorkspaceFile; loading: boolean; error?: string }>({ loading: true })
@@ -58,13 +58,13 @@ function FileSurface({ repository, revision, onAction }: { repository: FileRepos
   }, [repository, id, revision, retry])
   if (state.loading) return <div className={styles.loading} role="status">Opening file…</div>
   if (state.error) return <div className={styles.missing}><h1>Unable to open file</h1><p role="alert">{state.error}</p><button className={styles.primary} onClick={() => setRetry(value => value + 1)}>Try again</button></div>
-  if (!state.file) return <MissingFile onHome={() => navigate('/')} />
+  if (!state.file) return <><WorkspaceTabs onOpenNavigation={onOpenNavigation} /><MissingFile onHome={() => navigate('/')} /></>
   const file = state.file
-  return <><div className={styles.fileHeading}><div><span className={styles.eyebrow}>{file.kind === 'board' ? 'MOOD BOARD' : 'DOCUMENT'}</span><h1>{file.title}</h1></div><div className={styles.fileActions}><button onClick={() => onAction({ type: 'rename', file })}>Rename</button><button onClick={() => onAction({ type: 'delete', file })}>Delete</button></div></div><Suspense fallback={<div className={styles.loading}>Opening canvas…</div>}><EditorPlaceholder file={file} /></Suspense></>
+  return <><WorkspaceTabs title={file.title} onOpenNavigation={onOpenNavigation} onRename={() => onAction({ type: 'rename', file })} onDelete={() => onAction({ type: 'delete', file })} /><Suspense fallback={<div className={styles.loading}>Opening canvas…</div>}><EditorPlaceholder file={file} /></Suspense></>
 }
 
 function MissingFile({ onHome }: { onHome(): void }) {
-  return <div className={styles.missing}><Icon name="document" size={36} /><h1>This file isn’t here.</h1><p>It may have been deleted, or saved in a different browser.<br />Local drafts are available only on the device where you created them.</p><button className={styles.primary} onClick={onHome}>Back to overview</button></div>
+  return <div className={styles.missing}><h1>This file isn’t here.</h1><p>It may have been deleted, or saved in a different browser.</p><button className={styles.primary} onClick={onHome}>Back to Welcome</button></div>
 }
 
 function FileDialog({ action, onClose, onSubmit }: { action: FileAction; onClose(): void; onSubmit(title: string): Promise<void> }) {
