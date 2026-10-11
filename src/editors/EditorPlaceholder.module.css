@@ -1,0 +1,11 @@
+.canvas { flex: 1; min-height: 520px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 70px 28px; }
+.board { background-image: radial-gradient(#d7d9ce .8px, transparent .8px); background-size: 22px 22px; }
+.document { background: linear-gradient(90deg, var(--background) 0%, #fdfdf9 20%, #fdfdf9 80%, var(--background) 100%); }
+.placeholder { max-width: 390px; text-align: center; background: var(--background); padding: 28px; }
+.icon { display: inline-grid; place-items: center; width: 60px; height: 60px; border: 1px solid var(--border); border-radius: 18px; color: var(--accent); background: var(--surface); margin-bottom: 28px; }
+.eyebrow { display: block; font-size: 9px; letter-spacing: 1.6px; color: var(--muted); }
+.placeholder h2 { font-family: Georgia, serif; font-size: 36px; font-weight: 400; letter-spacing: -1px; margin: 16px 0; }
+.placeholder p { color: var(--muted); font-size: 13px; line-height: 1.9; }
+.status { display: inline-flex; gap: 7px; align-items: center; margin-top: 16px; color: var(--accent); font-size: 11px; }
+.canvasFooter { position: absolute; bottom: 22px; left: 30px; right: 30px; display: flex; justify-content: space-between; color: var(--muted); font-size: 9px; letter-spacing: 1px; gap: 12px; }
+@media (max-width: 760px) { .canvasFooter span:last-child { display: none; } .canvas { min-height: 470px; } }
