@@ -1,3 +1,0 @@
-.canvas { flex: 1; min-height: 0; background-color: var(--surface); }
-.board { background-image: radial-gradient(circle, #bfc2c6 .75px, transparent .85px); background-size: 22px 22px; }
-.document { background: var(--surface); }

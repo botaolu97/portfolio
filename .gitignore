@@ -1,9 +1,0 @@
-.DS_Store
-node_modules/
-dist/
-.env
-.env.local
-test-results/
-playwright-report/
-*.tsbuildinfo
-2026 job hunting/
