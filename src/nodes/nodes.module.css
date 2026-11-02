@@ -1,0 +1,214 @@
+.handle {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--surface);
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 120ms;
+}
+
+/* Handles appear on hover in edit mode; edges still anchor to them in view mode. */
+:global(.react-flow__node):hover .handle.editable,
+:global(.react-flow__node.selected) .handle.editable,
+:global(.react-flow.connecting) .handle.editable {
+  opacity: 1;
+}
+
+.fill {
+  width: 100%;
+  height: 100%;
+}
+
+/* Text */
+.text {
+  width: 100%;
+  height: 100%;
+  padding: 10px 14px;
+  overflow: auto;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.text.transparent {
+  background: transparent;
+  border-color: transparent;
+}
+
+.text :first-child {
+  margin-top: 0;
+}
+
+.text :last-child {
+  margin-bottom: 0;
+}
+
+.text :global(.ProseMirror) {
+  outline: none;
+  min-height: 100%;
+}
+
+/* Image */
+.image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: var(--radius-sm);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Shape */
+.shape {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.shape svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.shapeLabel {
+  position: absolute;
+  inset: 12%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: pre-wrap;
+  overflow: hidden;
+  font-weight: 500;
+  color: #1c1c1a;
+}
+
+/* Placeholder used by empty media and zoomed-out demos */
+.placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+/* Video */
+.video {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #000;
+}
+
+.video video,
+.video iframe,
+.video img {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  object-fit: cover;
+}
+
+.play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 68px;
+  height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.7);
+  color: #fff;
+  font-size: 20px;
+}
+
+.play:hover {
+  background: #e33;
+}
+
+/* Demo */
+.demo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.demoBar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 12px;
+}
+
+.dots {
+  display: flex;
+  gap: 5px;
+}
+
+.dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.demoTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* The title bar is the drag handle, since the iframe keeps pointer input for itself. */
+:global(.react-flow__node.draggable) .demoBar {
+  cursor: grab;
+}
+
+.demoBody {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: #fff;
+}
+
+.demoBody iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  transform-origin: 0 0;
+  background: #fff;
+}
+
+.demoBody img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}

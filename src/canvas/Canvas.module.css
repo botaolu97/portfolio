@@ -1,0 +1,46 @@
+.canvas {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+}
+
+.canvas :global(.react-flow__minimap) {
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.canvas :global(.react-flow__controls) {
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.canvas :global(.react-flow__edge-textbg) {
+  fill: var(--bg);
+}
+
+.canvas :global(.react-flow__edge-text) {
+  fill: var(--text);
+}
+
+.dropping::after {
+  content: "Drop to add to the canvas";
+  position: absolute;
+  inset: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent-soft) 60%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* While a drag or pan is in progress, iframes must not swallow the pointer as it passes over them. */
+.pointerDown iframe {
+  pointer-events: none;
+}

@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "title": "E2E fixture",
+  "nodes": [
+    {
+      "id": "note",
+      "type": "text",
+      "position": { "x": 0, "y": 0 },
+      "width": 240,
+      "height": 120,
+      "data": { "html": "<p>Fixture note</p>" }
+    },
+    {
+      "id": "box",
+      "type": "shape",
+      "position": { "x": 0, "y": 200 },
+      "width": 160,
+      "height": 100,
+      "data": { "shape": "ellipse", "fill": "#ffffff", "stroke": "#000000", "label": "Box" }
+    },
+    {
+      "id": "demo",
+      "type": "demo",
+      "position": { "x": 320, "y": 0 },
+      "width": 640,
+      "height": 440,
+      "data": {
+        "demoId": "d-e2e",
+        "entry": "index.html",
+        "title": "Fixture demo",
+        "device": "desktop"
+      }
+    }
+  ],
+  "edges": [
+    { "id": "e", "source": "note", "target": "box", "sourceHandle": "b", "targetHandle": "t" }
+  ]
+}

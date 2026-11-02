@@ -1,0 +1,79 @@
+import { ReactFlowProvider } from '@xyflow/react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { Link } from 'wouter';
+import { Canvas } from '../canvas/Canvas';
+import { fetchMap } from '../content/api';
+import { useMapStore } from '../store/mapStore';
+import styles from './MapPage.module.css';
+import top from './TopBar.module.css';
+
+// Checked inline (not via EDITABLE) so the production build drops the chunk entirely.
+const Editor = import.meta.env.DEV ? lazy(() => import('../editor/Editor')) : null;
+
+function ViewBar() {
+  const title = useMapStore((s) => s.title);
+  return (
+    <header className={top.bar}>
+      <Link href="/" className={top.back}>
+        ← Maps
+      </Link>
+      <h1 className={top.title}>{title}</h1>
+    </header>
+  );
+}
+
+export function MapPage({ slug }: { slug: string }) {
+  const [state, setState] = useState<'loading' | 'ready' | 'missing'>('loading');
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setState('loading');
+    fetchMap(slug)
+      .then((doc) => {
+        if (cancelled) return;
+        useMapStore.getState().load(slug, doc);
+        document.title = `${doc.title} · Mubu`;
+        setState('ready');
+      })
+      .catch(() => !cancelled && setState('missing'));
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  useEffect(() => {
+    if (!error) return;
+    const timer = setTimeout(() => setError(null), 5000);
+    return () => clearTimeout(timer);
+  }, [error]);
+
+  const onError = useCallback((message: string | null) => setError(message), []);
+
+  if (state === 'missing') {
+    return (
+      <div className={styles.message}>
+        <p>This map doesn't exist.</p>
+        <Link href="/">Back to all maps</Link>
+      </div>
+    );
+  }
+  if (state === 'loading') return <div className={styles.message}>Loading…</div>;
+
+  return (
+    <ReactFlowProvider>
+      <div className={styles.page}>
+        <div className={styles.canvas}>
+          <Canvas onError={onError} />
+        </div>
+        {Editor ? (
+          <Suspense fallback={<ViewBar />}>
+            <Editor key={slug} error={error} onError={onError} />
+          </Suspense>
+        ) : (
+          <ViewBar />
+        )}
+      </div>
+    </ReactFlowProvider>
+  );
+}

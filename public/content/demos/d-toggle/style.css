@@ -1,0 +1,103 @@
+/* Measured from the Figma "Toggle Button" frame (node 2156:36). The On state isn't in the design. */
+:root {
+  --page-bg: #f7f7f5;
+  --track-off: #e2e8f0;
+  --track-on: #1e293b;
+  --label-off: #475569;
+  --label-on: #ffffff;
+  --knob: #ffffff;
+
+  --track-w: 128px;
+  --track-h: 56px;
+  --inset: 6px;
+  --knob-size: 44px;
+  --travel: calc(var(--track-w) - var(--knob-size) - 2 * var(--inset));
+  --ease: 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--page-bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.toggle {
+  position: relative;
+  width: var(--track-w);
+  height: var(--track-h);
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--track-h) / 2);
+  background: var(--track-off);
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.08);
+  cursor: pointer;
+  transition: background-color var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid #4f6bed;
+  outline-offset: 3px;
+}
+
+.knob {
+  position: absolute;
+  top: var(--inset);
+  left: var(--inset);
+  width: var(--knob-size);
+  height: var(--knob-size);
+  border-radius: 50%;
+  background: var(--knob);
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.22);
+  transition: transform var(--ease);
+}
+
+.label {
+  position: absolute;
+  top: 50%;
+  right: 17px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--label-off);
+  transition: color var(--ease);
+  user-select: none;
+}
+
+.toggle[aria-checked='true'] {
+  background: var(--track-on);
+}
+
+.toggle[aria-checked='true'] .knob {
+  transform: translateX(var(--travel));
+}
+
+.toggle[aria-checked='true'] .label {
+  right: auto;
+  left: 19px;
+  color: var(--label-on);
+}
+
+.toggle:active .knob {
+  width: calc(var(--knob-size) + 6px);
+}
+
+.toggle[aria-checked='true']:active .knob {
+  transform: translateX(calc(var(--travel) - 6px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .knob,
+  .label {
+    transition: none;
+  }
+}

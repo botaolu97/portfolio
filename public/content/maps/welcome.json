@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "title": "Welcome to Mubu",
+  "nodes": [
+    {
+      "id": "intro",
+      "type": "text",
+      "position": {
+        "x": -16,
+        "y": -8
+      },
+      "data": {
+        "html": "<h2>Welcome to Mubu</h2><p>A canvas for ideas and <strong>live front-end demos</strong>. Scroll to pan, pinch or ⌘-scroll to zoom.</p>"
+      },
+      "width": 320,
+      "height": 176
+    },
+    {
+      "id": "idea",
+      "type": "shape",
+      "position": {
+        "x": 16,
+        "y": 288
+      },
+      "data": {
+        "shape": "rounded",
+        "fill": "#e8f0fe",
+        "stroke": "#4f6bed",
+        "label": "Click the demo to try it →"
+      },
+      "width": 240,
+      "height": 104
+    },
+    {
+      "id": "pricing",
+      "type": "demo",
+      "position": {
+        "x": 544,
+        "y": -32
+      },
+      "data": {
+        "demoId": "d-welcome",
+        "entry": "index.html",
+        "title": "Is bad?",
+        "device": "desktop"
+      },
+      "width": 640,
+      "height": 472
+    },
+    {
+      "id": "7f8115b7",
+      "type": "image",
+      "position": {
+        "x": 216,
+        "y": 520
+      },
+      "data": {
+        "src": "",
+        "alt": "",
+        "fit": "contain"
+      },
+      "width": 320,
+      "height": 240
+    },
+    {
+      "id": "9c64fde4",
+      "type": "text",
+      "position": {
+        "x": 40,
+        "y": 800
+      },
+      "data": {
+        "html": "<p>你好 这是我的第一个block</p>"
+      },
+      "width": 240,
+      "height": 120
+    },
+    {
+      "id": "bcd290b9",
+      "type": "demo",
+      "position": {
+        "x": 48,
+        "y": 1048
+      },
+      "data": {
+        "demoId": "pending",
+        "entry": "index.html",
+        "title": "Demo",
+        "device": "desktop"
+      },
+      "width": 640,
+      "height": 440
+    },
+    {
+      "id": "toggle",
+      "type": "demo",
+      "position": {
+        "x": 1320,
+        "y": 96
+      },
+      "data": {
+        "demoId": "d-toggle",
+        "entry": "index.html",
+        "title": "Toggle Button",
+        "device": "mobile"
+      },
+      "width": 390,
+      "height": 332
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "intro",
+      "target": "idea",
+      "sourceHandle": "b",
+      "targetHandle": "t",
+      "type": "smoothstep"
+    },
+    {
+      "id": "e2",
+      "source": "idea",
+      "target": "pricing",
+      "sourceHandle": "r",
+      "targetHandle": "l",
+      "type": "smoothstep"
+    },
+    {
+      "id": "e3",
+      "source": "pricing",
+      "target": "toggle",
+      "sourceHandle": "r",
+      "targetHandle": "l",
+      "type": "smoothstep"
+    }
+  ]
+}

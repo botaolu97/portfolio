@@ -1,0 +1,75 @@
+import type { XYPosition } from '@xyflow/react';
+import { uploadDemo, uploadFile } from '../content/api';
+import { NODE_DEFAULTS } from '../store/defaults';
+import { useMapStore } from '../store/mapStore';
+
+export type FileKind = 'image' | 'video' | 'demo';
+
+const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)$/i;
+const VIDEO = /\.(mp4|webm|mov|m4v|ogv)$/i;
+const DEMO = /\.(html?|css|m?js|json)$/i;
+
+export function classifyFile(name: string): FileKind | null {
+  if (IMAGE.test(name)) return 'image';
+  if (VIDEO.test(name)) return 'video';
+  if (DEMO.test(name)) return 'demo';
+  return null;
+}
+
+/** Scales natural dimensions down so the longer side is at most `max`. */
+export function fitSize(width: number, height: number, max = 480) {
+  const ratio = Math.min(1, max / Math.max(width, height));
+  return { width: Math.round(width * ratio), height: Math.round(height * ratio) };
+}
+
+function imageSize(file: File): Promise<{ width: number; height: number }> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      resolve(fitSize(img.naturalWidth || 320, img.naturalHeight || 240));
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = () => {
+      resolve({ width: 320, height: 240 });
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  });
+}
+
+/**
+ * Turns dropped files into nodes: each image/video becomes its own node, and all
+ * HTML/CSS/JS files in one drop become a single demo.
+ */
+export async function addNodesFromFiles(files: File[], at: XYPosition) {
+  const { addNode } = useMapStore.getState();
+  const demoFiles = files.filter((f) => classifyFile(f.name) === 'demo');
+  let offset = 0;
+  // Each node is centered on the drop point, cascading when several land at once.
+  const next = (size: { width: number; height: number }) => {
+    const position = { x: at.x - size.width / 2 + offset, y: at.y - size.height / 2 + offset };
+    offset += 32;
+    return position;
+  };
+
+  for (const file of files) {
+    const kind = classifyFile(file.name);
+    if (kind === 'image') {
+      const [{ src }, size] = await Promise.all([uploadFile(file), imageSize(file)]);
+      addNode('image', next(size), {
+        data: { src, alt: file.name.replace(/\.\w+$/, '') },
+        ...size,
+      });
+    } else if (kind === 'video') {
+      const { src } = await uploadFile(file);
+      addNode('video', next(NODE_DEFAULTS.video), { data: { src } });
+    }
+  }
+
+  if (demoFiles.length > 0) {
+    const { demoId, entry } = await uploadDemo(demoFiles);
+    const title = demoFiles.find((f) => f.name.endsWith('.html'))?.name.replace(/\.html?$/, '');
+    addNode('demo', next(NODE_DEFAULTS.demo), { data: { demoId, entry, title: title ?? 'Demo' } });
+  }
+}

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>Pricing</h1>
+      <div class="toggle" role="group" aria-label="Billing period">
+        <button type="button" data-period="monthly" class="active">Monthly</button>
+        <button type="button" data-period="yearly">Yearly</button>
+      </div>
+      <p class="price"><span id="amount">$12</span><small id="unit">/ month</small></p>
+      <button type="button" class="cta" id="cta">Start free trial</button>
+      <p class="note" id="note">&nbsp;</p>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
