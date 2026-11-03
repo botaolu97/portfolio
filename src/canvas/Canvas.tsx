@@ -15,8 +15,10 @@ import { nodeTypes } from '../nodes/nodeTypes';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
 import type { NodeType } from '../store/schema';
 import { useUiStore } from '../store/uiStore';
+import { useTheme } from '../ui/theme';
 import styles from './Canvas.module.css';
 import { addNodesFromFiles } from './fileDrop';
+import { usePageZoomGuard } from './usePageZoomGuard';
 import { useShortcuts } from './useShortcuts';
 
 export const PALETTE_MIME = 'application/x-mubu-node';
@@ -48,6 +50,8 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
     })),
   );
   const { screenToFlowPosition } = useReactFlow<FlowNode, FlowEdge>();
+  const theme = useTheme((s) => s.theme);
+  usePageZoomGuard();
   const handleNodesChange = useCallback(
     (changes: Parameters<typeof onNodesChange>[0]) =>
       onNodesChange(EDITABLE ? changes : selectOnly(changes)),
@@ -161,7 +165,7 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         onlyRenderVisibleElements
         fitView
         fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
-        colorMode="system"
+        colorMode={theme}
         attributionPosition="bottom-center"
       >
         <Background

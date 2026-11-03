@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "title": "Welcome to Mubu",
   "nodes": [
     {
@@ -10,7 +10,7 @@
         "y": -8
       },
       "data": {
-        "html": "<h2>Welcome to Mubu</h2><p>A canvas for ideas and <strong>live front-end demos</strong>. Scroll to pan, pinch or ⌘-scroll to zoom.</p>"
+        "html": "<h2>Welcome to Mubu</h2><p>A canvas for ideas and <strong>live front-end demos</strong>. Scroll to pan, pinch or ⌘-scroll to zoom.</p><p>1111</p><p></p>"
       },
       "width": 320,
       "height": 176
@@ -19,7 +19,7 @@
       "id": "idea",
       "type": "shape",
       "position": {
-        "x": 16,
+        "x": 24,
         "y": 288
       },
       "data": {
@@ -106,6 +106,35 @@
       },
       "width": 390,
       "height": 332
+    },
+    {
+      "id": "c6d817a2",
+      "type": "note",
+      "position": {
+        "x": -168,
+        "y": 512
+      },
+      "data": {
+        "html": "<p>🪇 is so cute!</p>",
+        "color": "yellow"
+      },
+      "width": 200,
+      "height": 200
+    },
+    {
+      "id": "fbcbc631",
+      "type": "image",
+      "position": {
+        "x": 616,
+        "y": 528
+      },
+      "data": {
+        "src": "content/assets/4e21ff6bc1a9c1d0.png",
+        "alt": "image",
+        "fit": "contain"
+      },
+      "width": 480,
+      "height": 290
     }
   ],
   "edges": [
@@ -115,7 +144,8 @@
       "target": "idea",
       "sourceHandle": "b",
       "targetHandle": "t",
-      "type": "smoothstep"
+      "type": "smoothstep",
+      "animated": true
     },
     {
       "id": "e2",
@@ -123,7 +153,9 @@
       "target": "pricing",
       "sourceHandle": "r",
       "targetHandle": "l",
-      "type": "smoothstep"
+      "type": "default",
+      "label": "hi?",
+      "animated": true
     },
     {
       "id": "e3",

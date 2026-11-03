@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
     <title>Mubu</title>
+    <script>
+      // Apply a theme chosen with the switch before first paint (see src/ui/theme.ts).
+      try {
+        const theme = localStorage.getItem('mubu.theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

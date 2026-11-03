@@ -1,9 +1,9 @@
 import { EditorContent, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import { useEffect } from 'react';
 import { useMapStore } from '../store/mapStore';
+import { richTextExtensions } from './richTextExtensions';
 
-/** Inline Tiptap editor for a text node; writes HTML back to the store as you type. */
+/** Inline Tiptap editor for a text node or note; writes HTML back to the store as you type. */
 export default function RichTextEditor({
   id,
   html,
@@ -14,11 +14,11 @@ export default function RichTextEditor({
   onDone: () => void;
 }) {
   const editor = useEditor({
-    extensions: [StarterKit.configure({ link: { openOnClick: false } })],
+    extensions: richTextExtensions,
     content: html,
     autofocus: 'end',
     onUpdate: ({ editor }) =>
-      useMapStore.getState().updateNodeData<'text'>(id, { html: editor.getHTML() }),
+      useMapStore.getState().updateNodeData<'text' | 'note'>(id, { html: editor.getHTML() }),
   });
 
   useEffect(() => {

@@ -61,5 +61,46 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await frame.getByRole('button').click();
   await expect(frame.getByRole('button')).toHaveText('Clicked 1');
 
+  // Zoom gestures over the interface zoom the canvas, never the page.
+  const viewport = () => page.locator('.react-flow__viewport').evaluate((el) => el.style.transform);
+  const header = page.getByRole('banner');
+  const headerBox = await header.boundingBox();
+  const beforeZoom = await viewport();
+  const pinchPrevented = await header.evaluate((el) => {
+    const pinch = new WheelEvent('wheel', {
+      deltaY: -100,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    el.dispatchEvent(pinch);
+    return pinch.defaultPrevented;
+  });
+  expect(pinchPrevented).toBe(true);
+  await expect.poll(viewport).not.toBe(beforeZoom);
+  const afterPinch = await viewport();
+  // Keys go to whatever has focus; after using a demo, that's its iframe, so click the canvas.
+  await page.locator('.react-flow__pane').click({ position: { x: 15, y: 15 } });
+  await page.keyboard.press('ControlOrMeta+-');
+  await expect.poll(viewport).not.toBe(afterPinch);
+  expect(await header.boundingBox()).toEqual(headerBox);
+
+  // The theme switch overrides the system theme and remembers the choice.
+  const html = page.locator('html');
+  const themeSwitch = page.getByRole('switch', { name: 'Dark theme' });
+  await expect(themeSwitch).toHaveAttribute('aria-checked', 'false');
+  await themeSwitch.click();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+  const canvasColor = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  expect(await canvasColor()).toBe('rgb(22, 22, 21)');
+  await page.reload();
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+  await expect(page.getByRole('switch', { name: 'Dark theme' })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await page.getByRole('switch', { name: 'Dark theme' }).click();
+  expect(await canvasColor()).toBe('rgb(246, 246, 244)');
+
   expect(editorRequests).toEqual([]);
 });

@@ -6,7 +6,27 @@ type Migration = (raw: Record<string, unknown>) => Record<string, unknown>;
  * migrations[n] upgrades a version-n document to version n+1.
  * When the schema changes: bump MAP_VERSION and add the step here.
  */
-const migrations: Record<number, Migration> = {};
+const migrations: Record<number, Migration> = {
+  // v2: notes became rich text. Plain `text` turns into one paragraph per line.
+  1: (raw) => ({
+    ...raw,
+    nodes: (Array.isArray(raw.nodes) ? raw.nodes : []).map((node) => {
+      if (node?.type !== 'note' || typeof node.data?.text !== 'string') return node;
+      const { text, ...data } = node.data;
+      return { ...node, data: { ...data, html: plainTextToHtml(text) } };
+    }),
+  }),
+};
+
+export function plainTextToHtml(text: string): string {
+  if (!text) return '';
+  const escapeHtml = (s: string) =>
+    s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  return text
+    .split('\n')
+    .map((line) => (line ? `<p>${escapeHtml(line)}</p>` : '<p></p>'))
+    .join('');
+}
 
 export function migrateMap(input: unknown): MapDoc {
   if (typeof input !== 'object' || input === null) {

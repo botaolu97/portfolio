@@ -1,0 +1,63 @@
+.switch {
+  position: fixed;
+  right: var(--theme-switch-inset);
+  bottom: var(--theme-switch-inset);
+  z-index: var(--z-toolbar);
+  width: var(--theme-switch-width);
+  height: var(--theme-switch-height);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--theme-switch-track);
+  box-shadow: var(--shadow-raised);
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: var(--theme-switch-knob);
+  height: var(--theme-switch-knob);
+  color: var(--theme-switch-icon);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.sun {
+  left: 2px;
+}
+
+.moon {
+  right: 2px;
+}
+
+.knob {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: var(--theme-switch-knob);
+  height: var(--theme-switch-knob);
+  border-radius: var(--radius-full);
+  background: var(--theme-switch-knob-bg);
+  box-shadow: var(--shadow-raised);
+  transform: translateY(-50%);
+  transition: transform var(--motion-duration-normal) var(--motion-easing-standard);
+}
+
+.switch[aria-checked="true"] .knob {
+  transform: translate(calc(var(--theme-switch-width) - var(--theme-switch-knob) - 6px), -50%);
+}
+
+/* The icon under the knob is the current theme. */
+.switch[aria-checked="false"] .sun,
+.switch[aria-checked="true"] .moon {
+  z-index: 1;
+  color: var(--theme-switch-icon-active);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knob {
+    transition: none;
+  }
+}

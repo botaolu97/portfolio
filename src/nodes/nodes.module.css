@@ -36,17 +36,83 @@
   border-color: transparent;
 }
 
-.text :first-child {
-  margin-top: 0;
+/* Rich text: shared by text nodes and notes, while editing and when rendered */
+.rich :global(.ProseMirror) {
+  outline: none;
+  min-height: 100%;
 }
 
-.text :last-child {
+.rich :is(p, h1, h2, h3, ul, ol) {
+  margin: 0 0 var(--rich-text-block-gap);
+}
+
+.rich :is(p, h1, h2, h3, ul, ol):last-child {
   margin-bottom: 0;
 }
 
-.text :global(.ProseMirror) {
-  outline: none;
-  min-height: 100%;
+.rich h1 {
+  font-size: var(--rich-text-display-size);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--font-line-height-tight);
+}
+
+.rich h2 {
+  font-size: var(--rich-text-headline-size);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--font-line-height-tight);
+}
+
+.rich h3 {
+  font-size: var(--rich-text-subheader-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-line-height-snug);
+}
+
+.rich :is(ul, ol) {
+  padding-left: var(--rich-text-list-indent);
+}
+
+.rich mark {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--rich-text-highlight);
+  color: inherit;
+}
+
+.rich ul[data-type="taskList"] {
+  padding-left: 0;
+  list-style: none;
+}
+
+.rich li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-8);
+}
+
+.rich li[data-type="taskItem"] > label {
+  flex: none;
+  margin-top: 0.2em;
+}
+
+.rich li[data-type="taskItem"] > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.rich li[data-type="taskItem"][data-checked="true"] > div {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.rich input[type="checkbox"] {
+  margin: 0;
+  accent-color: var(--rich-text-checkbox);
+}
+
+/* Rendered (not editing): checkboxes show state but don't toggle. */
+.richStatic input[type="checkbox"] {
+  pointer-events: none;
 }
 
 /* Image */
@@ -280,21 +346,9 @@
   overflow: auto;
   font-size: var(--note-font-size);
   line-height: var(--font-line-height-snug);
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.noteInput {
-  display: block;
-  border: 0;
-  outline: none;
-  resize: none;
-  background: transparent;
-  font-family: inherit;
-  color: inherit;
-}
-
-.noteInput::placeholder,
 .notePlaceholder {
   color: var(--note-placeholder);
 }

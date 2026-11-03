@@ -10,7 +10,8 @@
  * Conventions on top of DTCG:
  *   - The top-level `palette` group holds primitives and is not emitted; semantic tokens alias it.
  *   - `component.button.bg` is emitted as `--button-bg` (the `component` prefix is dropped).
- *   - Dark values live in `$extensions["app.mubu.modes"].dark`.
+ *   - Dark values live in `$extensions["app.mubu.modes"].dark`. They apply when the system is dark
+ *     (unless <html data-theme="light">) or when <html data-theme="dark">.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -176,6 +177,7 @@ export function build(tree: Record<string, unknown>) {
     resolved: toCss(t.type, resolve(t.value)),
   }));
 
+  const darkRows = rows.filter((r) => r.dark !== undefined);
   const banner = '/* Generated from design/tokens.json by `npm run tokens`. Do not edit. */';
   const css = [
     banner,
@@ -184,10 +186,15 @@ export function build(tree: Record<string, unknown>) {
     ...rows.map((r) => `  ${r.name}: ${r.light};`),
     '}',
     '',
+    // Dark follows the system unless the theme switch set data-theme on <html>.
     '@media (prefers-color-scheme: dark) {',
-    '  :root {',
-    ...rows.filter((r) => r.dark !== undefined).map((r) => `    ${r.name}: ${r.dark};`),
+    "  :root:not([data-theme='light']) {",
+    ...darkRows.map((r) => `    ${r.name}: ${r.dark};`),
     '  }',
+    '}',
+    '',
+    ":root[data-theme='dark'] {",
+    ...darkRows.map((r) => `  ${r.name}: ${r.dark};`),
     '}',
     '',
   ].join('\n');

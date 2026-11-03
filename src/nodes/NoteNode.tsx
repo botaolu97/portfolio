@@ -1,26 +1,48 @@
 import type { NodeProps } from '@xyflow/react';
-import { memo, useEffect, useRef } from 'react';
+import { lazy, memo, Suspense } from 'react';
 import { EDITABLE } from '../content/api';
-import { type FlowNode, useMapStore } from '../store/mapStore';
+import type { FlowNode } from '../store/mapStore';
 import { useUiStore } from '../store/uiStore';
 import { NodeChrome } from './NodeChrome';
 import styles from './nodes.module.css';
 
-/** A sticky note. Double-click to write (edit mode); the text is plain and keeps line breaks. */
+// Same editor as text nodes; checked inline so the production build drops it.
+const RichTextEditor = import.meta.env.DEV ? lazy(() => import('../editor/RichTextEditor')) : null;
+
+/** A sticky note with rich text. Double-click to write (edit mode). */
 export const NoteNode = memo(function NoteNode({
   id,
   data,
   selected,
 }: NodeProps<Extract<FlowNode, { type: 'note' }>>) {
-  const editing = useUiStore((s) => EDITABLE && s.editingTextId === id);
+  const editing = useUiStore((s) => s.editingTextId === id);
   const setEditing = useUiStore((s) => s.setEditingText);
-  const input = useRef<HTMLTextAreaElement>(null);
+  const empty = !data.html || data.html === '<p></p>';
 
-  useEffect(() => {
-    if (!editing || !input.current) return;
-    input.current.focus();
-    input.current.setSelectionRange(input.current.value.length, input.current.value.length);
-  }, [editing]);
+  let body: React.ReactNode;
+  if (RichTextEditor && editing) {
+    body = (
+      <div className={`${styles.noteText} ${styles.rich} nodrag nowheel`}>
+        <Suspense fallback={null}>
+          <RichTextEditor id={id} html={data.html} onDone={() => setEditing(null)} />
+        </Suspense>
+      </div>
+    );
+  } else if (empty) {
+    body = (
+      <div className={`${styles.noteText} ${styles.notePlaceholder}`}>
+        {EDITABLE ? 'Double-click to write' : ''}
+      </div>
+    );
+  } else {
+    body = (
+      <div
+        className={`${styles.noteText} ${styles.rich} ${styles.richStatic}`}
+        // Authored by the site owner in edit mode, never by visitors.
+        dangerouslySetInnerHTML={{ __html: data.html }}
+      />
+    );
+  }
 
   return (
     <div
@@ -29,26 +51,7 @@ export const NoteNode = memo(function NoteNode({
       onDoubleClick={EDITABLE ? () => setEditing(id) : undefined}
     >
       <NodeChrome selected={selected} minWidth={80} minHeight={60} />
-      {editing ? (
-        <textarea
-          ref={input}
-          className={`${styles.noteText} ${styles.noteInput} nodrag nowheel`}
-          value={data.text}
-          placeholder="Write something…"
-          aria-label="Note text"
-          onChange={(e) =>
-            useMapStore.getState().updateNodeData<'note'>(id, { text: e.target.value })
-          }
-          onBlur={() => setEditing(null)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') setEditing(null);
-          }}
-        />
-      ) : (
-        <div className={`${styles.noteText} ${data.text ? '' : styles.notePlaceholder}`}>
-          {data.text || (EDITABLE ? 'Double-click to write' : '')}
-        </div>
-      )}
+      {body}
     </div>
   );
 });

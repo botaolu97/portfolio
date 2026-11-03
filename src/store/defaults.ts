@@ -4,7 +4,7 @@ type Defaults = { [T in NodeType]: { data: NodeDataOf<T>; width: number; height:
 
 export const NODE_DEFAULTS: Defaults = {
   text: { data: { html: '<p>Double-click to edit</p>' }, width: 240, height: 120 },
-  note: { data: { text: '', color: 'yellow' }, width: 200, height: 200 },
+  note: { data: { html: '', color: 'yellow' }, width: 200, height: 200 },
   image: { data: { src: '', alt: '', fit: 'contain' }, width: 320, height: 240 },
   video: { data: { src: '' }, width: 480, height: 270 },
   shape: {

@@ -9,8 +9,8 @@
   align-items: center;
   gap: var(--space-8);
   padding: 0 var(--space-12);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  backdrop-filter: blur(8px);
+  /* Solid, not blurred: a backdrop blur repaints (and can flicker) on every canvas zoom frame. */
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
 

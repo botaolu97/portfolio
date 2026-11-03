@@ -20,6 +20,8 @@ describe('design tokens', () => {
     const { css } = build(tree);
     expect(css).toContain('--button-bg: var(--color-surface);');
     expect(css).toMatch(/@media \(prefers-color-scheme: dark\)[\s\S]*--color-surface: #1f1f1e;/);
+    expect(css).toMatch(/:root\[data-theme='dark'\] \{[\s\S]*--color-surface: #1f1f1e;/);
+    expect(css).toContain(":root:not([data-theme='light'])");
   });
 
   it('does not emit palette primitives', () => {

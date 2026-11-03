@@ -19,7 +19,7 @@ export const TextNode = memo(function TextNode({
   const setEditingText = useUiStore((s) => s.setEditingText);
   const transparent = data.background === 'transparent';
   const style = data.background && !transparent ? { background: data.background } : undefined;
-  const className = `${styles.text} ${transparent ? styles.transparent : ''}`;
+  const className = `${styles.text} ${styles.rich} ${transparent ? styles.transparent : ''}`;
 
   if (RichTextEditor && editing) {
     return (
@@ -38,7 +38,7 @@ export const TextNode = memo(function TextNode({
     <>
       <NodeChrome selected={selected} />
       <div
-        className={className}
+        className={`${className} ${styles.richStatic}`}
         style={style}
         onDoubleClick={EDITABLE ? () => setEditingText(id) : undefined}
         // Authored by the site owner in edit mode, never by visitors.

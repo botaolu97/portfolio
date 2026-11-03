@@ -1,5 +1,7 @@
 .page {
   position: relative;
+  /* Touch pinch zooms the canvas, not the page; scrollable panels opt back in to vertical pan. */
+  touch-action: none;
   width: 100%;
   height: 100%;
   overflow: hidden;

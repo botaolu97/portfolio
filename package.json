@@ -18,6 +18,8 @@
     "prebuild": "npm run tokens -- --check"
   },
   "dependencies": {
+    "@tiptap/extension-highlight": "^3.32.2",
+    "@tiptap/extension-list": "^3.32.2",
     "@tiptap/pm": "^3.32.2",
     "@tiptap/react": "^3.32.2",
     "@tiptap/starter-kit": "^3.32.2",

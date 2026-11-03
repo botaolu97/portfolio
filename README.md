@@ -15,6 +15,7 @@ npm run dev        # edit mode at http://127.0.0.1:5173
   - HTML/CSS/JS files dropped together become one **demo**. Use "Upload demo folder" to keep subfolders.
 - **Demos** run in a sandboxed iframe and are interactive right away. Drag or select one by its title bar.
 - **Canvas:** scroll to pan, pinch or ⌘-scroll to zoom, drag on empty space to box-select, Space + drag to pan.
+- **Text and notes:** double-click to edit; ⌘1–4 sizes, ⌘T checkboxes, ⌘L bullets, ⇧⌘E highlight, ⌘B/I/U, ⇧⌘X strike, ⌘⌫ clear (full table in `DESIGN.md`).
 - **Shortcuts:** ⌘Z / ⇧⌘Z undo/redo, ⌘C / ⌘V copy/paste, ⌘D duplicate, ⌘A select all, Delete removes.
 - Changes autosave to `public/content/` (maps, uploaded assets and demos), so everything lives in git.
 

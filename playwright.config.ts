@@ -16,9 +16,11 @@ export default defineConfig({
   webServer: [
     { command: 'npm run dev', url: 'http://127.0.0.1:5173', reuseExistingServer: true },
     {
-      command: 'npm run build && npm run preview',
+      // Always build fresh: a reused preview server would test whatever build it started with.
+      // `exec` lets Playwright stop vite itself instead of leaving it orphaned behind npm.
+      command: 'npm run build && exec npx vite preview --host 127.0.0.1 --port 4173 --strictPort',
       url: 'http://127.0.0.1:4173',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
       timeout: 120_000,
     },
   ],

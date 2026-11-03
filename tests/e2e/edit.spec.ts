@@ -28,14 +28,25 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await page.getByRole('button', { name: 'Redo' }).click();
   await expect(page.locator('.react-flow__node-shape')).toHaveCount(1);
 
-  // Add a sticky note: yellow by default, then write in it and switch it to pink.
+  // Add a sticky note (yellow by default), write in it with the text shortcuts, make it pink.
   await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Note').click();
   const note = page.locator('.react-flow__node-note');
   await expect(note).toHaveCount(1);
   await note.dblclick();
-  await page.getByLabel('Note text').fill('Remember the milk');
-  await page.keyboard.press('Escape');
-  await expect(note).toContainText('Remember the milk');
+  await expect(note.locator('.ProseMirror')).toBeFocused();
+  const keys = page.keyboard;
+  await keys.type('Plan');
+  await keys.press('ControlOrMeta+1');
+  await keys.press('Enter');
+  await keys.press('ControlOrMeta+t');
+  await keys.type('Buy milk');
+  await keys.press('Enter');
+  await keys.press('Enter');
+  await keys.press('ControlOrMeta+Shift+e');
+  await keys.type('marked');
+  await keys.press('Escape');
+  await expect(note.locator('h1')).toHaveText('Plan');
+  await expect(note.locator('input[type=checkbox]')).toHaveCount(1);
   await page.getByLabel('Pink').check();
 
   // Paste a PNG and SVG markup from the clipboard.
@@ -71,10 +82,11 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
     'note',
     'shape',
   ]);
-  expect(saved.nodes.find((n: { type: string }) => n.type === 'note').data).toEqual({
-    text: 'Remember the milk',
-    color: 'pink',
-  });
+  const noteData = saved.nodes.find((n: { type: string }) => n.type === 'note').data;
+  expect(noteData.color).toBe('pink');
+  expect(noteData.html).toContain('<h1>Plan</h1>');
+  expect(noteData.html).toMatch(/data-type="taskList"[\s\S]*Buy milk/);
+  expect(noteData.html).toContain('<mark>marked</mark>');
   for (const n of saved.nodes.filter((n: { type: string }) => n.type === 'image')) {
     createdAssets.push(path.join(content, n.data.src.replace(/^content\//, '')));
   }

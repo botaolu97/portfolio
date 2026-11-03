@@ -40,6 +40,7 @@
 }
 
 .inspector {
+  touch-action: pan-y;
   top: calc(var(--size-toolbar) + 16px);
   right: 12px;
   width: 260px;

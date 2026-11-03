@@ -34,11 +34,33 @@ describe('migrateMap', () => {
   it('defaults a note to yellow and rejects unknown colors', () => {
     const note = { id: 'n', type: 'note', position: { x: 0, y: 0 }, data: {} };
     expect(migrateMap({ ...valid, nodes: [note] }).nodes[0]).toMatchObject({
-      data: { text: '', color: 'yellow' },
+      data: { html: '', color: 'yellow' },
     });
     expect(() =>
       migrateMap({ ...valid, nodes: [{ ...note, data: { color: 'orange' } }] }),
     ).toThrow();
+  });
+
+  it('migrates v1 plain-text notes to rich text', () => {
+    const v1 = {
+      version: 1,
+      title: 'Old',
+      nodes: [
+        {
+          id: 'n',
+          type: 'note',
+          position: { x: 0, y: 0 },
+          data: { text: 'Buy milk\n\n<b>&', color: 'pink' },
+        },
+      ],
+      edges: [],
+    };
+    const doc = migrateMap(v1);
+    expect(doc.version).toBe(MAP_VERSION);
+    expect(doc.nodes[0].data).toEqual({
+      html: '<p>Buy milk</p><p></p><p>&lt;b&gt;&amp;</p>',
+      color: 'pink',
+    });
   });
 
   it('rejects unknown node types', () => {

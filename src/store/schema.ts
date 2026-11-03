@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const MAP_VERSION = 1;
+export const MAP_VERSION = 2;
 
 export const SHAPE_KINDS = [
   'rect',
@@ -26,9 +26,9 @@ const nodeBase = {
 export const NOTE_COLORS = ['yellow', 'pink', 'green', 'blue', 'purple'] as const;
 export type NoteColor = (typeof NOTE_COLORS)[number];
 
-/** A sticky note: plain text on one of the note colors (a token name, not a hex value). */
+/** A sticky note: rich text on one of the note colors (a token name, not a hex value). */
 export const noteData = z.object({
-  text: z.string().default(''),
+  html: z.string().default(''),
   color: z.enum(NOTE_COLORS).default('yellow'),
 });
 

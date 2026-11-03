@@ -40,6 +40,7 @@ Tokens come in three tiers:
 2. **One accent.** `--color-accent` means "this is interactive, selected or focused". Don't use it
    for decoration, and don't introduce a second brand color.
 3. **Same system in light and dark.** Every semantic color has a dark value. Design both at once.
+   The theme follows the system until the viewer flips the theme switch.
 4. **Show editability, even when read-only.** Hover and selection states look the same on the
    published site as in the editor, so visitors can see what could be edited.
 5. **Small, dense, calm.** 14px base text, 32px controls, short 120–200ms transitions.
@@ -105,7 +106,7 @@ Disabled buttons drop to 45% opacity. In panels, buttons use `--size-control-sm`
 
 ### Top bar (`src/app/TopBar.module.css`)
 
-Fixed above the canvas, translucent surface with blur, one border at the bottom. Left: back link
+Fixed above the canvas, solid surface, one border at the bottom. Left: back link
 and map title. Right: actions, grouped with a vertical divider.
 
 ### Panel: palette and inspector (`src/editor/`)
@@ -128,10 +129,23 @@ Surface card with a border; on hover the border turns accent and the card gains
 
 Bottom-center, `--toast-bg` with `--toast-text`, `--radius-md`, raised. Disappears after 5 seconds.
 
+### Theme switch (`src/ui/ThemeSwitch.tsx`)
+
+A `--theme-switch-*` pill fixed `--theme-switch-inset` from the bottom-right corner on every page,
+in edit and view mode. A sun and a moon sit in the track; the knob slides over the current theme
+in `--motion-duration-normal`. It's a native button with `role="switch"` (checked = dark).
+
+The choice sets `data-theme` on `<html>` and is saved in `localStorage` (`mubu.theme`); a small
+inline script in `index.html` applies it before first paint. Until the viewer chooses, the
+theme follows the system. `npm run tokens` emits each dark value twice: under
+`prefers-color-scheme: dark` (skipped when `data-theme="light"`) and under `[data-theme='dark']`.
+
 ### Canvas
 
 No on-screen zoom buttons or minimap: the canvas is the whole view. Zoom with pinch or ⌘-scroll,
-pan with scroll or by dragging empty space (Space + drag in edit mode). Keep it that way; add
+pan with scroll or by dragging empty space (Space + drag in edit mode).
+On canvas pages every zoom gesture (pinch, ⌘-scroll, ⌘+ ⌘− ⌘0) zooms the canvas and never the
+browser page, so the top bar, panels and theme switch keep a fixed size (`src/canvas/usePageZoomGuard.ts`). Keep it that way; add
 navigation UI only if the gestures stop being enough.
 
 ### Canvas node chrome (`src/nodes/NodeChrome.tsx`, `src/canvas/Canvas.module.css`)
@@ -148,7 +162,7 @@ navigation UI only if the gestures stop being enough.
 
 - **Note:** a sticky note for quick thoughts. It's the first item in the palette and defaults to
   yellow. It comes in five `--color-note-*` fills (yellow, pink, green, blue, purple), stored by
-  name in the map so the palette can change later. Plain text in `--note-text` at
+  name in the map so the palette can change later. Rich text (see below) in `--note-text` at
   `--note-font-size`, `--note-padding` inside, `--note-radius` corners and `--note-shadow` like
   paper. Notes stay light in dark mode. In the inspector the colors are round
   `--note-swatch-size` swatches (native radio buttons); the chosen one gets the accent focus ring.
@@ -161,6 +175,28 @@ navigation UI only if the gestures stop being enough.
 - **Demo frame:** surface card with `--shadow-raised`. A `--demo-bar-height` title bar
   (`--demo-bar-bg`) with three dots and the title; it's the drag handle in edit mode. The page
   inside is the demo's own and is not styled by Mubu.
+
+### Rich text (text nodes and notes)
+
+One editor (`src/editor/richTextExtensions.ts`) with the same shortcuts everywhere. Double-click a
+text node or note to edit; Esc or clicking the canvas finishes.
+
+| Shortcut | Result | Markdown start |
+| --- | --- | --- |
+| ⌘1 | Display (`--rich-text-display-size`, bold) | `# ` |
+| ⌘2 | Headline (`--rich-text-headline-size`, bold) | `## ` |
+| ⌘3 | Subheader (`--rich-text-subheader-size`, semibold) | `### ` |
+| ⌘4 | Normal text | |
+| ⌘T | Checkbox list; checked items fade and strike through | `[ ] ` |
+| ⌘L | Bullet list | `- ` |
+| ⇧⌘E | Highlight marker (`--rich-text-highlight`) | |
+| ⌘B / ⌘I / ⌘U | Bold / italic / underline | |
+| ⇧⌘X | Strikethrough | |
+| ⌘⌫ | Clear styling (marks and block type) | |
+
+Browsers keep some shortcuts for themselves: Chrome always opens a new tab on ⌘T, so use `[ ] `
+there; ⌘⌥1–3 also set headings. Rendered (not editing), checkboxes show their state but can't be
+toggled.
 
 ## Accessibility
 
@@ -375,5 +411,30 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--note-font-size` | `var(--font-size-lg) → 15px` | follows alias |  |
 | `--note-shadow` | `0 1px 2px 0 rgb(0 0 0 / 0.08), 0 6px 14px -4px rgb(0 0 0 / 0.1)` | — | Lifts the note off the canvas like paper. |
 | `--note-swatch-size` | `24px` | — | Color swatches in the inspector. |
+
+#### `component.rich-text`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--rich-text-display-size` | `var(--font-size-3xl) → 28px` | follows alias | ⌘1 or # — Display. |
+| `--rich-text-headline-size` | `var(--font-size-2xl) → 20px` | follows alias | ⌘2 or ## — Headline. |
+| `--rich-text-subheader-size` | `var(--font-size-xl) → 16px` | follows alias | ⌘3 or ### — Subheader. |
+| `--rich-text-block-gap` | `var(--space-6) → 6px` | follows alias | Space after paragraphs, headings and lists. |
+| `--rich-text-list-indent` | `var(--space-20) → 20px` | follows alias |  |
+| `--rich-text-highlight` | `rgb(255 196 0 / 0.45)` | — | ⇧⌘E marker. Translucent amber so it reads on white, dark and every note color. |
+| `--rich-text-checkbox` | `var(--color-accent) → #4f6bed` | follows alias |  |
+
+#### `component.theme-switch`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--theme-switch-width` | `52px` | — |  |
+| `--theme-switch-height` | `28px` | — |  |
+| `--theme-switch-knob` | `22px` | — |  |
+| `--theme-switch-inset` | `var(--space-16) → 16px` | follows alias | Distance from the window's bottom and right edges. |
+| `--theme-switch-track` | `var(--color-surface-muted) → #f0f0ed` | follows alias |  |
+| `--theme-switch-knob-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
+| `--theme-switch-icon` | `var(--color-text-muted) → #6b6b66` | follows alias |  |
+| `--theme-switch-icon-active` | `var(--color-text) → #1c1c1a` | follows alias |  |
 
 <!-- tokens:end -->
