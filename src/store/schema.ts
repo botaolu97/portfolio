@@ -23,6 +23,15 @@ const nodeBase = {
   zIndex: z.number().optional(),
 };
 
+export const NOTE_COLORS = ['yellow', 'pink', 'green', 'blue', 'purple'] as const;
+export type NoteColor = (typeof NOTE_COLORS)[number];
+
+/** A sticky note: plain text on one of the note colors (a token name, not a hex value). */
+export const noteData = z.object({
+  text: z.string().default(''),
+  color: z.enum(NOTE_COLORS).default('yellow'),
+});
+
 export const textData = z.object({
   html: z.string(),
   background: z.string().optional(),
@@ -58,6 +67,7 @@ export const demoData = z.object({
 
 export const mapNode = z.discriminatedUnion('type', [
   z.object({ ...nodeBase, type: z.literal('text'), data: textData }),
+  z.object({ ...nodeBase, type: z.literal('note'), data: noteData }),
   z.object({ ...nodeBase, type: z.literal('image'), data: imageData }),
   z.object({ ...nodeBase, type: z.literal('video'), data: videoData }),
   z.object({ ...nodeBase, type: z.literal('shape'), data: shapeData }),

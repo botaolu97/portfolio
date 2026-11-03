@@ -3,7 +3,14 @@ import { useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { asset, uploadDemo, uploadFile } from '../content/api';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
-import { DEVICES, type NodeDataOf, type NodeType, SHAPE_KINDS } from '../store/schema';
+import {
+  DEVICES,
+  NOTE_COLORS,
+  type NodeDataOf,
+  type NodeType,
+  type NoteColor,
+  SHAPE_KINDS,
+} from '../store/schema';
 import { Button } from '../ui/Button';
 import styles from './Editor.module.css';
 
@@ -59,6 +66,45 @@ function useUpdate<T extends NodeType>(id: string) {
   return (patch: Partial<NodeDataOf<T>>) => updateNodeData<T>(id, patch);
 }
 
+const NOTE_COLOR_NAMES: Record<NoteColor, string> = {
+  yellow: 'Yellow',
+  pink: 'Pink',
+  green: 'Green',
+  blue: 'Blue',
+  purple: 'Purple',
+};
+
+function NoteFields({ node }: { node: Extract<FlowNode, { type: 'note' }> }) {
+  const update = useUpdate<'note'>(node.id);
+  return (
+    <>
+      <fieldset className={`${styles.field} ${styles.fieldset}`}>
+        <legend className={styles.legend}>Color</legend>
+        <div className={styles.swatches}>
+          {NOTE_COLORS.map((color) => (
+            <label
+              key={color}
+              className={styles.swatch}
+              style={{ background: `var(--color-note-${color})` }}
+              title={NOTE_COLOR_NAMES[color]}
+            >
+              <input
+                type="radio"
+                name={`note-color-${node.id}`}
+                value={color}
+                checked={node.data.color === color}
+                aria-label={NOTE_COLOR_NAMES[color]}
+                onChange={() => update({ color })}
+              />
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <p className={styles.hint}>Double-click the note on the canvas to write. Esc to finish.</p>
+    </>
+  );
+}
+
 function TextFields({ node }: { node: Extract<FlowNode, { type: 'text' }> }) {
   const update = useUpdate<'text'>(node.id);
   return (
@@ -70,10 +116,6 @@ function TextFields({ node }: { node: Extract<FlowNode, { type: 'text' }> }) {
         >
           <option value="">Card</option>
           <option value="transparent">None</option>
-          <option value="#fff8d6">Yellow note</option>
-          <option value="#e3f4e8">Green note</option>
-          <option value="#fde8e8">Pink note</option>
-          <option value="#e8ecfd">Blue note</option>
         </select>
       </Field>
       <p className={styles.hint}>Double-click the text on the canvas to edit it. Esc to finish.</p>
@@ -286,6 +328,7 @@ function EdgeFields({ edge }: { edge: FlowEdge }) {
 }
 
 const TITLES: Record<NodeType, string> = {
+  note: 'Note',
   text: 'Text',
   shape: 'Shape',
   image: 'Image',
@@ -295,6 +338,8 @@ const TITLES: Record<NodeType, string> = {
 
 function NodeFields({ node, onError }: { node: FlowNode; onError: OnError }) {
   switch (node.type) {
+    case 'note':
+      return <NoteFields node={node} />;
     case 'text':
       return <TextFields node={node} />;
     case 'shape':

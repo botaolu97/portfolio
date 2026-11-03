@@ -1,72 +1,119 @@
+/* Generated from design/tokens.json by `npm run tokens`. Do not edit. */
+
 :root {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
-
-  --bg: #f6f6f4;
-  --surface: #ffffff;
-  --surface-2: #f0f0ed;
-  --border: #e2e2dd;
-  --text: #1c1c1a;
-  --text-muted: #6b6b66;
-  --accent: #4f6bed;
-  --accent-soft: #e8ecfd;
-  --danger: #d4483b;
-  --canvas-dot: #d4d4cf;
-
-  --radius: 8px;
+  --color-canvas: #f6f6f4;
+  --color-canvas-dot: #d4d4cf;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f0f0ed;
+  --color-border: #e2e2dd;
+  --color-text: #1c1c1a;
+  --color-text-muted: #6b6b66;
+  --color-text-on-accent: #ffffff;
+  --color-accent: #4f6bed;
+  --color-accent-soft: #e8ecfd;
+  --color-danger: #d4483b;
+  --color-note-yellow: #ffef9f;
+  --color-note-pink: #ffd6e2;
+  --color-note-green: #c8f0d0;
+  --color-note-blue: #cfe4ff;
+  --color-note-purple: #e2d8ff;
+  --font-family-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 28px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-line-height-tight: 1;
+  --font-line-height-snug: 1.4;
+  --font-line-height-normal: 1.5;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-56: 56px;
+  --space-80: 80px;
+  --radius-xs: 2px;
   --radius-sm: 5px;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 16px rgb(0 0 0 / 0.06);
-  --toolbar-h: 48px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;
+  --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 4px 16px 0 rgb(0 0 0 / 0.06);
+  --motion-duration-fast: 120ms;
+  --motion-duration-normal: 200ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --size-toolbar: 48px;
+  --size-control: 32px;
+  --size-control-sm: 28px;
+  --size-inspector: 260px;
+  --z-node-adornment: 2;
+  --z-panel: 5;
+  --z-toolbar: 6;
+  --z-overlay: 10;
+  --z-toast: 20;
+  --button-height: var(--size-control);
+  --button-padding-x: var(--space-12);
+  --button-radius: var(--radius-sm);
+  --button-bg: var(--color-surface);
+  --button-bg-hover: var(--color-surface-muted);
+  --button-border: var(--color-border);
+  --button-primary-bg: var(--color-accent);
+  --button-primary-text: var(--color-text-on-accent);
+  --panel-bg: var(--color-surface);
+  --panel-border: var(--color-border);
+  --panel-radius: var(--radius-md);
+  --panel-shadow: var(--shadow-raised);
+  --selection-outline: var(--color-accent);
+  --selection-badge-bg: var(--color-accent);
+  --selection-badge-text: var(--color-text-on-accent);
+  --handle-size: 10px;
+  --handle-color: var(--color-accent);
+  --demo-bar-height: 32px;
+  --demo-bar-bg: var(--color-surface-muted);
+  --demo-page-bg: #ffffff;
+  --shape-label: #1c1c1a;
+  --video-backdrop: #000000;
+  --video-play-bg: rgb(0 0 0 / 0.7);
+  --video-play-bg-hover: #ee3333;
+  --video-play-icon: #ffffff;
+  --toast-bg: var(--color-danger);
+  --toast-text: var(--color-text-on-accent);
+  --note-text: #1c1c1a;
+  --note-placeholder: #6b6b66;
+  --note-padding: var(--space-16);
+  --note-radius: var(--radius-xs);
+  --note-font-size: var(--font-size-lg);
+  --note-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.08), 0 6px 14px -4px rgb(0 0 0 / 0.1);
+  --note-swatch-size: 24px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #161615;
-    --surface: #1f1f1e;
-    --surface-2: #2a2a28;
-    --border: #353532;
-    --text: #ececea;
-    --text-muted: #9a9a94;
-    --accent: #7d93f5;
-    --accent-soft: #2a3156;
-    --danger: #ef6a5d;
-    --canvas-dot: #3a3a37;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.3);
+    --color-canvas: #161615;
+    --color-canvas-dot: #3a3a37;
+    --color-surface: #1f1f1e;
+    --color-surface-muted: #2a2a28;
+    --color-border: #353532;
+    --color-text: #ececea;
+    --color-text-muted: #9a9a94;
+    --color-accent: #7d93f5;
+    --color-accent-soft: #2a3156;
+    --color-danger: #ef6a5d;
+    --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 4px 16px 0 rgb(0 0 0 / 0.3);
   }
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-}
-
-body {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--text);
-  background: var(--bg);
-  -webkit-font-smoothing: antialiased;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }

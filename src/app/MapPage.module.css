@@ -7,7 +7,7 @@
 
 .canvas {
   position: absolute;
-  inset: var(--toolbar-h) 0 0 0;
+  inset: var(--size-toolbar) 0 0 0;
 }
 
 .message {
@@ -15,11 +15,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--space-12);
   height: 100%;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
 }
 
 .message a {
-  color: var(--accent);
+  color: var(--color-accent);
 }

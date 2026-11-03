@@ -3,10 +3,11 @@ import { memo } from 'react';
 import { asset } from '../content/api';
 import type { FlowNode } from '../store/mapStore';
 import { DEVICES } from '../store/schema';
+import { tokenValues } from '../ui/tokens';
 import { NodeChrome } from './NodeChrome';
 import styles from './nodes.module.css';
 
-const BAR_HEIGHT = 32;
+const BAR_HEIGHT = Number.parseFloat(tokenValues['component.demo.bar-height']);
 /** Below this zoom a live page is unreadable anyway, so show the poster instead of an iframe. */
 const LIVE_MIN_ZOOM = 0.35;
 

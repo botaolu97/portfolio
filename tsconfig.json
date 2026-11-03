@@ -18,6 +18,7 @@
   "include": [
     "src",
     "tests",
+    "scripts",
     "vite.config.ts",
     "vite-plugin-mubu-content.ts",
     "playwright.config.ts"

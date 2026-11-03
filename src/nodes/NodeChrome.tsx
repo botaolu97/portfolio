@@ -11,6 +11,7 @@ const SIDES = [
 ];
 
 const TYPE_LABELS: Record<NodeType, string> = {
+  note: 'Note',
   text: 'Text',
   shape: 'Shape',
   image: 'Image',
@@ -73,7 +74,7 @@ export function NodeChrome({
           minWidth={minWidth}
           minHeight={minHeight}
           keepAspectRatio={keepAspectRatio}
-          color="var(--accent)"
+          color="var(--color-accent)"
         />
       )}
       {selected && <SelectionBadge />}

@@ -4,7 +4,7 @@ import { useMapStore } from '../store/mapStore';
 import styles from './Editor.module.css';
 import { useViewportCenter } from './Toolbar';
 
-const ICONS = { text: 'T', shape: '◇', image: '▣', video: '▶', demo: '</>' } as const;
+const ICONS = { note: '▤', text: 'T', shape: '◇', image: '▣', video: '▶', demo: '</>' } as const;
 
 /** Drag an item onto the canvas, or click to drop it in the middle of the view. */
 export function Palette() {

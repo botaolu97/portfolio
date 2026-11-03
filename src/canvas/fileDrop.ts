@@ -16,6 +16,34 @@ export function classifyFile(name: string): FileKind | null {
   return null;
 }
 
+const IMAGE_TYPES: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/svg+xml': 'svg',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+};
+
+/**
+ * Images on the clipboard: copied files and screenshots, or SVG markup copied as text
+ * (e.g. Figma's "Copy as SVG"). Unnamed images get a name with the right extension.
+ */
+export function imagesFromClipboard(data: Pick<DataTransfer, 'files' | 'getData'>): File[] {
+  const files = Array.from(data.files)
+    .filter((f) => f.type in IMAGE_TYPES || classifyFile(f.name) === 'image')
+    .map((f) =>
+      classifyFile(f.name) === 'image'
+        ? f
+        : new File([f], `pasted.${IMAGE_TYPES[f.type]}`, { type: f.type }),
+    );
+  if (files.length > 0) return files;
+  const text = data.getData('text/plain').trim();
+  if (/^(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*<svg[\s>]/i.test(text) && text.endsWith('</svg>')) {
+    return [new File([text], 'pasted.svg', { type: 'image/svg+xml' })];
+  }
+  return [];
+}
+
 /** Scales natural dimensions down so the longer side is at most `max`. */
 export function fitSize(width: number, height: number, max = 480) {
   const ratio = Math.min(1, max / Math.max(width, height));

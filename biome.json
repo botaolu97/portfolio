@@ -4,11 +4,15 @@
     "includes": [
       "**",
       "!dist",
+      "!.vite",
       "!public/content",
       "!test-results",
       "!playwright-report",
       "!.claude",
-      "!tests/e2e/fixtures"
+      "!tests/e2e/fixtures",
+      "!src/ui/tokens.css",
+      "!src/ui/tokens.ts",
+      "!DESIGN.md"
     ]
   },
   "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },

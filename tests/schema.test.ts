@@ -31,6 +31,16 @@ describe('migrateMap', () => {
     });
   });
 
+  it('defaults a note to yellow and rejects unknown colors', () => {
+    const note = { id: 'n', type: 'note', position: { x: 0, y: 0 }, data: {} };
+    expect(migrateMap({ ...valid, nodes: [note] }).nodes[0]).toMatchObject({
+      data: { text: '', color: 'yellow' },
+    });
+    expect(() =>
+      migrateMap({ ...valid, nodes: [{ ...note, data: { color: 'orange' } }] }),
+    ).toThrow();
+  });
+
   it('rejects unknown node types', () => {
     expect(() =>
       migrateMap({ ...valid, nodes: [{ id: 'x', type: 'blob', position: { x: 0, y: 0 } }] }),

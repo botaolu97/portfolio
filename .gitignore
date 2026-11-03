@@ -7,3 +7,4 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 2026 job hunting/
+.vite/

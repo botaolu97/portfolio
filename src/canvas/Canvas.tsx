@@ -2,9 +2,7 @@ import {
   Background,
   BackgroundVariant,
   ConnectionMode,
-  Controls,
   MarkerType,
-  MiniMap,
   ReactFlow,
   SelectionMode,
   useReactFlow,
@@ -33,8 +31,8 @@ const defaultEdgeOptions = {
 const selectOnly = <C extends { type: string }>(changes: C[]) =>
   changes.filter((c) => c.type === 'select' || c.type === 'dimensions');
 
-function ShortcutsHost() {
-  useShortcuts();
+function ShortcutsHost({ onPasteImages }: { onPasteImages: (files: File[]) => void }) {
+  useShortcuts(onPasteImages);
   return null;
 }
 
@@ -62,6 +60,21 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
   );
   const [dropping, setDropping] = useState(false);
   const root = useRef<HTMLDivElement>(null);
+  // Where the pointer last was over the canvas, so pasted images land under the cursor.
+  const pointer = useRef<{ x: number; y: number } | null>(null);
+
+  const onPasteImages = useCallback(
+    (files: File[]) => {
+      const box = root.current?.getBoundingClientRect();
+      const at =
+        pointer.current ??
+        (box ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : { x: 0, y: 0 });
+      addNodesFromFiles(files, screenToFlowPosition(at)).catch((err: Error) =>
+        onError?.(err.message),
+      );
+    },
+    [screenToFlowPosition, onError],
+  );
 
   // Presses inside a demo never reach this document, so this only tracks canvas gestures.
   useEffect(() => {
@@ -113,8 +126,12 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
       onDragOver={EDITABLE ? onDragOver : undefined}
       onDragLeave={EDITABLE ? () => setDropping(false) : undefined}
       onDrop={EDITABLE ? onDrop : undefined}
+      onPointerMove={
+        EDITABLE ? (e) => (pointer.current = { x: e.clientX, y: e.clientY }) : undefined
+      }
+      onPointerLeave={EDITABLE ? () => (pointer.current = null) : undefined}
     >
-      {EDITABLE && <ShortcutsHost />}
+      {EDITABLE && <ShortcutsHost onPasteImages={onPasteImages} />}
       <ReactFlow<FlowNode, FlowEdge>
         nodes={nodes}
         edges={edges}
@@ -151,10 +168,8 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
           variant={BackgroundVariant.Dots}
           gap={24}
           size={1.5}
-          color="var(--canvas-dot)"
+          color="var(--color-canvas-dot)"
         />
-        <Controls showInteractive={false} position="bottom-left" />
-        <MiniMap pannable zoomable position="bottom-right" nodeBorderRadius={4} />
       </ReactFlow>
     </div>
   );
