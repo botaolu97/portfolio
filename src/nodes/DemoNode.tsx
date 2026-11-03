@@ -35,7 +35,7 @@ export const DemoNode = memo(function DemoNode({
     body = (
       <iframe
         title={data.title}
-        src={asset(`content/demos/${data.demoId}/${data.entry}`)}
+        src={`${asset(`content/demos/${data.demoId}/${data.entry}`)}?v=${__MUBU_BUILD__}`}
         // No allow-same-origin: the demo runs in an opaque origin and can't touch Mubu.
         sandbox="allow-scripts allow-forms allow-modals"
         loading="lazy"

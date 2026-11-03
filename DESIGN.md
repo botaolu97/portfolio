@@ -151,7 +151,13 @@ browser page, so the panels, canvas switcher and theme switch keep a fixed size
 (`src/canvas/usePageZoomGuard.ts`). That includes gestures over code blocks and inside live demos;
 pinches zoom around the pointer. For demos, Mubu adds an invisible bridge script to each demo page
 when serving it (dev server and build, never the source files) that stops the browser zoom and
-asks the canvas to zoom instead. Keep it that way; add
+asks the canvas to zoom instead. Chrome and Firefox report a trackpad pinch as ctrl + wheel and
+Safari as gesture events; both are handled, and a pinch reported both ways only zooms once. Demo
+URLs carry the build id (`?v=…`), so a new deploy never shows a cached demo without the bridge.
+
+Two-finger swipes never become the browser's back/forward gesture or a page bounce:
+`overscroll-behavior` is `none` on the page and inside demos (set by the bridge) and `contain` on
+scrollable areas (code blocks, inspector, switcher menu). Keep it that way; add
 navigation UI only if the gestures stop being enough.
 
 ### Canvas node chrome (`src/nodes/NodeChrome.tsx`, `src/canvas/Canvas.module.css`)

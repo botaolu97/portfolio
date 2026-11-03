@@ -11,7 +11,7 @@ const ZOOM_KEYS = new Set(['=', '+', '-', '_', '0']);
  *   leaves alone ("nowheel") — zooms around the pointer;
  * - pinch / ⌘-scroll and zoom keys inside a live demo, forwarded by the demo bridge that Mubu
  *   injects into demo pages (see vite-plugin-mubu-content.ts);
- * - ⌘/Ctrl + = − 0, and Safari's gesture events.
+ * - ⌘/Ctrl + = − 0, and Safari's gesture events (its way of reporting a pinch).
  * Pages without a canvas keep normal browser zoom.
  */
 export function usePageZoomGuard() {
@@ -36,9 +36,15 @@ export function usePageZoomGuard() {
       else zoomIn({ duration: 150 });
     };
 
+    // Chrome and Firefox report a trackpad pinch as ctrl + wheel; Safari as gesture events, which
+    // React Flow doesn't handle. Remember wheel zooms so a browser sending both never zooms twice.
+    let lastWheelZoom = Number.NEGATIVE_INFINITY;
+    let lastScale = 1;
+
     const onWheel = (e: WheelEvent) => {
       // Pinch arrives as a ctrl + wheel event.
       if (!(e.ctrlKey || e.metaKey)) return;
+      lastWheelZoom = performance.now();
       const inScrollableNode = (e.target as Element | null)?.closest?.('.react-flow .nowheel');
       // React Flow zoomed (and prevented) it over the canvas; elsewhere it's ours.
       if (e.defaultPrevented && !inScrollableNode) return;
@@ -66,27 +72,34 @@ export function usePageZoomGuard() {
       // The iframe is scaled to fit its node: map its coordinates to the page.
       const rect = frame.getBoundingClientRect();
       const scale = frame.offsetWidth ? rect.width / frame.offsetWidth : 1;
-      zoomAt(
-        rect.left + e.data.clientX * scale,
-        rect.top + e.data.clientY * scale,
-        wheelZoomFactor(e.data.deltaY),
-      );
+      const factor = e.data.type === 'zoom' ? wheelZoomFactor(e.data.deltaY) : e.data.factor;
+      zoomAt(rect.left + e.data.clientX * scale, rect.top + e.data.clientY * scale, factor);
     };
 
-    const preventGesture = (e: Event) => e.preventDefault();
+    // Safari: gesture events carry the scale since the gesture began.
+    const onGesture = (e: Event) => {
+      e.preventDefault();
+      const gesture = e as Event & { scale: number; clientX: number; clientY: number };
+      if (e.type === 'gesturestart') lastScale = 1;
+      if (e.type !== 'gesturechange') return;
+      const factor = gesture.scale / lastScale;
+      lastScale = gesture.scale;
+      if (performance.now() - lastWheelZoom < 150) return;
+      zoomAt(gesture.clientX, gesture.clientY, factor);
+    };
 
     document.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('keydown', onKeyDown, true);
     window.addEventListener('message', onMessage);
     for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
-      document.addEventListener(type, preventGesture, { passive: false });
+      document.addEventListener(type, onGesture, { passive: false });
     }
     return () => {
       document.removeEventListener('wheel', onWheel);
       window.removeEventListener('keydown', onKeyDown, true);
       window.removeEventListener('message', onMessage);
       for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
-        document.removeEventListener(type, preventGesture);
+        document.removeEventListener(type, onGesture);
       }
     };
   }, [zoomIn, zoomOut, fitView, getViewport, setViewport]);

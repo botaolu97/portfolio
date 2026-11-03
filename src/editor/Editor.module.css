@@ -41,6 +41,7 @@
 
 .inspector {
   touch-action: pan-y;
+  overscroll-behavior: contain;
   top: var(--space-16);
   right: var(--space-16);
   width: 260px;

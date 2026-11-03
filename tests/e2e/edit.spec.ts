@@ -196,6 +196,49 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   expect(overCode).toBe(true);
   await expect.poll(viewport).not.toBe(zoomBefore);
 
+  // Safari reports a pinch as gesture events; inside a demo or over the interface they zoom the canvas.
+  const safariPinch = (target: Window | Document, scale: number) => {
+    for (const [type, s] of [
+      ['gesturestart', 1],
+      ['gesturechange', scale],
+      ['gestureend', scale],
+    ] as const) {
+      const e = new Event(type, { bubbles: true, cancelable: true });
+      Object.assign(e, { scale: s, clientX: 40, clientY: 40 });
+      target.dispatchEvent(e);
+    }
+  };
+  // Wait out the window in which a gesture right after a wheel pinch counts as a duplicate.
+  await page.waitForTimeout(200);
+  zoomBefore = await viewport();
+  await frame
+    .locator('body')
+    .evaluate(
+      (_, fn) => new Function('target', 'scale', `(${fn})(target, scale)`)(document, 1.5),
+      safariPinch.toString(),
+    );
+  await expect.poll(viewport).not.toBe(zoomBefore);
+  zoomBefore = await viewport();
+  await page.evaluate(
+    (fn) => new Function('target', 'scale', `(${fn})(target, scale)`)(document, 0.7),
+    safariPinch.toString(),
+  );
+  await expect.poll(viewport).not.toBe(zoomBefore);
+
+  // Swipes stay inside demos and code blocks instead of becoming browser back/forward.
+  expect(
+    await frame.locator('html').evaluate((el) => getComputedStyle(el).overscrollBehaviorX),
+  ).toBe('none');
+  expect(
+    await code
+      .locator('[class*="codeHtml"]')
+      .evaluate((el) => getComputedStyle(el).overscrollBehaviorX),
+  ).toBe('contain');
+  expect(
+    await page.locator('html').evaluate((el) => getComputedStyle(el).overscrollBehaviorX),
+  ).toBe('none');
+  expect(await demo.locator('iframe').getAttribute('src')).toMatch(/\?v=\w+$/);
+
   // Its title bar still drags the node.
   const before = await demo.evaluate((el) => el.style.transform);
   const bar = demo.getByText('Demo', { exact: true });

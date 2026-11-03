@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  DEMO_BRIDGE,
   injectDemoBridge,
   injectDemoBridgeInto,
   resolveDemoEntry,
@@ -89,6 +90,13 @@ describe('demo bridge', () => {
     expect(once.indexOf('data-mubu-bridge')).toBeGreaterThan(once.indexOf('<head>'));
     expect(once.indexOf('data-mubu-bridge')).toBeLessThan(once.indexOf('<title>'));
     expect(injectDemoBridge(once)).toBe(once);
+  });
+
+  it('contains swipes and forwards both pinch styles', () => {
+    expect(DEMO_BRIDGE).toContain('overscroll-behavior: none');
+    expect(DEMO_BRIDGE).toContain("type: 'zoom'");
+    expect(DEMO_BRIDGE).toContain("type: 'zoom-scale'");
+    expect(DEMO_BRIDGE).toContain("addEventListener('gesturechange'");
   });
 
   it('is prepended to pages without a <head>', () => {

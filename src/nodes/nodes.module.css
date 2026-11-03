@@ -415,6 +415,8 @@
   position: absolute;
   inset: 0;
   overflow: auto;
+  /* A swipe that reaches the edge stops here instead of chaining to the page. */
+  overscroll-behavior: contain;
   font-family: var(--font-family-mono);
   font-size: var(--code-font-size);
   line-height: var(--code-line-height);

@@ -5,6 +5,7 @@ export const MAX_ZOOM = 4;
 /** Messages the demo bridge (injected into demo pages) posts to Mubu. */
 export type DemoBridgeMessage =
   | { source: 'mubu-demo'; type: 'zoom'; deltaY: number; clientX: number; clientY: number }
+  | { source: 'mubu-demo'; type: 'zoom-scale'; factor: number; clientX: number; clientY: number }
   | { source: 'mubu-demo'; type: 'zoom-key'; key: string };
 
 /** Pinch and ⌘-scroll: d3-zoom's rate, so every route zooms at the same speed as the canvas. */

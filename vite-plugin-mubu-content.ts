@@ -166,23 +166,39 @@ const MIME: Record<string, string> = {
  * A tiny script Mubu adds to every demo page (dev server and build). Pinch / ⌘-scroll and
  * ⌘ + = − 0 inside a sandboxed demo would otherwise zoom the whole browser page, and Mubu's
  * page can't see that input. The bridge stops the browser zoom and asks Mubu to zoom the
- * canvas instead (see src/canvas/usePageZoomGuard.ts). It draws nothing and touches no styles.
+ * canvas instead (see src/canvas/usePageZoomGuard.ts). It also stops swipes inside the demo from
+ * chaining out to the browser's back/forward gesture (overscroll-behavior). It draws nothing.
  */
 export const DEMO_BRIDGE = `<script data-mubu-bridge>(() => {
   const send = (msg) => parent.postMessage({ source: 'mubu-demo', ...msg }, '*');
+  // Keep swipes inside the demo: no scroll chaining, no browser back/forward swipe.
+  const style = document.createElement('style');
+  style.textContent = 'html, body { overscroll-behavior: none; }';
+  document.head ? document.head.prepend(style) : document.documentElement.prepend(style);
+  // Chrome/Firefox report a pinch as ctrl + wheel.
+  let lastWheelZoom = -Infinity;
   addEventListener('wheel', (e) => {
     if (!(e.ctrlKey || e.metaKey)) return;
     e.preventDefault();
+    lastWheelZoom = performance.now();
     send({ type: 'zoom', deltaY: e.deltaY, clientX: e.clientX, clientY: e.clientY });
   }, { passive: false, capture: true });
+  // Safari reports it as gesture events (scale since the gesture began); skip if wheel already did.
+  let lastScale = 1;
+  addEventListener('gesturestart', (e) => { e.preventDefault(); lastScale = 1; }, { passive: false });
+  addEventListener('gesturechange', (e) => {
+    e.preventDefault();
+    const factor = e.scale / lastScale;
+    lastScale = e.scale;
+    if (performance.now() - lastWheelZoom < 150) return;
+    send({ type: 'zoom-scale', factor, clientX: e.clientX, clientY: e.clientY });
+  }, { passive: false });
+  addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
   addEventListener('keydown', (e) => {
     if (!(e.metaKey || e.ctrlKey) || e.altKey || !['=', '+', '-', '_', '0'].includes(e.key)) return;
     e.preventDefault();
     send({ type: 'zoom-key', key: e.key });
   }, true);
-  for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
-    addEventListener(type, (e) => e.preventDefault(), { passive: false });
-  }
 })();</script>`;
 
 /** Adds the bridge once, at the start of <head> (or of the document if it has none). */
