@@ -29,7 +29,9 @@ const defaultEdgeOptions = {
   style: { strokeWidth: 1.5 },
 };
 
-const noop = () => {};
+// View mode keeps selection (to show nodes could be edited) but drops every change that would edit.
+const selectOnly = <C extends { type: string }>(changes: C[]) =>
+  changes.filter((c) => c.type === 'select' || c.type === 'dimensions');
 
 function ShortcutsHost() {
   useShortcuts();
@@ -48,6 +50,16 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
     })),
   );
   const { screenToFlowPosition } = useReactFlow<FlowNode, FlowEdge>();
+  const handleNodesChange = useCallback(
+    (changes: Parameters<typeof onNodesChange>[0]) =>
+      onNodesChange(EDITABLE ? changes : selectOnly(changes)),
+    [onNodesChange],
+  );
+  const handleEdgesChange = useCallback(
+    (changes: Parameters<typeof onEdgesChange>[0]) =>
+      onEdgesChange(EDITABLE ? changes : selectOnly(changes)),
+    [onEdgesChange],
+  );
   const [dropping, setDropping] = useState(false);
   const root = useRef<HTMLDivElement>(null);
 
@@ -97,7 +109,7 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
   return (
     <div
       ref={root}
-      className={`${styles.canvas} ${dropping ? styles.dropping : ''}`}
+      className={`${styles.canvas} ${EDITABLE ? '' : styles.view} ${dropping ? styles.dropping : ''}`}
       onDragOver={EDITABLE ? onDragOver : undefined}
       onDragLeave={EDITABLE ? () => setDropping(false) : undefined}
       onDrop={EDITABLE ? onDrop : undefined}
@@ -107,20 +119,17 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        onNodesChange={EDITABLE ? onNodesChange : undefined}
-        onEdgesChange={EDITABLE ? onEdgesChange : undefined}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={handleEdgesChange}
         onConnect={EDITABLE ? onConnect : undefined}
         onPaneClick={() => useUiStore.getState().setEditingText(null)}
-        // React Flow disables pointer events on non-selectable nodes unless a click handler exists;
-        // view mode still needs them for demos, links and video controls.
-        onNodeClick={EDITABLE ? undefined : noop}
         defaultEdgeOptions={defaultEdgeOptions}
         connectionMode={ConnectionMode.Loose}
         nodesDraggable={EDITABLE}
         nodesConnectable={EDITABLE}
-        elementsSelectable={EDITABLE}
-        edgesFocusable={EDITABLE}
-        nodesFocusable={EDITABLE}
+        elementsSelectable
+        edgesFocusable
+        nodesFocusable
         deleteKeyCode={EDITABLE ? ['Backspace', 'Delete'] : null}
         // Figma-style: drag on empty canvas selects in edit mode; scroll pans, pinch / ⌘-scroll zooms.
         selectionOnDrag={EDITABLE}

@@ -212,3 +212,53 @@
   object-fit: cover;
   object-position: top;
 }
+
+/* Selection tag and view-mode corner handles (see SelectionBadge) */
+.badge {
+  position: absolute;
+  bottom: 100%;
+  left: -2px;
+  z-index: 2;
+  margin-bottom: 6px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  transform-origin: left bottom;
+  pointer-events: none;
+}
+
+.corner {
+  position: absolute;
+  z-index: 2;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--accent);
+  border-radius: 2px;
+  background: var(--surface);
+  pointer-events: none;
+}
+
+.tl {
+  top: -2px;
+  left: -2px;
+}
+
+.tr {
+  top: -2px;
+  left: calc(100% + 2px);
+}
+
+.br {
+  top: calc(100% + 2px);
+  left: calc(100% + 2px);
+}
+
+.bl {
+  top: calc(100% + 2px);
+  left: -2px;
+}

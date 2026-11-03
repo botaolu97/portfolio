@@ -47,6 +47,15 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await page.mouse.up();
   expect(await transform()).toBe(before);
 
+  // Nodes can still be hovered and selected, to show they could be edited.
+  await shape.click();
+  await expect(shape).toHaveClass(/selected/);
+  await expect(shape.getByText('Shape · 160 × 100')).toBeVisible();
+  await page.keyboard.press('Backspace');
+  await expect(shape).toHaveCount(1);
+  await page.locator('.react-flow__pane').click({ position: { x: 15, y: 15 } });
+  await expect(shape).not.toHaveClass(/selected/);
+
   // Demos are interactive without any extra step.
   const frame = page.frameLocator('.react-flow__node-demo iframe');
   await frame.getByRole('button').click();

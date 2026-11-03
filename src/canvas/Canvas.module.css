@@ -44,3 +44,32 @@
 .pointerDown iframe {
   pointer-events: none;
 }
+
+/*
+ * State outlines drawn around every node: hover is a light dashed line, selected (view mode) a
+ * solid line with a soft halo. In edit mode the resizer draws the selected outline instead.
+ */
+.canvas :global(.react-flow__node)::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1px dashed transparent;
+  border-radius: 4px;
+  pointer-events: none;
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
+}
+
+.canvas :global(.react-flow__node:not(.selected):hover)::after {
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.view :global(.react-flow__node.selected)::after {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.view :global(.react-flow__node) {
+  cursor: pointer;
+}
