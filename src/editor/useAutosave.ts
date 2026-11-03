@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { saveMap } from '../content/api';
 import { toDoc, useMapStore } from '../store/mapStore';
-
-export type SaveStatus = 'saved' | 'pending' | 'saving' | 'error';
+import { type SaveStatus, useUiStore } from '../store/uiStore';
 
 const DELAY_MS = 500;
 
@@ -43,6 +42,12 @@ export function useAutosave() {
       unsubscribe();
     };
   }, []);
+
+  // The canvas switcher shows this as a small status dot.
+  useEffect(() => {
+    useUiStore.getState().setSaveStatus(status);
+  }, [status]);
+  useEffect(() => () => useUiStore.getState().setSaveStatus(null), []);
 
   return { status, error };
 }

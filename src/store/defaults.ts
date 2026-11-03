@@ -1,10 +1,25 @@
 import type { NodeDataOf, NodeType } from './schema';
 
-type Defaults = { [T in NodeType]: { data: NodeDataOf<T>; width: number; height: number } };
+/** Types that can be added from the palette or files; stacks are made from images instead. */
+export type AddableNodeType = Exclude<NodeType, 'stack'>;
+
+type Defaults = { [T in AddableNodeType]: { data: NodeDataOf<T>; width: number; height: number } };
 
 export const NODE_DEFAULTS: Defaults = {
   text: { data: { html: '<p>Double-click to edit</p>' }, width: 240, height: 120 },
   note: { data: { html: '', color: 'yellow' }, width: 200, height: 200 },
+  code: {
+    data: {
+      code: "function greet(name: string): string {\n  return 'Hello, ' + name;\n}\n\nconsole.log(greet('Mubu'));",
+      language: 'typescript',
+      title: '',
+      lineNumbers: true,
+      wrap: true,
+      html: '',
+    },
+    width: 420,
+    height: 200,
+  },
   image: { data: { src: '', alt: '', fit: 'contain' }, width: 320, height: 240 },
   video: { data: { src: '' }, width: 480, height: 270 },
   shape: {
@@ -19,9 +34,10 @@ export const NODE_DEFAULTS: Defaults = {
   },
 };
 
-export const PALETTE: { type: NodeType; label: string }[] = [
+export const PALETTE: { type: AddableNodeType; label: string }[] = [
   { type: 'note', label: 'Note' },
   { type: 'text', label: 'Text' },
+  { type: 'code', label: 'Code' },
   { type: 'shape', label: 'Shape' },
   { type: 'image', label: 'Image' },
   { type: 'video', label: 'Video' },

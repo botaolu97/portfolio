@@ -8,8 +8,8 @@
 }
 
 .palette {
-  top: calc(var(--size-toolbar) + 16px);
-  left: 12px;
+  top: var(--space-16);
+  left: var(--space-16);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -41,10 +41,10 @@
 
 .inspector {
   touch-action: pan-y;
-  top: calc(var(--size-toolbar) + 16px);
-  right: 12px;
+  top: var(--space-16);
+  right: var(--space-16);
   width: 260px;
-  max-height: calc(100% - var(--size-toolbar) - 200px);
+  max-height: calc(100% - 2 * var(--space-80));
   overflow: auto;
   padding: var(--space-14);
   display: flex;
@@ -202,4 +202,50 @@
 .legend {
   padding: 0;
   margin-bottom: var(--space-4);
+}
+
+/* Floating toolbar above a multi-selection (React Flow's NodeToolbar positions it). */
+.floatingToolbar {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-full);
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+}
+
+.floatingButton,
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-10);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.floatingButton:hover,
+.menuItem:hover,
+.menuItem:focus-visible {
+  background: var(--color-surface-muted);
+  outline: none;
+}
+
+.contextMenu {
+  position: fixed;
+  z-index: var(--z-overlay);
+  min-width: 160px;
+  padding: var(--space-4);
+}
+
+.menuItem {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  text-align: left;
 }

@@ -57,14 +57,14 @@
   --motion-duration-fast: 120ms;
   --motion-duration-normal: 200ms;
   --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
-  --size-toolbar: 48px;
   --size-control: 32px;
   --size-control-sm: 28px;
   --size-inspector: 260px;
   --z-node-adornment: 2;
   --z-panel: 5;
-  --z-toolbar: 6;
+  --z-controls: 6;
   --z-overlay: 10;
+  --z-viewer: 15;
   --z-toast: 20;
   --button-height: var(--size-control);
   --button-padding-x: var(--space-12);
@@ -115,6 +115,31 @@
   --theme-switch-knob-bg: var(--color-surface);
   --theme-switch-icon: var(--color-text-muted);
   --theme-switch-icon-active: var(--color-text);
+  --code-bg: var(--color-surface);
+  --code-bar-bg: var(--color-surface-muted);
+  --code-bar-height: 32px;
+  --code-border: var(--color-border);
+  --code-radius: var(--radius-md);
+  --code-font-size: var(--font-size-md);
+  --code-line-height: 1.6;
+  --code-padding: var(--space-12);
+  --code-line-number: var(--color-text-muted);
+  --switcher-inset: var(--space-16);
+  --switcher-height: var(--size-control);
+  --switcher-max-width: 280px;
+  --switcher-menu-width: 260px;
+  --switcher-menu-max-height: 360px;
+  --switcher-item-height: var(--size-control);
+  --stack-frame: #ffffff;
+  --stack-frame-width: 4px;
+  --stack-radius: var(--radius-xs);
+  --stack-shadow: var(--shadow-raised);
+  --stack-badge-bg: var(--color-text);
+  --stack-badge-text: var(--color-surface);
+  --stack-viewer-backdrop: rgb(20 20 18 / 0.45);
+  --stack-viewer-blur: 10px;
+  --stack-viewer-padding: var(--space-48);
+  --stack-viewer-gap: var(--space-24);
 }
 
 @media (prefers-color-scheme: dark) {

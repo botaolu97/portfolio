@@ -19,8 +19,8 @@
       "id": "idea",
       "type": "shape",
       "position": {
-        "x": 24,
-        "y": 288
+        "x": 40,
+        "y": 248
       },
       "data": {
         "shape": "rounded",
@@ -48,50 +48,6 @@
       "height": 472
     },
     {
-      "id": "7f8115b7",
-      "type": "image",
-      "position": {
-        "x": 216,
-        "y": 520
-      },
-      "data": {
-        "src": "",
-        "alt": "",
-        "fit": "contain"
-      },
-      "width": 320,
-      "height": 240
-    },
-    {
-      "id": "9c64fde4",
-      "type": "text",
-      "position": {
-        "x": 40,
-        "y": 800
-      },
-      "data": {
-        "html": "<p>你好 这是我的第一个block</p>"
-      },
-      "width": 240,
-      "height": 120
-    },
-    {
-      "id": "bcd290b9",
-      "type": "demo",
-      "position": {
-        "x": 48,
-        "y": 1048
-      },
-      "data": {
-        "demoId": "pending",
-        "entry": "index.html",
-        "title": "Demo",
-        "device": "desktop"
-      },
-      "width": 640,
-      "height": 440
-    },
-    {
       "id": "toggle",
       "type": "demo",
       "position": {
@@ -111,8 +67,8 @@
       "id": "c6d817a2",
       "type": "note",
       "position": {
-        "x": -168,
-        "y": 512
+        "x": -280,
+        "y": 560
       },
       "data": {
         "html": "<p>🪇 is so cute!</p>",
@@ -122,16 +78,99 @@
       "height": 200
     },
     {
-      "id": "fbcbc631",
-      "type": "image",
+      "id": "a17f3551",
+      "type": "code",
       "position": {
-        "x": 616,
+        "x": 880,
+        "y": 960
+      },
+      "data": {
+        "code": "git add -A -- . ':!.claude' && git commit -m \"Update canvas\" && git push origin feat/studio-foundation && git push origin feat/studio-foundation:main",
+        "language": "bash",
+        "title": "",
+        "lineNumbers": true,
+        "wrap": true,
+        "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e\" tabindex=\"0\"><code><span class=\"line\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#B392F0\">git</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> add</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#79B8FF\"> -A</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#79B8FF\"> --</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> .</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> ':!.claude'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\"> &#x26;&#x26; </span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#B392F0\">git</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> commit</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#79B8FF\"> -m</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> \"Update canvas\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\"> &#x26;&#x26; </span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#B392F0\">git</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> push</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> origin</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> feat/studio-foundation</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\"> &#x26;&#x26; </span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#B392F0\">git</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> push</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> origin</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\"> feat/studio-foundation:main</span></span></code></pre>"
+      },
+      "width": 588,
+      "height": 232
+    },
+    {
+      "id": "3c8bfa17",
+      "type": "note",
+      "position": {
+        "x": 564,
+        "y": 484
+      },
+      "data": {
+        "html": "",
+        "color": "yellow"
+      },
+      "width": 200,
+      "height": 200
+    },
+    {
+      "id": "5374e766",
+      "type": "text",
+      "position": {
+        "x": -504,
+        "y": 120
+      },
+      "data": {
+        "html": "<h1>Summary</h1><p></p><p>Our team wanted to accommodate increasing customer's needs in time series data anomaly detection (tsAD). I helped the team to define the product scope, establish project lifecycle, and design and test the UI from scratch.</p><p>The MVP was adopted by 300+ customers, quickly validating our initial direction. This may not be a big number in consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.</p>"
+      },
+      "width": 336,
+      "height": 280
+    },
+    {
+      "id": "c175a0dd",
+      "type": "video",
+      "position": {
+        "x": 16,
+        "y": 401
+      },
+      "data": {
+        "src": "content/assets/9986327ac757be94.mp4"
+      },
+      "width": 480,
+      "height": 270,
+      "zIndex": 1
+    },
+    {
+      "id": "2e7f9ceb",
+      "type": "stack",
+      "position": {
+        "x": 1300,
         "y": 528
       },
       "data": {
-        "src": "content/assets/4e21ff6bc1a9c1d0.png",
-        "alt": "image",
-        "fit": "contain"
+        "items": [
+          {
+            "id": "fbcbc631",
+            "src": "content/assets/4e21ff6bc1a9c1d0.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 290
+          },
+          {
+            "id": "78b45585",
+            "src": "content/assets/4e21ff6bc1a9c1d0.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 290
+          },
+          {
+            "id": "fad9363a",
+            "src": "content/assets/4e21ff6bc1a9c1d0.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 290
+          }
+        ],
+        "edges": []
       },
       "width": 480,
       "height": 290
@@ -164,6 +203,15 @@
       "sourceHandle": "r",
       "targetHandle": "l",
       "type": "smoothstep"
+    },
+    {
+      "id": "95a43ff7",
+      "source": "5374e766",
+      "target": "c175a0dd",
+      "sourceHandle": "r",
+      "targetHandle": "l",
+      "type": "default",
+      "animated": true
     }
   ]
 }

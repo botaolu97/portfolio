@@ -93,3 +93,76 @@ describe('cloneSubgraph', () => {
     expect(out.edges[0]).toMatchObject({ source: out.nodes[0].id, target: out.nodes[1].id });
   });
 });
+
+describe('stacks', () => {
+  const image = (id: string, x: number) => ({
+    id,
+    type: 'image' as const,
+    position: { x, y: 0 },
+    width: 100,
+    height: 80,
+    data: { src: `content/assets/${id}.png`, alt: id, fit: 'contain' as const },
+  });
+  const setup = () =>
+    useMapStore.getState().load('test', {
+      version: MAP_VERSION,
+      title: 'T',
+      nodes: [
+        image('a', 0),
+        image('b', 200),
+        image('c', 400),
+        { id: 'n', type: 'note', position: { x: 0, y: 300 }, data: { html: '', color: 'yellow' } },
+      ],
+      edges: [
+        { id: 'ab', source: 'a', target: 'b' },
+        { id: 'nc', source: 'n', target: 'c' },
+      ],
+    });
+
+  it('stacks images into one node and reroutes outside connectors', () => {
+    setup();
+    const id = useMapStore.getState().stackImages(['a', 'b', 'c', 'n']);
+    const { nodes, edges } = useMapStore.getState();
+    expect(nodes.map((n) => n.type).sort()).toEqual(['note', 'stack']);
+    const stack = nodes.find((n) => n.id === id);
+    expect(stack?.type === 'stack' && stack.data.items.map((i) => i.id)).toEqual(['a', 'b', 'c']);
+    expect(edges).toHaveLength(1);
+    expect(edges[0]).toMatchObject({ source: 'n', target: id });
+  });
+
+  it('needs at least two images', () => {
+    setup();
+    expect(useMapStore.getState().stackImages(['a', 'n'])).toBeNull();
+    expect(useMapStore.getState().nodes).toHaveLength(4);
+  });
+
+  it('unstacks side by side and restores the images and connectors', () => {
+    setup();
+    const id = useMapStore.getState().stackImages(['a', 'b', 'c']) as string;
+    useMapStore.getState().unstack(id);
+    const { nodes, edges } = useMapStore.getState();
+    const images = nodes.filter((n) => n.type === 'image');
+    expect(images.map((n) => n.id)).toEqual(['a', 'b', 'c']);
+    const xs = images.map((n) => n.position.x);
+    expect(xs[1] - xs[0]).toBe(124);
+    expect(new Set(images.map((n) => n.position.y)).size).toBe(1);
+    expect(edges.map((e) => e.id).sort()).toEqual(['ab', 'nc']);
+  });
+
+  it('is a single undo step', () => {
+    setup();
+    vi.advanceTimersByTime(500);
+    useMapStore.getState().stackImages(['a', 'b']);
+    vi.advanceTimersByTime(500);
+    history().undo();
+    expect(useMapStore.getState().nodes.filter((n) => n.type === 'image')).toHaveLength(3);
+  });
+
+  it('gives copied stacks their own image ids', () => {
+    setup();
+    const id = useMapStore.getState().stackImages(['a', 'b']) as string;
+    const stack = useMapStore.getState().nodes.find((n) => n.id === id) as FlowNode;
+    const [copy] = cloneSubgraph([stack], [], 20).nodes;
+    expect(copy.type === 'stack' && copy.data.items.map((i) => i.id)).not.toContain('a');
+  });
+});

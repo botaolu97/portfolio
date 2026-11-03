@@ -15,18 +15,27 @@ test.afterAll(async ({ request }) => {
 });
 
 test('create a map, add nodes, undo, and run an uploaded demo', async ({ page }) => {
-  await page.goto('/');
-  await page.getByLabel('New map title').fill(slug);
-  await page.getByRole('button', { name: 'New map' }).click();
+  // Start from a missing canvas (so no real canvas is opened) and create one from the switcher.
+  await page.goto('/#/m/__missing__');
+  const switcher = page.getByRole('button', { name: /Switch canvas/ });
+  await switcher.click();
+  await page.getByRole('menuitem', { name: 'New canvas' }).click();
+  await page.getByLabel('New canvas name').fill(slug);
+  await page.keyboard.press('Enter');
   await expect(page).toHaveURL(new RegExp(`#/m/${slug}$`));
+  await expect(switcher).toContainText(slug);
 
-  // Add a shape from the palette, then undo and redo it.
+  // Add a shape from the palette; ⌘Z undoes it and there is no redo.
+  const shapes = page.locator('.react-flow__node-shape');
   await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Shape').click();
-  await expect(page.locator('.react-flow__node-shape')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Undo' }).click();
-  await expect(page.locator('.react-flow__node-shape')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Redo' }).click();
-  await expect(page.locator('.react-flow__node-shape')).toHaveCount(1);
+  await expect(shapes).toHaveCount(1);
+  await page.keyboard.press('ControlOrMeta+z');
+  await expect(shapes).toHaveCount(0);
+  await page.keyboard.press('ControlOrMeta+Shift+z');
+  await page.keyboard.press('ControlOrMeta+y');
+  await expect(shapes).toHaveCount(0);
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Shape').click();
+  await expect(shapes).toHaveCount(1);
 
   // Add a sticky note (yellow by default), write in it with the text shortcuts, make it pink.
   await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Note').click();
@@ -48,6 +57,17 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await expect(note.locator('h1')).toHaveText('Plan');
   await expect(note.locator('input[type=checkbox]')).toHaveCount(1);
   await page.getByLabel('Pink').check();
+
+  // Add a code block: highlighted on arrival, editable, re-highlighted for a new language.
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Code').click();
+  const code = page.locator('.react-flow__node-code');
+  await expect(code.locator('.shiki span[style*="--shiki-light"]').first()).toBeVisible();
+  await code.dblclick();
+  await page.getByLabel('Code').fill('def hello():\n    return "hi"');
+  await page.keyboard.press('Escape');
+  await page.getByLabel('Language').selectOption('python');
+  await expect(code.locator('.shiki')).toContainText('def hello');
+  await expect(code.getByText('Python')).toBeVisible();
 
   // Paste a PNG and SVG markup from the clipboard.
   await page.locator('.react-flow__pane').click({ position: { x: 600, y: 680 } });
@@ -73,15 +93,35 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   });
   await expect(page.locator('.react-flow__node-image')).toHaveCount(2);
 
+  // Select everything: the floating toolbar offers to stack the two images, right-click unstacks.
+  await page.locator('.react-flow__pane').click({ position: { x: 600, y: 680 } });
+  await page.keyboard.press('ControlOrMeta+a');
+  await page
+    .getByRole('toolbar', { name: 'Selected images' })
+    .getByRole('button', { name: 'Stack 2 images' })
+    .click();
+  const stack = page.locator('.react-flow__node-stack');
+  await expect(stack).toHaveCount(1);
+  await expect(page.locator('.react-flow__node-image')).toHaveCount(0);
+  await expect(stack).toContainText('2');
+  await stack.click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Unstack' }).click();
+  await expect(stack).toHaveCount(0);
+  await expect(page.locator('.react-flow__node-image')).toHaveCount(2);
+
   // Autosave writes the map into public/content.
-  await expect(page.getByRole('status')).toHaveText('Saved');
+  await expect(page.getByRole('status')).toHaveText('All changes saved');
   const saved = JSON.parse(await readFile(path.join(content, 'maps', `${slug}.json`), 'utf8'));
   expect(saved.nodes.map((n: { type: string }) => n.type).sort()).toEqual([
+    'code',
     'image',
     'image',
     'note',
     'shape',
   ]);
+  const codeData = saved.nodes.find((n: { type: string }) => n.type === 'code').data;
+  expect(codeData).toMatchObject({ language: 'python', code: 'def hello():\n    return "hi"' });
+  expect(codeData.html).toContain('--shiki-dark');
   const noteData = saved.nodes.find((n: { type: string }) => n.type === 'note').data;
   expect(noteData.color).toBe('pink');
   expect(noteData.html).toContain('<h1>Plan</h1>');
@@ -91,9 +131,11 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
     createdAssets.push(path.join(content, n.data.src.replace(/^content\//, '')));
   }
 
-  // Upload a tiny HTML/CSS/JS demo through the toolbar.
+  // Add a demo and upload a tiny HTML/CSS/JS page from the inspector.
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Demo').click();
   await page
-    .locator('header input[type=file]')
+    .getByRole('complementary', { name: 'Inspector' })
+    .locator('input[type=file]')
     .first()
     .setInputFiles([
       {
@@ -111,8 +153,8 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
       },
     ]);
   const demo = page.locator('.react-flow__node-demo');
-  await expect(demo).toHaveCount(1);
-  await expect(page.getByRole('status')).toHaveText('Saved');
+  await expect(demo.locator('iframe')).toHaveCount(1);
+  await expect(page.getByRole('status')).toHaveText('All changes saved');
   const demoId = JSON.parse(
     await readFile(path.join(content, 'maps', `${slug}.json`), 'utf8'),
   ).nodes.find((n: { type: string }) => n.type === 'demo').data.demoId;
@@ -124,9 +166,39 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await frame.getByRole('button').click();
   await expect(frame.getByRole('button')).toHaveText('Clicked 1');
 
+  // Zooming inside the demo or over a code block zooms the canvas, never the page.
+  const viewport = () => page.locator('.react-flow__viewport').evaluate((el) => el.style.transform);
+  let zoomBefore = await viewport();
+  const insideDemo = await frame.locator('body').evaluate((body) => {
+    const e = new WheelEvent('wheel', {
+      deltaY: -60,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    body.dispatchEvent(e);
+    return e.defaultPrevented;
+  });
+  expect(insideDemo).toBe(true);
+  await expect.poll(viewport).not.toBe(zoomBefore);
+  zoomBefore = await viewport();
+  await frame.getByRole('button').press('ControlOrMeta+-');
+  await expect.poll(viewport).not.toBe(zoomBefore);
+  zoomBefore = await viewport();
+  const overCode = await code.locator('.shiki').evaluate(
+    (el, e) => {
+      const event = new WheelEvent('wheel', e);
+      el.dispatchEvent(event);
+      return event.defaultPrevented;
+    },
+    { deltaY: 60, ctrlKey: true, bubbles: true, cancelable: true },
+  );
+  expect(overCode).toBe(true);
+  await expect.poll(viewport).not.toBe(zoomBefore);
+
   // Its title bar still drags the node.
   const before = await demo.evaluate((el) => el.style.transform);
-  const bar = demo.getByText('counter');
+  const bar = demo.getByText('Demo', { exact: true });
   const box = await bar.boundingBox();
   if (!box) throw new Error('demo title bar not visible');
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -134,4 +206,14 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await page.mouse.move(box.x + 120, box.y + 80, { steps: 8 });
   await page.mouse.up();
   expect(await demo.evaluate((el) => el.style.transform)).not.toBe(before);
+
+  // The switcher lists this canvas, checked, and offers New canvas in edit mode.
+  await switcher.click();
+  await expect(page.getByRole('menuitemradio', { name: slug })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await expect(page.getByRole('menuitem', { name: 'New canvas' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('menu')).toHaveCount(0);
 });

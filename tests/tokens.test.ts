@@ -4,6 +4,12 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { build, collectTokens, createResolver, outputs, toCss } from '../scripts/tokens';
 
+/**
+ * Not tokens, and allowed: --shiki-* (Shiki writes them on each highlighted token) and --_*
+ * (private helper variables scoped to one rule, e.g. a computed indent).
+ */
+const THIRD_PARTY_VARS = /^--(shiki-|_)/;
+
 const tree = JSON.parse(readFileSync(path.resolve('design/tokens.json'), 'utf8'));
 
 describe('design tokens', () => {
@@ -49,6 +55,7 @@ describe('design tokens', () => {
       const css = readFileSync(file, 'utf8');
       expect(css.match(/#[0-9a-fA-F]{3,8}\b|rgba?\(/g), `raw color in ${file}`).toBeNull();
       for (const [, name] of css.matchAll(/var\((--[a-z0-9-]+)/g)) {
+        if (THIRD_PARTY_VARS.test(name)) continue;
         expect(defined.has(name), `${name} in ${file} is not a token`).toBe(true);
       }
     }

@@ -28,8 +28,8 @@ export function useShortcuts(onPasteImages: (files: File[]) => void) {
       const store = useMapStore.getState();
       const history = useMapStore.temporal.getState();
 
+      // Undo only: there is deliberately no redo on the canvas.
       if (key === 'z' && !e.shiftKey) history.undo();
-      else if ((key === 'z' && e.shiftKey) || key === 'y') history.redo();
       else if (key === 'd') {
         store.insertClones(
           store.nodes.filter((n) => n.selected),

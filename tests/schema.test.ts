@@ -63,6 +63,30 @@ describe('migrateMap', () => {
     });
   });
 
+  it('fills code block defaults', () => {
+    const code = { id: 'c', type: 'code', position: { x: 0, y: 0 }, data: { code: 'x = 1' } };
+    expect(migrateMap({ ...valid, nodes: [code] }).nodes[0].data).toEqual({
+      code: 'x = 1',
+      language: 'typescript',
+      title: '',
+      lineNumbers: true,
+      wrap: true,
+      html: '',
+    });
+  });
+
+  it('requires at least two images in a stack', () => {
+    const item = { id: 'i', src: 'x.png', width: 10, height: 10 };
+    const stack = (items: unknown[]) => ({
+      ...valid,
+      nodes: [{ id: 's', type: 'stack', position: { x: 0, y: 0 }, data: { items } }],
+    });
+    expect(migrateMap(stack([item, { ...item, id: 'j' }])).nodes[0].data).toMatchObject({
+      edges: [],
+    });
+    expect(() => migrateMap(stack([item]))).toThrow();
+  });
+
   it('rejects unknown node types', () => {
     expect(() =>
       migrateMap({ ...valid, nodes: [{ id: 'x', type: 'blob', position: { x: 0, y: 0 } }] }),

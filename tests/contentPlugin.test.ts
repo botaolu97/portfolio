@@ -1,8 +1,10 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  injectDemoBridge,
+  injectDemoBridgeInto,
   resolveDemoEntry,
   safeRelativePath,
   saveDemo,
@@ -77,5 +79,36 @@ describe('content writes', () => {
       ['one', 'First'],
     ]);
     expect(JSON.parse(await readFile(path.join(dir, 'index.json'), 'utf8'))).toHaveLength(2);
+  });
+});
+
+describe('demo bridge', () => {
+  it('goes at the start of <head>, once', () => {
+    const html = '<!doctype html><html><head><title>x</title></head><body></body></html>';
+    const once = injectDemoBridge(html);
+    expect(once.indexOf('data-mubu-bridge')).toBeGreaterThan(once.indexOf('<head>'));
+    expect(once.indexOf('data-mubu-bridge')).toBeLessThan(once.indexOf('<title>'));
+    expect(injectDemoBridge(once)).toBe(once);
+  });
+
+  it('is prepended to pages without a <head>', () => {
+    expect(injectDemoBridge('<button>Hi</button>')).toMatch(
+      /^<script data-mubu-bridge>[\s\S]*<button>Hi<\/button>$/,
+    );
+  });
+
+  it('is added to every built demo page', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'mubu-demos-'));
+    await mkdir(path.join(dir, 'd-1', 'pages'), { recursive: true });
+    await writeFile(path.join(dir, 'd-1', 'index.html'), '<head></head>');
+    await writeFile(path.join(dir, 'd-1', 'pages', 'two.html'), '<p>two</p>');
+    await writeFile(path.join(dir, 'd-1', 'app.js'), 'console.log(1)');
+    expect(await injectDemoBridgeInto(dir)).toBe(2);
+    expect(await readFile(path.join(dir, 'd-1', 'pages', 'two.html'), 'utf8')).toContain(
+      'data-mubu-bridge',
+    );
+    expect(await readFile(path.join(dir, 'd-1', 'app.js'), 'utf8')).toBe('console.log(1)');
+    expect(await injectDemoBridgeInto(dir)).toBe(0);
+    await rm(dir, { recursive: true, force: true });
   });
 });

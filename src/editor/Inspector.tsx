@@ -4,6 +4,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { asset, uploadDemo, uploadFile } from '../content/api';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
 import {
+  CODE_LANGUAGES,
+  type CodeLanguage,
   DEVICES,
   NOTE_COLORS,
   type NodeDataOf,
@@ -101,6 +103,62 @@ function NoteFields({ node }: { node: Extract<FlowNode, { type: 'note' }> }) {
         </div>
       </fieldset>
       <p className={styles.hint}>Double-click the note on the canvas to write. Esc to finish.</p>
+    </>
+  );
+}
+
+function StackFields({ node }: { node: Extract<FlowNode, { type: 'stack' }> }) {
+  return (
+    <>
+      <p className={styles.hint}>
+        {node.data.items.length} images. Visitors click the stack to spread them out; double-click
+        to preview. Right-click it to unstack.
+      </p>
+      <Button onClick={() => useMapStore.getState().unstack(node.id)}>Unstack</Button>
+    </>
+  );
+}
+
+function CodeFields({ node }: { node: Extract<FlowNode, { type: 'code' }> }) {
+  const update = useUpdate<'code'>(node.id);
+  return (
+    <>
+      <Field label="Language">
+        <select
+          value={node.data.language}
+          onChange={(e) => update({ language: e.target.value as CodeLanguage })}
+        >
+          {Object.entries(CODE_LANGUAGES).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field label="File name (optional)">
+        <input
+          value={node.data.title}
+          placeholder="e.g. Button.tsx"
+          onChange={(e) => update({ title: e.target.value })}
+        />
+      </Field>
+      <label className={`${styles.field} ${styles.check}`}>
+        <input
+          type="checkbox"
+          checked={node.data.lineNumbers}
+          onChange={(e) => update({ lineNumbers: e.target.checked })}
+        />
+        Line numbers
+      </label>
+      <label className={`${styles.field} ${styles.check}`}>
+        <input
+          type="checkbox"
+          checked={node.data.wrap}
+          onChange={(e) => update({ wrap: e.target.checked })}
+        />
+        Wrap long lines
+      </label>
+      <p className={styles.hint}>Double-click the block to edit. Tab indents, Esc finishes.</p>
     </>
   );
 }
@@ -330,6 +388,8 @@ function EdgeFields({ edge }: { edge: FlowEdge }) {
 const TITLES: Record<NodeType, string> = {
   note: 'Note',
   text: 'Text',
+  code: 'Code',
+  stack: 'Stack',
   shape: 'Shape',
   image: 'Image',
   video: 'Video',
@@ -342,6 +402,10 @@ function NodeFields({ node, onError }: { node: FlowNode; onError: OnError }) {
       return <NoteFields node={node} />;
     case 'text':
       return <TextFields node={node} />;
+    case 'code':
+      return <CodeFields node={node} />;
+    case 'stack':
+      return <StackFields node={node} />;
     case 'shape':
       return <ShapeFields node={node} />;
     case 'image':

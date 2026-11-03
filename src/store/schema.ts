@@ -32,6 +32,40 @@ export const noteData = z.object({
   color: z.enum(NOTE_COLORS).default('yellow'),
 });
 
+export const CODE_LANGUAGES = {
+  typescript: 'TypeScript',
+  tsx: 'TSX',
+  javascript: 'JavaScript',
+  jsx: 'JSX',
+  html: 'HTML',
+  css: 'CSS',
+  json: 'JSON',
+  python: 'Python',
+  bash: 'Shell',
+  swift: 'Swift',
+  kotlin: 'Kotlin',
+  go: 'Go',
+  rust: 'Rust',
+  sql: 'SQL',
+  markdown: 'Markdown',
+  yaml: 'YAML',
+  text: 'Plain text',
+} as const;
+export type CodeLanguage = keyof typeof CODE_LANGUAGES;
+
+/** A code block. `html` is the highlighted rendering, regenerated in the editor from `code`. */
+export const codeData = z.object({
+  code: z.string().default(''),
+  language: z
+    .enum(Object.keys(CODE_LANGUAGES) as [CodeLanguage, ...CodeLanguage[]])
+    .default('typescript'),
+  title: z.string().default(''),
+  lineNumbers: z.boolean().default(true),
+  /** Wrap long lines (continuation lines hang under their own indentation) instead of scrolling. */
+  wrap: z.boolean().default(true),
+  html: z.string().default(''),
+});
+
 export const textData = z.object({
   html: z.string(),
   background: z.string().optional(),
@@ -65,15 +99,6 @@ export const demoData = z.object({
   poster: z.string().optional(),
 });
 
-export const mapNode = z.discriminatedUnion('type', [
-  z.object({ ...nodeBase, type: z.literal('text'), data: textData }),
-  z.object({ ...nodeBase, type: z.literal('note'), data: noteData }),
-  z.object({ ...nodeBase, type: z.literal('image'), data: imageData }),
-  z.object({ ...nodeBase, type: z.literal('video'), data: videoData }),
-  z.object({ ...nodeBase, type: z.literal('shape'), data: shapeData }),
-  z.object({ ...nodeBase, type: z.literal('demo'), data: demoData }),
-]);
-
 export const mapEdge = z.object({
   id: z.string().min(1),
   source: z.string(),
@@ -84,6 +109,33 @@ export const mapEdge = z.object({
   label: z.string().optional(),
   animated: z.boolean().optional(),
 });
+
+export const stackItem = z.object({
+  /** The original image node's id, restored on unstack. */
+  id: z.string().min(1),
+  src: z.string(),
+  alt: z.string().default(''),
+  fit: z.enum(['contain', 'cover']).default('contain'),
+  width: z.number().positive(),
+  height: z.number().positive(),
+});
+
+/** A pile of images. `items` runs bottom to top; `edges` are the images' own connectors. */
+export const stackData = z.object({
+  items: z.array(stackItem).min(2),
+  edges: z.array(mapEdge).default([]),
+});
+
+export const mapNode = z.discriminatedUnion('type', [
+  z.object({ ...nodeBase, type: z.literal('text'), data: textData }),
+  z.object({ ...nodeBase, type: z.literal('note'), data: noteData }),
+  z.object({ ...nodeBase, type: z.literal('code'), data: codeData }),
+  z.object({ ...nodeBase, type: z.literal('stack'), data: stackData }),
+  z.object({ ...nodeBase, type: z.literal('image'), data: imageData }),
+  z.object({ ...nodeBase, type: z.literal('video'), data: videoData }),
+  z.object({ ...nodeBase, type: z.literal('shape'), data: shapeData }),
+  z.object({ ...nodeBase, type: z.literal('demo'), data: demoData }),
+]);
 
 export const mapDoc = z.object({
   version: z.literal(MAP_VERSION),
@@ -101,6 +153,7 @@ export const mapIndexEntry = z.object({
 export type MapDoc = z.infer<typeof mapDoc>;
 export type MapNode = z.infer<typeof mapNode>;
 export type MapEdge = z.infer<typeof mapEdge>;
+export type StackItem = z.infer<typeof stackItem>;
 export type NodeType = MapNode['type'];
 export type NodeDataOf<T extends NodeType> = Extract<MapNode, { type: T }>['data'];
 export type MapIndexEntry = z.infer<typeof mapIndexEntry>;

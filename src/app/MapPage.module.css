@@ -9,7 +9,7 @@
 
 .canvas {
   position: absolute;
-  inset: var(--size-toolbar) 0 0 0;
+  inset: 0;
 }
 
 .message {

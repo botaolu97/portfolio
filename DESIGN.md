@@ -1,16 +1,17 @@
 # Mubu design system
 
-How Mubu's own interface looks and behaves: the editor, the map list and the canvas chrome
+How Mubu's own interface looks and behaves: the editor, the canvas switcher and the canvas chrome
 around nodes. Read this before changing any UI. The token reference at the end is generated
 from the source of truth.
 
 ## Scope
 
-- **In scope:** everything Mubu draws itself: the top bar, palette, inspector, buttons, map cards,
+- **In scope:** everything Mubu draws itself: the canvas switcher, theme switch, palette, inspector, buttons,
   toasts, and the chrome around canvas nodes (outlines, handles, selection tags, the demo title
   bar, text and shape nodes).
 - **Out of scope:** the content of demos. Each demo is its own page with its own visual language,
   running in a sandboxed iframe. Demos never import Mubu tokens, and Mubu never styles inside them.
+  (The only thing Mubu adds to a demo page is the invisible zoom bridge described under Canvas.)
 
 ## Source of truth
 
@@ -61,9 +62,7 @@ System font stack (`--font-family-sans`); no web fonts, so the editor loads inst
 
 | Role                    | Size               | Weight                                                 |
 | ----------------------- | ------------------ | ------------------------------------------------------ |
-| Page title (map list)   | `--font-size-3xl`  | `--font-weight-bold`                                   |
-| Card title              | `--font-size-xl`   | `--font-weight-semibold`                               |
-| Toolbar map title       | `--font-size-lg`   | `--font-weight-semibold`                               |
+| Canvas switcher name    | `--font-size-base` | `--font-weight-semibold`                               |
 | Body, buttons           | `--font-size-base` | regular                                                |
 | Inputs                  | `--font-size-md`   | regular                                                |
 | Labels, captions, hints | `--font-size-sm`   | regular or `--font-weight-semibold` for section titles |
@@ -73,8 +72,9 @@ System font stack (`--font-family-sans`); no web fonts, so the editor loads inst
 
 - Use only `--space-*` values for padding, gaps and margins. The names are the pixel values.
 - Common rhythms: 6–8 between related controls, 12–14 inside panels, 16 page gutters.
-- The top bar is `--size-toolbar` tall; the canvas starts directly below it.
-- Floating panels sit `--space-12` from the window edges and `--space-16` below the top bar.
+- There is no top bar: the canvas fills the window. Everything else floats above it, `--space-16`
+  from the window edges: palette (top-left), inspector (top-right), canvas switcher (bottom-left),
+  theme switch (bottom-right).
 
 ## Shape and elevation
 
@@ -97,17 +97,24 @@ System font stack (`--font-family-sans`); no web fonts, so the editor loads inst
 | Variant   | Use                                                                |
 | --------- | ------------------------------------------------------------------ |
 | default   | Most actions: surface fill, border, hover to `--button-bg-hover`.  |
-| `primary` | The one main action in a view (e.g. "New map"). Accent fill.       |
-| `ghost`   | Toolbar actions like Undo and Redo. No fill or border until hover. |
+| `primary` | The one main action in a view. Accent fill.                         |
+| `ghost`   | Quiet actions. No fill or border until hover.                       |
 | `danger`  | Destructive actions. Danger text color, otherwise default.         |
 
 Height `--button-height`, horizontal padding `--button-padding-x`, radius `--button-radius`.
 Disabled buttons drop to 45% opacity. In panels, buttons use `--size-control-sm`.
 
-### Top bar (`src/app/TopBar.module.css`)
+### Canvas switcher (`src/app/CanvasSwitcher.tsx`)
 
-Fixed above the canvas, solid surface, one border at the bottom. Left: back link
-and map title. Right: actions, grouped with a vertical divider.
+A `--panel-*` pill fixed `--switcher-inset` from the bottom-left corner, on every page and in both
+modes. Closed, it shows the open canvas's name (truncated at `--switcher-max-width`) and a
+chevron; in edit mode a small dot before the name shows autosave (muted while saving, danger on
+failure, hidden when saved). Open, a `--switcher-menu-width` menu rises above it: a "Canvases"
+heading, every canvas with a check on the current one, and, in edit mode only, "New canvas"
+(name it inline, Enter to create). Arrow keys move through the menu, Esc or a click outside closes
+it. Canvases aren't deleted from the UI; use `npm run delete-canvas -- "Exact name"`.
+
+The site root opens the "welcome" canvas (or the first one); there is no separate list page.
 
 ### Panel: palette and inspector (`src/editor/`)
 
@@ -119,11 +126,6 @@ small uppercase muted text, and actions at the bottom above a divider.
 
 A caption in `--font-size-sm` muted text above the control. Controls are `--color-canvas` filled
 with a border and `--radius-sm`, 30px tall.
-
-### Map card (`src/app/MapList.tsx`)
-
-Surface card with a border; on hover the border turns accent and the card gains
-`--shadow-raised`. A danger "Delete" button appears on hover in edit mode only.
 
 ### Toast
 
@@ -145,7 +147,11 @@ theme follows the system. `npm run tokens` emits each dark value twice: under
 No on-screen zoom buttons or minimap: the canvas is the whole view. Zoom with pinch or ⌘-scroll,
 pan with scroll or by dragging empty space (Space + drag in edit mode).
 On canvas pages every zoom gesture (pinch, ⌘-scroll, ⌘+ ⌘− ⌘0) zooms the canvas and never the
-browser page, so the top bar, panels and theme switch keep a fixed size (`src/canvas/usePageZoomGuard.ts`). Keep it that way; add
+browser page, so the panels, canvas switcher and theme switch keep a fixed size
+(`src/canvas/usePageZoomGuard.ts`). That includes gestures over code blocks and inside live demos;
+pinches zoom around the pointer. For demos, Mubu adds an invisible bridge script to each demo page
+when serving it (dev server and build, never the source files) that stops the browser zoom and
+asks the canvas to zoom instead. Keep it that way; add
 navigation UI only if the gestures stop being enough.
 
 ### Canvas node chrome (`src/nodes/NodeChrome.tsx`, `src/canvas/Canvas.module.css`)
@@ -175,6 +181,35 @@ navigation UI only if the gestures stop being enough.
 - **Demo frame:** surface card with `--shadow-raised`. A `--demo-bar-height` title bar
   (`--demo-bar-bg`) with three dots and the title; it's the drag handle in edit mode. The page
   inside is the demo's own and is not styled by Mubu.
+
+### Code block (`src/nodes/CodeNode.tsx`)
+
+A `--code-*` card: a `--code-bar-height` title bar (file name in mono, or the language) with a
+Copy button that works for visitors too, then the code in `--font-family-mono` at
+`--code-font-size` / `--code-line-height`, optional `--code-line-number` gutter. Double-click to
+edit as plain text (Tab indents, Esc finishes). Long lines wrap by default ("Wrap long lines" in
+the inspector turns it off for that block): wrapped rows hang 2 characters past the line's own
+indentation and keep one line number per source line. Copy always copies the original lines.
+
+Syntax colors are the one place Mubu doesn't use its own tokens: they come from Shiki's GitHub
+light and dark themes. The editor highlights the code (`src/editor/highlight.ts`, grammars load per
+language) and stores HTML in which every token carries both colors, so the published site needs
+no highlighter and the colors follow the theme switch.
+
+### Stack (`src/nodes/StackNode.tsx`)
+
+Select two or more images in the editor and a floating mini toolbar (`src/editor/SelectionToolbar.tsx`)
+appears above them, styled like the switcher pill; "Stack N images" turns them into one stack
+node. The pile draws each image as a print: `--stack-frame-width` white `--stack-frame` border,
+`--stack-radius`, `--stack-shadow`, centred and tilted by its depth (top nearly straight, the
+ones below fanning out by a few degrees), with a `--stack-badge-*` count pill in the corner.
+Prints stay white in dark mode, like paper.
+
+Visitors click a stack to spread it: a `--stack-viewer-backdrop` layer blurred by
+`--stack-viewer-blur` covers the canvas and the images lie flat on top in a row (up to 3) or a
+near-square grid that always fits the window. Clicking outside an image or pressing Esc stacks
+them again. In the editor, double-click previews it; right-click (or the inspector) unstacks,
+laying the images out side by side where the stack was; connectors come back with them.
 
 ### Rich text (text nodes and notes)
 
@@ -211,6 +246,7 @@ toggled.
 - **Do** add a token to `design/tokens.json` before using a new value in CSS.
 - **Do** add a component token when a component needs a value that differs from the semantic one.
 - **Don't** write hex or rgb colors in CSS modules. The test suite rejects them.
+- **Do** prefix private helper variables with `--_` (e.g. `--_indent`); any other `var(--…)` must be a token.
 - **Don't** reference `palette.*` from components; go through a semantic or component token.
 - **Don't** style inside demos or share Mubu tokens with them.
 
@@ -318,7 +354,6 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--size-toolbar` | `48px` | — | Height of the top bar; the canvas starts below it. |
 | `--size-control` | `32px` | — | Default height of buttons and inputs. |
 | `--size-control-sm` | `28px` | — | Compact buttons inside panels. |
 | `--size-inspector` | `260px` | — | Inspector panel width. |
@@ -329,8 +364,9 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--z-node-adornment` | `2` | — | Selection tags and handles above node content. |
 | `--z-panel` | `5` | — | Palette and inspector. |
-| `--z-toolbar` | `6` | — | Top bar. |
+| `--z-controls` | `6` | — | Floating controls: canvas switcher and theme switch. |
 | `--z-overlay` | `10` | — | Drop target overlay. |
+| `--z-viewer` | `15` | — | Spread-out stack view and its backdrop, above controls. |
 | `--z-toast` | `20` | — | Error toasts. |
 
 #### `component.button`
@@ -436,5 +472,50 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--theme-switch-knob-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
 | `--theme-switch-icon` | `var(--color-text-muted) → #6b6b66` | follows alias |  |
 | `--theme-switch-icon-active` | `var(--color-text) → #1c1c1a` | follows alias |  |
+
+#### `component.code`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--code-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
+| `--code-bar-bg` | `var(--color-surface-muted) → #f0f0ed` | follows alias |  |
+| `--code-bar-height` | `32px` | — |  |
+| `--code-border` | `var(--color-border) → #e2e2dd` | follows alias |  |
+| `--code-radius` | `var(--radius-md) → 8px` | follows alias |  |
+| `--code-font-size` | `var(--font-size-md) → 13px` | follows alias |  |
+| `--code-line-height` | `1.6` | — |  |
+| `--code-padding` | `var(--space-12) → 12px` | follows alias |  |
+| `--code-line-number` | `var(--color-text-muted) → #6b6b66` | follows alias | Line numbers in the gutter. |
+
+#### `component.switcher`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--switcher-inset` | `var(--space-16) → 16px` | follows alias | Distance from the window's bottom and left edges. |
+| `--switcher-height` | `var(--size-control) → 32px` | follows alias |  |
+| `--switcher-max-width` | `280px` | — | Longer canvas names are truncated. |
+| `--switcher-menu-width` | `260px` | — |  |
+| `--switcher-menu-max-height` | `360px` | — |  |
+| `--switcher-item-height` | `var(--size-control) → 32px` | follows alias |  |
+
+#### `component.stack`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--stack-frame` | `#ffffff` | — | Print border around each image; stays white in dark mode, like paper. |
+| `--stack-frame-width` | `4px` | — |  |
+| `--stack-radius` | `var(--radius-xs) → 2px` | follows alias |  |
+| `--stack-shadow` | `var(--shadow-raised) → 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 4px 16px 0 rgb(0 0 0 / 0.06)` | follows alias |  |
+| `--stack-badge-bg` | `var(--color-text) → #1c1c1a` | follows alias | Image count pill; inverts with the theme. |
+| `--stack-badge-text` | `var(--color-surface) → #ffffff` | follows alias |  |
+
+#### `component.stack-viewer`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--stack-viewer-backdrop` | `rgb(20 20 18 / 0.45)` | — |  |
+| `--stack-viewer-blur` | `10px` | — |  |
+| `--stack-viewer-padding` | `var(--space-48) → 48px` | follows alias |  |
+| `--stack-viewer-gap` | `var(--space-24) → 24px` | follows alias |  |
 
 <!-- tokens:end -->

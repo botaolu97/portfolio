@@ -112,11 +112,10 @@ export async function saveDemo(demosDir: string, files: DemoFile[]) {
 }
 
 class HttpError extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-  ) {
+  readonly status: number;
+  constructor(status: number, message: string) {
     super(message);
+    this.status = status;
   }
 }
 
@@ -163,6 +162,54 @@ const MIME: Record<string, string> = {
  * Serves public/content directly instead of through Vite's public-dir handler, which only
  * knows about files that existed (or were watched) at startup and would miss fresh uploads.
  */
+/**
+ * A tiny script Mubu adds to every demo page (dev server and build). Pinch / ⌘-scroll and
+ * ⌘ + = − 0 inside a sandboxed demo would otherwise zoom the whole browser page, and Mubu's
+ * page can't see that input. The bridge stops the browser zoom and asks Mubu to zoom the
+ * canvas instead (see src/canvas/usePageZoomGuard.ts). It draws nothing and touches no styles.
+ */
+export const DEMO_BRIDGE = `<script data-mubu-bridge>(() => {
+  const send = (msg) => parent.postMessage({ source: 'mubu-demo', ...msg }, '*');
+  addEventListener('wheel', (e) => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    e.preventDefault();
+    send({ type: 'zoom', deltaY: e.deltaY, clientX: e.clientX, clientY: e.clientY });
+  }, { passive: false, capture: true });
+  addEventListener('keydown', (e) => {
+    if (!(e.metaKey || e.ctrlKey) || e.altKey || !['=', '+', '-', '_', '0'].includes(e.key)) return;
+    e.preventDefault();
+    send({ type: 'zoom-key', key: e.key });
+  }, true);
+  for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
+    addEventListener(type, (e) => e.preventDefault(), { passive: false });
+  }
+})();</script>`;
+
+/** Adds the bridge once, at the start of <head> (or of the document if it has none). */
+export function injectDemoBridge(html: string): string {
+  if (html.includes('data-mubu-bridge')) return html;
+  const head = /<head[^>]*>/i.exec(html);
+  if (head) return html.replace(head[0], `${head[0]}${DEMO_BRIDGE}`);
+  return `${DEMO_BRIDGE}${html}`;
+}
+
+/** Injects the bridge into every HTML file under `dir` (the built demos folder). */
+export async function injectDemoBridgeInto(dir: string): Promise<number> {
+  if (!existsSync(dir)) return 0;
+  let count = 0;
+  for (const entry of await readdir(dir, { recursive: true })) {
+    if (!/\.html?$/i.test(entry)) continue;
+    const file = path.join(dir, entry);
+    const html = await readFile(file, 'utf8');
+    const injected = injectDemoBridge(html);
+    if (injected !== html) {
+      await writeFile(file, injected);
+      count += 1;
+    }
+  }
+  return count;
+}
+
 async function serveContent(root: string, rel: string, res: ServerResponse, next: () => void) {
   const safe = safeRelativePath(decodeURIComponent(rel));
   const file = safe && path.join(root, safe);
@@ -176,6 +223,11 @@ async function serveContent(root: string, rel: string, res: ServerResponse, next
   res.setHeader('Cache-Control', 'no-cache');
   // Sandboxed demos have an opaque origin, so module scripts need CORS (GitHub Pages sends this too).
   res.setHeader('Access-Control-Allow-Origin', '*');
+  if (safe.startsWith('demos/') && /\.html?$/i.test(file)) {
+    const html = injectDemoBridge(await readFile(file, 'utf8'));
+    res.setHeader('Content-Length', Buffer.byteLength(html));
+    return res.end(html);
+  }
   createReadStream(file).pipe(res);
 }
 
@@ -187,11 +239,17 @@ function requireSlug(url: URL) {
 
 export function mubuContent(): Plugin {
   let dirs: ReturnType<typeof contentPaths>;
+  let outDir: string;
 
   return {
     name: 'mubu-content',
     configResolved(config) {
       dirs = contentPaths(config.root);
+      outDir = config.command === 'build' ? path.resolve(config.root, config.build.outDir) : '';
+    },
+    async closeBundle() {
+      // Vite has copied public/ into the output by now; add the bridge to the built demos.
+      if (outDir) await injectDemoBridgeInto(path.join(outDir, 'content', 'demos'));
     },
     async buildStart() {
       await writeMapIndex(dirs.maps);

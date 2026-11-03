@@ -352,3 +352,199 @@
 .notePlaceholder {
   color: var(--note-placeholder);
 }
+
+/* Code block */
+.code {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--code-border);
+  border-radius: var(--code-radius);
+  background: var(--code-bg);
+}
+
+.codeBar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--code-bar-height);
+  padding: 0 var(--space-6) 0 var(--space-12);
+  border-bottom: 1px solid var(--code-border);
+  background: var(--code-bar-bg);
+  font-size: var(--font-size-sm);
+}
+
+.codeTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-medium);
+}
+
+.codeLang {
+  color: var(--color-text-muted);
+}
+
+.codeCopy {
+  margin-left: auto;
+  height: 22px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--font-size-xs);
+}
+
+.codeCopy:hover {
+  background: var(--color-surface-muted);
+}
+
+.codeBody {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.codeHtml,
+.codeInput {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  font-family: var(--font-family-mono);
+  font-size: var(--code-font-size);
+  line-height: var(--code-line-height);
+}
+
+.codeHtml pre {
+  min-width: max-content;
+  margin: 0;
+  padding: var(--code-padding);
+  /* Shiki's dual-theme output only sets --shiki-*-bg variables; the block uses Mubu's surface. */
+  background: transparent;
+}
+
+.codeHtml code {
+  font-family: inherit;
+}
+
+/* Shiki's dual-theme output: each token carries both colors; pick the one for the theme. */
+.codeHtml :global(.shiki) span {
+  color: var(--shiki-light);
+}
+
+:global(:root[data-theme="dark"]) .codeHtml :global(.shiki) span {
+  color: var(--shiki-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"])) .codeHtml :global(.shiki) span {
+    color: var(--shiki-dark);
+  }
+}
+
+.lineNumbers .codeHtml code {
+  counter-reset: line;
+}
+
+.lineNumbers .codeHtml :global(.line)::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 2.5ch;
+  margin-right: 2ch;
+  text-align: right;
+  color: var(--code-line-number);
+  user-select: none;
+}
+
+.codeInput {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: var(--code-padding);
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--color-text);
+  white-space: pre;
+  tab-size: 2;
+}
+
+.wrap .codeInput {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * Wrapped lines. Each source line is an inline-block as wide as the block, so a wrapped part
+ * stays inside its line: one line number per source line. Continuation rows hang under the
+ * line's own indentation (--_indent, set by the highlighter) plus 2 characters.
+ */
+.wrap .codeHtml pre {
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.wrap .codeHtml :global(.line) {
+  --_hang: calc((var(--_indent, 0) + 2) * 1ch);
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  padding-left: var(--_hang);
+  text-indent: calc(-1 * var(--_hang));
+}
+
+.wrap.lineNumbers .codeHtml :global(.line) {
+  padding-left: calc(4.5ch + var(--_hang));
+}
+
+.wrap.lineNumbers .codeHtml :global(.line)::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-right: 0;
+  text-indent: 0;
+}
+
+/* Stack: a pile of tilted prints */
+.stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.stackPrint {
+  position: absolute;
+  object-fit: cover;
+  border: var(--stack-frame-width) solid var(--stack-frame);
+  border-radius: var(--stack-radius);
+  background: var(--stack-frame);
+  box-shadow: var(--stack-shadow);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.stackCount {
+  position: absolute;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--stack-badge-bg);
+  color: var(--stack-badge-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 22px;
+  text-align: center;
+  box-shadow: var(--shadow-raised);
+}

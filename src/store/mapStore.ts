@@ -11,7 +11,7 @@ import {
 } from '@xyflow/react';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
-import { NODE_DEFAULTS } from './defaults';
+import { type AddableNodeType, NODE_DEFAULTS } from './defaults';
 import {
   MAP_VERSION,
   type MapDoc,
@@ -34,7 +34,7 @@ export interface MapState {
   onNodesChange: (changes: NodeChange<FlowNode>[]) => void;
   onEdgesChange: (changes: EdgeChange<FlowEdge>[]) => void;
   onConnect: (connection: Connection) => void;
-  addNode: <T extends NodeType>(
+  addNode: <T extends AddableNodeType>(
     type: T,
     position: XYPosition,
     overrides?: { data?: Partial<NodeDataOf<T>>; width?: number; height?: number },
@@ -42,11 +42,18 @@ export interface MapState {
   updateNodeData: <T extends NodeType>(id: string, patch: Partial<NodeDataOf<T>>) => void;
   updateEdge: (id: string, patch: Partial<Pick<FlowEdge, 'label' | 'type' | 'animated'>>) => void;
   insertClones: (nodes: FlowNode[], edges: FlowEdge[], offset: number) => void;
+  /** Turns two or more image nodes into one stack node; returns its id. */
+  stackImages: (ids: string[]) => string | null;
+  /** Puts a stack's images (and their connectors) back where they were. */
+  unstack: (id: string) => void;
 }
 
 export const newId = () => crypto.randomUUID().slice(0, 8);
 
 const round = (n: number) => Math.round(n);
+
+/** Space between images when a stack is spread back out. */
+const UNSTACK_GAP = 24;
 
 /** The persistent part of a node: drops React Flow's runtime fields (selected, measured, …). */
 function toMapNode(node: FlowNode): MapNode {
@@ -82,6 +89,21 @@ export function toDoc(state: Pick<MapState, 'title' | 'nodes' | 'edges'>): MapDo
 }
 
 /** Copies nodes with fresh ids, keeping only edges whose both ends were copied. */
+/** A copied stack needs new ids for its images (and their connectors), or unstacking twice clashes. */
+function cloneStackData(data: NodeDataOf<'stack'>): NodeDataOf<'stack'> {
+  const ids = new Map(data.items.map((item) => [item.id, newId()]));
+  const swap = (id: string) => ids.get(id) ?? id;
+  return {
+    items: data.items.map((item) => ({ ...item, id: swap(item.id) })),
+    edges: data.edges.map((e) => ({
+      ...e,
+      id: newId(),
+      source: swap(e.source),
+      target: swap(e.target),
+    })),
+  };
+}
+
 export function cloneSubgraph(nodes: FlowNode[], edges: FlowEdge[], offset: number) {
   const ids = new Map(nodes.map((n) => [n.id, newId()]));
   const clonedNodes = nodes.map(
@@ -90,7 +112,7 @@ export function cloneSubgraph(nodes: FlowNode[], edges: FlowEdge[], offset: numb
         ...toMapNode(n),
         id: ids.get(n.id) as string,
         position: { x: n.position.x + offset, y: n.position.y + offset },
-        data: structuredClone(n.data),
+        data: n.type === 'stack' ? cloneStackData(n.data) : structuredClone(n.data),
         selected: true,
       }) as FlowNode,
   );
@@ -171,6 +193,100 @@ export const useMapStore = create<MapState>()(
       updateEdge: (id, patch) =>
         set({ edges: get().edges.map((e) => (e.id === id ? { ...e, ...patch } : e)) }),
 
+      stackImages: (ids) => {
+        const { nodes, edges } = get();
+        const chosen = new Set(ids);
+        const images = nodes.filter(
+          (n): n is Extract<FlowNode, { type: 'image' }> => n.type === 'image' && chosen.has(n.id),
+        );
+        if (images.length < 2) return null;
+        const size = (n: FlowNode) => ({
+          width: n.width ?? n.measured?.width ?? NODE_DEFAULTS.image.width,
+          height: n.height ?? n.measured?.height ?? NODE_DEFAULTS.image.height,
+        });
+        // The pile takes the top image's size, centred on the images' bounding box.
+        const boxes = images.map((n) => ({ ...n.position, ...size(n) }));
+        const left = Math.min(...boxes.map((b) => b.x));
+        const top = Math.min(...boxes.map((b) => b.y));
+        const right = Math.max(...boxes.map((b) => b.x + b.width));
+        const bottom = Math.max(...boxes.map((b) => b.y + b.height));
+        const front = boxes[boxes.length - 1];
+        const position = {
+          x: round((left + right - front.width) / 2),
+          y: round((top + bottom - front.height) / 2),
+        };
+        const id = newId();
+        const imageIds = new Set(images.map((n) => n.id));
+        const touched = edges.filter((e) => imageIds.has(e.source) || imageIds.has(e.target));
+        // Connectors to the outside now attach to the stack; ones between the images are kept for later.
+        const rerouted = touched
+          .filter((e) => !(imageIds.has(e.source) && imageIds.has(e.target)))
+          .map((e) => ({
+            ...e,
+            id: `${id}-${e.id}`,
+            source: imageIds.has(e.source) ? id : e.source,
+            target: imageIds.has(e.target) ? id : e.target,
+            selected: false,
+          }));
+        const stack = {
+          id,
+          type: 'stack',
+          position,
+          width: round(front.width),
+          height: round(front.height),
+          selected: true,
+          data: {
+            items: images.map((n, i) => ({
+              id: n.id,
+              src: n.data.src,
+              alt: n.data.alt,
+              fit: n.data.fit,
+              width: round(boxes[i].width),
+              height: round(boxes[i].height),
+            })),
+            edges: touched.map(toMapEdge),
+          },
+        } as FlowNode;
+        set({
+          nodes: [
+            ...nodes.filter((n) => !imageIds.has(n.id)).map((n) => ({ ...n, selected: false })),
+            stack,
+          ],
+          edges: [...edges.filter((e) => !touched.includes(e)), ...rerouted],
+        });
+        return id;
+      },
+
+      unstack: (id) => {
+        const { nodes, edges } = get();
+        const stack = nodes.find((n) => n.id === id);
+        if (stack?.type !== 'stack') return;
+        // Laid out side by side from where the stack was; old positions aren't kept.
+        let x = stack.position.x;
+        const images = stack.data.items.map((item) => {
+          const position = { x, y: stack.position.y };
+          x += item.width + UNSTACK_GAP;
+          return {
+            id: item.id,
+            type: 'image',
+            position,
+            width: item.width,
+            height: item.height,
+            data: { src: item.src, alt: item.alt, fit: item.fit },
+            selected: true,
+          } as FlowNode;
+        });
+        const rest = nodes.filter((n) => n.id !== id).map((n) => ({ ...n, selected: false }));
+        const present = new Set([...rest, ...images].map((n) => n.id));
+        const restored = stack.data.edges.filter(
+          (e) => present.has(e.source) && present.has(e.target),
+        );
+        set({
+          nodes: [...rest, ...images],
+          edges: [...edges.filter((e) => e.source !== id && e.target !== id), ...restored],
+        });
+      },
+
       insertClones: (nodes, edges, offset) => {
         const clones = cloneSubgraph(nodes, edges, offset);
         set({
@@ -186,7 +302,12 @@ export const useMapStore = create<MapState>()(
       // History tracks only what gets saved, so selection and measuring never create undo steps.
       partialize: (state) => {
         const { title, nodes, edges } = toDoc(state);
-        return { title, nodes: nodes as FlowNode[], edges: edges as FlowEdge[] };
+        // A code block's highlighted HTML is derived from its code, so it never makes its own
+        // undo step; after undo the node highlights itself again.
+        const tracked = nodes.map((n) =>
+          n.type === 'code' ? { ...n, data: { ...n.data, html: '' } } : n,
+        );
+        return { title, nodes: tracked as FlowNode[], edges: edges as FlowEdge[] };
       },
       equality: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       // A drag or a burst of typing becomes one undo step.

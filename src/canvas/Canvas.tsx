@@ -8,18 +8,24 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { type DragEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { type DragEvent, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { EDITABLE } from '../content/api';
 import { nodeTypes } from '../nodes/nodeTypes';
+import type { AddableNodeType } from '../store/defaults';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
-import type { NodeType } from '../store/schema';
 import { useUiStore } from '../store/uiStore';
 import { useTheme } from '../ui/theme';
 import styles from './Canvas.module.css';
 import { addNodesFromFiles } from './fileDrop';
 import { usePageZoomGuard } from './usePageZoomGuard';
 import { useShortcuts } from './useShortcuts';
+import { MAX_ZOOM, MIN_ZOOM } from './zoom';
+
+// Edit-only; checked inline so the production build drops it.
+const SelectionToolbar = import.meta.env.DEV
+  ? lazy(() => import('../editor/SelectionToolbar'))
+  : null;
 
 export const PALETTE_MIME = 'application/x-mubu-node';
 
@@ -110,7 +116,7 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
       e.preventDefault();
       setDropping(false);
       const at = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      const paletteType = e.dataTransfer.getData(PALETTE_MIME) as NodeType;
+      const paletteType = e.dataTransfer.getData(PALETTE_MIME) as AddableNodeType;
       if (paletteType) {
         addNode(paletteType, at);
         return;
@@ -144,6 +150,17 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         onEdgesChange={handleEdgesChange}
         onConnect={EDITABLE ? onConnect : undefined}
         onPaneClick={() => useUiStore.getState().setEditingText(null)}
+        onNodeContextMenu={
+          EDITABLE
+            ? (e, node) => {
+                if (node.type !== 'stack') return;
+                e.preventDefault();
+                useUiStore
+                  .getState()
+                  .setContextMenu({ nodeId: node.id, x: e.clientX, y: e.clientY });
+              }
+            : undefined
+        }
         defaultEdgeOptions={defaultEdgeOptions}
         connectionMode={ConnectionMode.Loose}
         nodesDraggable={EDITABLE}
@@ -160,14 +177,19 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         zoomOnPinch
         snapToGrid={EDITABLE}
         snapGrid={[8, 8]}
-        minZoom={0.05}
-        maxZoom={4}
+        minZoom={MIN_ZOOM}
+        maxZoom={MAX_ZOOM}
         onlyRenderVisibleElements
         fitView
         fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
         colorMode={theme}
         attributionPosition="bottom-center"
       >
+        {SelectionToolbar && (
+          <Suspense fallback={null}>
+            <SelectionToolbar />
+          </Suspense>
+        )}
         <Background
           variant={BackgroundVariant.Dots}
           gap={24}

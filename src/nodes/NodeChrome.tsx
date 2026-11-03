@@ -13,6 +13,8 @@ const SIDES = [
 const TYPE_LABELS: Record<NodeType, string> = {
   note: 'Note',
   text: 'Text',
+  code: 'Code',
+  stack: 'Stack',
   shape: 'Shape',
   image: 'Image',
   video: 'Video',

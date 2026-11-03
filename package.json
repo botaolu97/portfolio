@@ -15,9 +15,12 @@
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "tokens": "node scripts/tokens.ts",
     "predev": "npm run tokens",
-    "prebuild": "npm run tokens -- --check"
+    "prebuild": "npm run tokens -- --check",
+    "delete-canvas": "node scripts/delete-canvas.ts"
   },
   "dependencies": {
+    "@shikijs/langs": "^4.6.0",
+    "@shikijs/themes": "^4.6.0",
     "@tiptap/extension-highlight": "^3.32.2",
     "@tiptap/extension-list": "^3.32.2",
     "@tiptap/pm": "^3.32.2",
@@ -26,6 +29,7 @@
     "@xyflow/react": "^12.12.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "shiki": "^4.6.0",
     "wouter": "^3.13.0",
     "zod": "^4.6.7",
     "zundo": "^2.3.0",

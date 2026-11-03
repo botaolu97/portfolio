@@ -1,0 +1,67 @@
+/* Sandwich: the canvas, this blurred gray layer, then the spread-out images on top. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-viewer);
+  display: grid;
+  place-items: center;
+  padding: var(--stack-viewer-padding);
+  background: var(--stack-viewer-backdrop);
+  backdrop-filter: blur(var(--stack-viewer-blur));
+  -webkit-backdrop-filter: blur(var(--stack-viewer-blur));
+  animation: fade var(--motion-duration-normal) var(--motion-easing-standard);
+}
+
+.grid {
+  display: grid;
+  gap: var(--stack-viewer-gap);
+  align-items: center;
+  justify-items: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.print {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+  border: var(--stack-frame-width) solid var(--stack-frame);
+  border-radius: var(--stack-radius);
+  background: var(--stack-frame);
+  box-shadow: var(--stack-shadow);
+  animation: spread var(--motion-duration-normal) var(--motion-easing-standard) both;
+}
+
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-24);
+  transform: translateX(-50%);
+  padding: var(--space-6) var(--space-12);
+  border-radius: var(--radius-full);
+  background: var(--stack-badge-bg);
+  color: var(--stack-badge-text);
+  font-size: var(--font-size-sm);
+  pointer-events: none;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Each print starts from its tilt in the pile and settles flat. */
+@keyframes spread {
+  from {
+    opacity: 0;
+    transform: rotate(var(--_angle)) scale(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .print {
+    animation: none;
+  }
+}

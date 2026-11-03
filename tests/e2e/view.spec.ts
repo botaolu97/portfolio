@@ -7,7 +7,22 @@ const fixtures = path.resolve('tests/e2e/fixtures');
 async function useFixtures(page: Page) {
   await page.route('**/content/maps/index.json', (route) =>
     route.fulfill({
-      json: [{ slug: 'e2e-fixture', title: 'E2E fixture', updatedAt: new Date().toISOString() }],
+      json: [
+        { slug: 'e2e-fixture', title: 'E2E fixture', updatedAt: new Date().toISOString() },
+        { slug: 'e2e-other', title: 'Other canvas', updatedAt: new Date().toISOString() },
+      ],
+    }),
+  );
+  await page.route('**/content/maps/e2e-other.json', (route) =>
+    route.fulfill({
+      json: {
+        version: 2,
+        title: 'Other canvas',
+        nodes: [
+          { id: 'o', type: 'note', position: { x: 0, y: 0 }, data: { html: '<p>Other note</p>' } },
+        ],
+        edges: [],
+      },
     }),
   );
   await page.route('**/content/maps/e2e-fixture.json', (route) =>
@@ -27,12 +42,42 @@ test('published site is read-only and demos still run', async ({ page }) => {
   });
   await useFixtures(page);
 
+  // The root opens the first canvas; the switcher lists canvases but can't create one.
   await page.goto('/');
-  await expect(page.getByRole('link', { name: /E2E fixture/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'New map' })).toHaveCount(0);
+  await expect(page).toHaveURL(/#\/m\/e2e-fixture$/);
+  const switcher = page.getByRole('button', { name: /Switch canvas/ });
+  await expect(switcher).toContainText('E2E fixture');
+  await switcher.click();
+  await expect(page.getByRole('menuitemradio', { name: 'E2E fixture' })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await expect(page.getByRole('menuitemradio', { name: 'Other canvas' })).toBeVisible();
+  await expect(page.getByRole('menuitem', { name: 'New canvas' })).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('banner')).toHaveCount(0);
 
-  await page.getByRole('link', { name: /E2E fixture/ }).click();
-  await expect(page.locator('.react-flow__node')).toHaveCount(3);
+  await expect(page.locator('.react-flow__node')).toHaveCount(5);
+
+  // Clicking a stack spreads it out over a blurred canvas; Esc or a click outside stacks it again.
+  const pile = page.locator('.react-flow__node-stack');
+  await pile.click();
+  const spread = page.getByRole('dialog', { name: '2 stacked images' });
+  await expect(spread).toBeVisible();
+  await expect(spread.getByRole('img')).toHaveCount(2);
+  await spread.getByRole('img', { name: 'Red' }).click();
+  await expect(spread).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(spread).toHaveCount(0);
+  await pile.click();
+  await expect(spread).toBeVisible();
+  await page.mouse.click(8, 8);
+  await expect(spread).toHaveCount(0);
+
+  const snippet = page.locator('.react-flow__node-code');
+  await expect(snippet).toContainText('const fixture = true;');
+  await expect(snippet.getByText('fixture.ts')).toBeVisible();
+  await expect(snippet.getByRole('button', { name: 'Copy' })).toBeVisible();
   await expect(page.getByText('Fixture note')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Upload files' })).toHaveCount(0);
   await expect(page.getByRole('navigation', { name: 'Add to canvas' })).toHaveCount(0);
@@ -63,7 +108,7 @@ test('published site is read-only and demos still run', async ({ page }) => {
 
   // Zoom gestures over the interface zoom the canvas, never the page.
   const viewport = () => page.locator('.react-flow__viewport').evaluate((el) => el.style.transform);
-  const header = page.getByRole('banner');
+  const header = switcher;
   const headerBox = await header.boundingBox();
   const beforeZoom = await viewport();
   const pinchPrevented = await header.evaluate((el) => {
@@ -103,4 +148,11 @@ test('published site is read-only and demos still run', async ({ page }) => {
   expect(await canvasColor()).toBe('rgb(246, 246, 244)');
 
   expect(editorRequests).toEqual([]);
+
+  // Switch to another canvas from the menu.
+  await switcher.click();
+  await page.getByRole('menuitemradio', { name: 'Other canvas' }).click();
+  await expect(page).toHaveURL(/#\/m\/e2e-other$/);
+  await expect(switcher).toContainText('Other canvas');
+  await expect(page.getByText('Other note')).toBeVisible();
 });

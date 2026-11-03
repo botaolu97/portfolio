@@ -2,9 +2,17 @@ import { PALETTE_MIME } from '../canvas/Canvas';
 import { NODE_DEFAULTS, PALETTE } from '../store/defaults';
 import { useMapStore } from '../store/mapStore';
 import styles from './Editor.module.css';
-import { useViewportCenter } from './Toolbar';
+import { useViewportCenter } from './useViewportCenter';
 
-const ICONS = { note: '▤', text: 'T', shape: '◇', image: '▣', video: '▶', demo: '</>' } as const;
+const ICONS = {
+  note: '▤',
+  text: 'T',
+  code: '{ }',
+  shape: '◇',
+  image: '▣',
+  video: '▶',
+  demo: '</>',
+} as const;
 
 /** Drag an item onto the canvas, or click to drop it in the middle of the view. */
 export function Palette() {
