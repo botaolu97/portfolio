@@ -120,6 +120,17 @@ it. Canvases aren't deleted from the UI; use `npm run delete-canvas -- "Exact na
 
 The site root opens the "welcome" canvas (or the first one); there is no separate list page.
 
+Canvases have a stable order, 1 to n from top to bottom, which the menu shows: existing ones keep
+their place and new ones go to the bottom (editing never reorders). Switching slides by that order
+in `--motion-duration-slide` with `--motion-easing-slide`: going further down the list, the current
+canvas moves up and out while the next one rises from below; going back, both slide down. Only the
+canvas layer moves — palette, inspector, switcher and theme switch stay put. While moving, both
+canvases cast `--canvas-slide-shadow`, so they read as separate sheets rather than one canvas
+scrolling. The leaving canvas is
+a static snapshot (only one canvas can be live), with demos and videos shown as plain blocks.
+Reduced motion switches instantly. In the editor, a save still waiting when you switch is written
+first.
+
 ### Panel: palette and inspector (`src/editor/`)
 
 Floating `--panel-*` containers. The palette lists node types as rows you can drag or click.
@@ -420,8 +431,10 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--motion-duration-normal` | `200ms` | — | State changes such as toggles. |
 | `--motion-duration-zoom` | `380ms` | — | Zooming a text box into and out of the reader. |
 | `--motion-duration-zoom-out` | `320ms` | — | Zooming a text box back out of the reader: a little quicker than zooming in. |
+| `--motion-duration-slide` | `640ms` | — | Sliding from one canvas to the next. |
 | `--motion-easing-standard` | `cubic-bezier(0.2, 0, 0, 1)` | — | Default easing for UI transitions. |
 | `--motion-easing-zoom-out` | `cubic-bezier(0.45, 0, 0.55, 1)` | — | Symmetric ease in and out, so a shrink back reads as one move (the decelerating standard curve leaves a long slow tail that looks like a second shrink). |
+| `--motion-easing-slide` | `cubic-bezier(0.65, 0, 0.35, 1)` | — | Symmetric ease for two canvases moving together. |
 
 #### `size`
 
@@ -654,5 +667,11 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--label-color` | `var(--color-text) → #1c1c1a` | follows alias |  |
 | `--label-padding` | `var(--space-4) → 4px` | follows alias | Small inset so the selection outline doesn't touch the letters. |
+
+#### `component.canvas-slide`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--canvas-slide-shadow` | `0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12)` | `0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45)` |  |
 
 <!-- tokens:end -->

@@ -241,6 +241,27 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await switcher.click();
   await page.getByRole('menuitemradio', { name: 'Other canvas' }).click();
   await expect(page).toHaveURL(/#\/m\/e2e-other$/);
+  // Canvas 1 → 2 slides up: the new canvas comes in from below while a snapshot of the old one
+  // leaves upward; the snapshot is gone afterwards.
+  const firstFrame = (dir: 'in' | 'out') =>
+    page.evaluate((d) => {
+      const layer = document.querySelector('[data-canvas-layer]');
+      const ghost = [...document.body.children].find(
+        (el) => el.querySelector('.react-flow') && !el.contains(layer),
+      );
+      const el = d === 'in' ? layer : ghost;
+      const keyframes = el?.getAnimations()[0]?.effect as KeyframeEffect | undefined;
+      return keyframes?.getKeyframes()[d === 'in' ? 0 : 1]?.transform ?? null;
+    }, dir);
+  await expect.poll(() => firstFrame('in')).toBe('translateY(100%)');
+  expect(await firstFrame('out')).toBe('translateY(-100%)');
+  await expect.poll(() => page.locator('.react-flow').count()).toBe(1);
   await expect(switcher).toContainText('Other canvas');
   await expect(page.getByText('Other note')).toBeVisible();
+
+  // And back (2 → 1) slides down.
+  await switcher.click();
+  await page.getByRole('menuitemradio', { name: 'E2E fixture' }).click();
+  await expect.poll(() => firstFrame('in')).toBe('translateY(-100%)');
+  await expect.poll(() => page.locator('.react-flow').count()).toBe(1);
 });

@@ -1,9 +1,10 @@
 import { ReactFlowProvider } from '@xyflow/react';
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Canvas } from '../canvas/Canvas';
 import { fetchMap } from '../content/api';
 import { useMapStore } from '../store/mapStore';
 import { CanvasSwitcher } from './CanvasSwitcher';
+import { CANVAS_LAYER_ATTR, finishCanvasSlide } from './canvasTransition';
 import styles from './MapPage.module.css';
 
 // Checked inline (not via EDITABLE) so the production build drops the chunk entirely.
@@ -16,6 +17,7 @@ function Switcher({ slug }: { slug: string }) {
 }
 
 export function MapPage({ slug }: { slug: string }) {
+  const layer = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'missing'>('loading');
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +45,11 @@ export function MapPage({ slug }: { slug: string }) {
 
   const onError = useCallback((message: string | null) => setError(message), []);
 
+  // A canvas switch slides the previous canvas out and this one in once it's on screen.
+  useLayoutEffect(() => {
+    if (state !== 'loading') finishCanvasSlide(layer.current);
+  }, [state]);
+
   if (state === 'missing') {
     return (
       <div className={styles.message}>
@@ -56,7 +63,7 @@ export function MapPage({ slug }: { slug: string }) {
   return (
     <ReactFlowProvider>
       <div className={styles.page}>
-        <div className={styles.canvas}>
+        <div ref={layer} className={styles.canvas} {...{ [CANVAS_LAYER_ATTR]: '' }}>
           <Canvas onError={onError} />
         </div>
         {Editor && (

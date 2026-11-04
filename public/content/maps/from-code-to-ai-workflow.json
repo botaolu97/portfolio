@@ -144,6 +144,21 @@
       },
       "width": 744,
       "height": 837
+    },
+    {
+      "id": "474d7971",
+      "type": "image",
+      "position": {
+        "x": -400,
+        "y": 1400
+      },
+      "data": {
+        "src": "content/assets/44e0c0dade8f8cde.png",
+        "alt": "image",
+        "fit": "contain"
+      },
+      "width": 1024,
+      "height": 796
     }
   ],
   "edges": [

@@ -4,6 +4,7 @@ import { EDITABLE, fetchMapIndex, saveMap } from '../content/api';
 import { MAP_VERSION, type MapIndexEntry, slugify } from '../store/schema';
 import { type SaveStatus, useUiStore } from '../store/uiStore';
 import styles from './CanvasSwitcher.module.css';
+import { beginCanvasSlide } from './canvasTransition';
 
 const STATUS_LABEL: Record<SaveStatus, string> = {
   saved: 'All changes saved',
@@ -65,7 +66,12 @@ export function CanvasSwitcher({ slug, title }: { slug: string | null; title: st
 
   const go = (target: string) => {
     close();
-    if (target !== slug) navigate(`/m/${target}`);
+    if (target === slug) return;
+    // Slide by position in the canvas order: further down the list slides up, back slides down.
+    const from = maps.findIndex((m) => m.slug === slug);
+    const to = maps.findIndex((m) => m.slug === target);
+    if (from !== -1 && to !== -1) beginCanvasSlide(to > from ? 'up' : 'down');
+    navigate(`/m/${target}`);
   };
 
   const create = async (e: FormEvent) => {

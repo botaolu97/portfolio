@@ -40,6 +40,12 @@ export function useAutosave() {
     return () => {
       clearTimeout(timer);
       unsubscribe();
+      // Leaving the canvas (e.g. switching) with a save still waiting: write it now, while the
+      // store still holds this canvas.
+      const last = snapshot();
+      if (last && last.json !== lastSaved.current) {
+        saveMap(last.slug, JSON.parse(last.json)).catch(() => {});
+      }
     };
   }, []);
 

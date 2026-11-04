@@ -86,7 +86,16 @@ export async function writeMapIndex(mapsDir: string) {
       return { slug: file.replace(/\.json$/, ''), title, updatedAt: info.mtime.toISOString() };
     }),
   );
-  entries.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  // Canvases keep a stable order (1..n, top to bottom): existing ones keep their place, new ones go
+  // to the bottom (oldest first). Editing a canvas never reorders it.
+  const previous: string[] = await readFile(path.join(mapsDir, 'index.json'), 'utf8')
+    .then((raw) => (JSON.parse(raw) as { slug: string }[]).map((e) => e.slug))
+    .catch(() => []);
+  const rank = (slug: string) => {
+    const i = previous.indexOf(slug);
+    return i === -1 ? Number.POSITIVE_INFINITY : i;
+  };
+  entries.sort((a, b) => rank(a.slug) - rank(b.slug) || a.updatedAt.localeCompare(b.updatedAt));
   await writeFile(path.join(mapsDir, 'index.json'), `${JSON.stringify(entries, null, 2)}\n`);
   return entries;
 }

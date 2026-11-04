@@ -71,6 +71,20 @@ describe('content writes', () => {
     await expect(saveDemo(dir, [{ path: '../x.js', data: '' }])).rejects.toThrow();
   });
 
+  it('keeps canvases in a stable order, adding new ones at the bottom', async () => {
+    await writeFile(path.join(dir, 'b.json'), JSON.stringify({ title: 'B' }));
+    await writeFile(path.join(dir, 'a.json'), JSON.stringify({ title: 'A' }));
+    await writeFile(
+      path.join(dir, 'index.json'),
+      JSON.stringify([{ slug: 'b' }, { slug: 'a' }, { slug: 'gone' }]),
+    );
+    expect((await writeMapIndex(dir)).map((e) => e.slug)).toEqual(['b', 'a']);
+    await new Promise((r) => setTimeout(r, 10));
+    await writeFile(path.join(dir, 'c.json'), JSON.stringify({ title: 'C' }));
+    await writeFile(path.join(dir, 'a.json'), JSON.stringify({ title: 'A edited' }));
+    expect((await writeMapIndex(dir)).map((e) => e.slug)).toEqual(['b', 'a', 'c']);
+  });
+
   it('indexes maps by title', async () => {
     await writeFile(path.join(dir, 'one.json'), JSON.stringify({ title: 'First' }));
     await writeFile(path.join(dir, 'broken.json'), '{');

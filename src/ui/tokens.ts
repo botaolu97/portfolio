@@ -63,8 +63,10 @@ export const tokenValues = {
   'motion.duration.normal': "200ms",
   'motion.duration.zoom': "380ms",
   'motion.duration.zoom-out': "320ms",
+  'motion.duration.slide': "640ms",
   'motion.easing.standard': "cubic-bezier(0.2, 0, 0, 1)",
   'motion.easing.zoom-out': "cubic-bezier(0.45, 0, 0.55, 1)",
+  'motion.easing.slide': "cubic-bezier(0.65, 0, 0.35, 1)",
   'size.control': "32px",
   'size.control-sm': "28px",
   'size.inspector': "260px",
@@ -177,4 +179,5 @@ export const tokenValues = {
   'component.node.shape-shadow': "rgb(0 0 0 / 0.08)",
   'component.label.color': "#1c1c1a",
   'component.label.padding': "4px",
+  'component.canvas-slide.shadow': "0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12)",
 } as const;
