@@ -2,6 +2,7 @@ import type { NodeTypes } from '@xyflow/react';
 import { CodeNode } from './CodeNode';
 import { DemoNode } from './DemoNode';
 import { ImageNode } from './ImageNode';
+import { LabelNode } from './LabelNode';
 import { NoteNode } from './NoteNode';
 import { ShapeNode } from './ShapeNode';
 import { StackNode } from './StackNode';
@@ -12,6 +13,7 @@ import { VideoNode } from './VideoNode';
 export const nodeTypes = {
   note: NoteNode,
   text: TextNode,
+  label: LabelNode,
   code: CodeNode,
   stack: StackNode,
   image: ImageNode,

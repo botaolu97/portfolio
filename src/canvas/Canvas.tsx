@@ -172,6 +172,10 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         // Figma-style: drag on empty canvas selects in edit mode; scroll pans, pinch / ⌘-scroll zooms.
         selectionOnDrag={EDITABLE}
         selectionMode={SelectionMode.Partial}
+        // Shift isn't a box-select key (dragging empty canvas already box-selects in the editor), so
+        // Shift is free for snapping handles; Shift- or ⌘-click adds to the selection.
+        selectionKeyCode={null}
+        multiSelectionKeyCode={['Shift', 'Meta', 'Control']}
         panOnDrag={EDITABLE ? [1, 2] : true}
         panOnScroll
         zoomOnPinch

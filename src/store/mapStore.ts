@@ -201,8 +201,8 @@ export const useMapStore = create<MapState>()(
         );
         if (images.length < 2) return null;
         const size = (n: FlowNode) => ({
-          width: n.width ?? n.measured?.width ?? NODE_DEFAULTS.image.width,
-          height: n.height ?? n.measured?.height ?? NODE_DEFAULTS.image.height,
+          width: n.width ?? n.measured?.width ?? NODE_DEFAULTS.image.width ?? 0,
+          height: n.height ?? n.measured?.height ?? NODE_DEFAULTS.image.height ?? 0,
         });
         // The pile takes the top image's size, centred on the images' bounding box.
         const boxes = images.map((n) => ({ ...n.position, ...size(n) }));

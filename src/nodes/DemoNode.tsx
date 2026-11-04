@@ -1,11 +1,14 @@
 import { type NodeProps, useStore } from '@xyflow/react';
 import { memo } from 'react';
-import { asset } from '../content/api';
+import { asset, EDITABLE } from '../content/api';
 import type { FlowNode } from '../store/mapStore';
 import { DEVICES } from '../store/schema';
 import { tokenValues } from '../ui/tokens';
 import { NodeChrome } from './NodeChrome';
 import styles from './nodes.module.css';
+
+/** View mode: lifts on hover (see .lift). */
+const lift = EDITABLE ? '' : styles.lift;
 
 const BAR_HEIGHT = Number.parseFloat(tokenValues['component.demo.bar-height']);
 /** Below this zoom a live page is unreadable anyway, so show the poster instead of an iframe. */
@@ -53,7 +56,7 @@ export const DemoNode = memo(function DemoNode({
   }
 
   return (
-    <div className={styles.demo}>
+    <div className={`${styles.demo} ${lift}`}>
       <NodeChrome selected={selected} minWidth={200} minHeight={150} />
       <div className={styles.demoBar}>
         <span className={styles.dots} aria-hidden="true">

@@ -13,6 +13,7 @@ const SIDES = [
 const TYPE_LABELS: Record<NodeType, string> = {
   note: 'Note',
   text: 'Text',
+  label: 'Label',
   code: 'Code',
   stack: 'Stack',
   shape: 'Shape',
@@ -61,8 +62,11 @@ export function NodeChrome({
   minWidth = 40,
   minHeight = 30,
   keepAspectRatio,
+  resizable = true,
 }: {
   selected: boolean;
+  /** False for nodes that size themselves to their content. */
+  resizable?: boolean;
   minWidth?: number;
   minHeight?: number;
   keepAspectRatio?: boolean;
@@ -70,7 +74,7 @@ export function NodeChrome({
   const handleClass = `${styles.handle} ${EDITABLE ? styles.editable : ''}`;
   return (
     <>
-      {EDITABLE && (
+      {EDITABLE && resizable && (
         <NodeResizer
           isVisible={selected}
           minWidth={minWidth}

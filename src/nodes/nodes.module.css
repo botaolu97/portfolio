@@ -23,17 +23,23 @@
 .text {
   width: 100%;
   height: 100%;
-  padding: var(--space-10) var(--space-14);
-  overflow: auto;
+  /* Text containers: 10% of the width on every side except the bottom, where long text runs to
+     the edge and is clipped (no scrollbar). Click opens the full-screen reader. */
+  padding: calc(var(--text-box-padding) * 100%) calc(var(--text-box-padding) * 100%) 0;
+  overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  /* --_scale is the node's text size (S/M/L/XL), set inline from its data. */
+  font-size: calc(var(--font-size-base) * var(--_scale, 1));
   line-height: var(--font-line-height-normal);
+  box-shadow: var(--node-shadow);
 }
 
 .text.transparent {
   background: transparent;
   border-color: transparent;
+  box-shadow: none;
 }
 
 /* Rich text: shared by text nodes and notes, while editing and when rendered */
@@ -46,24 +52,29 @@
   margin: 0 0 var(--rich-text-block-gap);
 }
 
+/* An empty paragraph (Enter on an empty line) keeps one line of height, as it does while editing. */
+.rich p:empty::before {
+  content: "\00a0";
+}
+
 .rich :is(p, h1, h2, h3, ul, ol):last-child {
   margin-bottom: 0;
 }
 
 .rich h1 {
-  font-size: var(--rich-text-display-size);
+  font-size: calc(var(--rich-text-display-scale) * 1em);
   font-weight: var(--font-weight-bold);
   line-height: var(--font-line-height-tight);
 }
 
 .rich h2 {
-  font-size: var(--rich-text-headline-size);
+  font-size: calc(var(--rich-text-headline-scale) * 1em);
   font-weight: var(--font-weight-bold);
   line-height: var(--font-line-height-tight);
 }
 
 .rich h3 {
-  font-size: var(--rich-text-subheader-size);
+  font-size: calc(var(--rich-text-subheader-scale) * 1em);
   font-weight: var(--font-weight-semibold);
   line-height: var(--font-line-height-snug);
 }
@@ -123,6 +134,7 @@
   border-radius: var(--radius-sm);
   user-select: none;
   -webkit-user-drag: none;
+  box-shadow: var(--node-shadow);
 }
 
 /* Shape */
@@ -136,6 +148,8 @@
   position: absolute;
   inset: 0;
   overflow: visible;
+  /* Follows the outline, unlike box-shadow. */
+  filter: drop-shadow(0 1px 3px var(--node-shape-shadow));
 }
 
 .shapeLabel {
@@ -176,6 +190,7 @@
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--video-backdrop);
+  box-shadow: var(--node-shadow);
 }
 
 .video video,
@@ -215,7 +230,7 @@
   border-radius: var(--radius-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-raised);
+  box-shadow: var(--node-shadow);
 }
 
 .demoBar {
@@ -344,7 +359,7 @@
   margin: 0;
   padding: var(--note-padding);
   overflow: auto;
-  font-size: var(--note-font-size);
+  font-size: calc(var(--note-font-size) * var(--_scale, 1));
   line-height: var(--font-line-height-snug);
   overflow-wrap: anywhere;
 }
@@ -363,6 +378,7 @@
   border: 1px solid var(--code-border);
   border-radius: var(--code-radius);
   background: var(--code-bg);
+  box-shadow: var(--node-shadow);
 }
 
 .codeBar {
@@ -549,4 +565,117 @@
   line-height: 22px;
   text-align: center;
   box-shadow: var(--shadow-raised);
+}
+
+/* While editing, long text can scroll inside its box, still without a visible scrollbar. */
+.editingScroll {
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.editingScroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Text boxes open the reader on click in view mode. */
+.opensReader {
+  cursor: zoom-in;
+}
+
+/* Edit mode: drag handle along the top of a video (the player itself keeps its drags for seeking). */
+.dragStrip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  height: var(--video-drag-strip-height);
+  background: linear-gradient(var(--video-drag-strip-shade), transparent);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast);
+}
+
+:global(.react-flow__node):hover .dragStrip,
+:global(.react-flow__node.selected) .dragStrip,
+:global(.react-flow__node.dragging) .dragStrip {
+  opacity: 1;
+}
+
+:global(.react-flow__node.dragging) .dragStrip {
+  cursor: grabbing;
+}
+
+/* Two rows of three dots. */
+.grip {
+  color: var(--video-play-icon);
+  filter: drop-shadow(0 0 2px var(--video-drag-strip-shade));
+}
+
+/* Rotate handle (edit mode, selected note): a dot above the box on a short stem. */
+.rotateHandle {
+  position: absolute;
+  top: calc(-1 * var(--rotate-handle-offset));
+  left: 50%;
+  z-index: var(--z-node-adornment);
+  width: var(--rotate-handle-size);
+  height: var(--rotate-handle-size);
+  margin: calc(var(--rotate-handle-size) / -2) 0 0 calc(var(--rotate-handle-size) / -2);
+  border: 2px solid var(--rotate-handle-color);
+  border-radius: var(--radius-full);
+  background: var(--rotate-handle-fill);
+  cursor: grab;
+  touch-action: none;
+}
+
+.rotateHandle:active {
+  cursor: grabbing;
+}
+
+.rotateHandle::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: calc(var(--rotate-handle-offset) - var(--rotate-handle-size) / 2 - 2px);
+  margin-left: -0.5px;
+  background: var(--rotate-handle-color);
+  pointer-events: none;
+}
+
+/* View mode: interactive boxes (text, video, demo, stack) lift a little on hover. A text box the
+   reader just zoomed back into stays put until the pointer leaves (data-landing). */
+.lift {
+  transition: transform var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+:global(.react-flow__node):hover .lift:not([data-landing]) {
+  transform: scale(var(--hover-lift-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.react-flow__node):hover .lift:not([data-landing]) {
+    transform: none;
+  }
+}
+
+/* Label: text with no box, sized to its content. */
+.label {
+  padding: var(--label-padding);
+  color: var(--label-color);
+  line-height: var(--font-line-height-tight);
+  white-space: pre;
+}
+
+.labelEmpty {
+  color: var(--color-text-muted);
+}
+
+.labelEditing {
+  min-width: 1ch;
+  outline: none;
+  cursor: text;
 }

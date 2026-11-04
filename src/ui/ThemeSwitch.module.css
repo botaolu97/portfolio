@@ -2,7 +2,7 @@
   position: fixed;
   right: var(--theme-switch-inset);
   bottom: var(--theme-switch-inset);
-  z-index: var(--z-controls);
+  z-index: var(--z-theme-switch);
   width: var(--theme-switch-width);
   height: var(--theme-switch-height);
   padding: 0;

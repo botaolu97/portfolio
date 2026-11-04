@@ -111,7 +111,12 @@ describe('stacks', () => {
         image('a', 0),
         image('b', 200),
         image('c', 400),
-        { id: 'n', type: 'note', position: { x: 0, y: 300 }, data: { html: '', color: 'yellow' } },
+        {
+          id: 'n',
+          type: 'note',
+          position: { x: 0, y: 300 },
+          data: { html: '', color: 'yellow', size: 'md', rotation: 0 },
+        },
       ],
       edges: [
         { id: 'ab', source: 'a', target: 'b' },

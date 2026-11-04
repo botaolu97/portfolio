@@ -6,8 +6,8 @@
       "id": "intro",
       "type": "text",
       "position": {
-        "x": -16,
-        "y": -8
+        "x": 0,
+        "y": -40
       },
       "data": {
         "html": "<h2>Welcome to Mubu</h2><p>A canvas for ideas and <strong>live front-end demos</strong>. Scroll to pan, pinch or ⌘-scroll to zoom.</p><p>1111</p><p></p>"
@@ -32,27 +32,11 @@
       "height": 104
     },
     {
-      "id": "pricing",
-      "type": "demo",
-      "position": {
-        "x": 544,
-        "y": -32
-      },
-      "data": {
-        "demoId": "d-welcome",
-        "entry": "index.html",
-        "title": "Is bad?",
-        "device": "desktop"
-      },
-      "width": 640,
-      "height": 472
-    },
-    {
       "id": "toggle",
       "type": "demo",
       "position": {
-        "x": 1320,
-        "y": 96
+        "x": 432,
+        "y": -64
       },
       "data": {
         "demoId": "d-toggle",
@@ -81,8 +65,8 @@
       "id": "a17f3551",
       "type": "code",
       "position": {
-        "x": 880,
-        "y": 960
+        "x": 896,
+        "y": 464
       },
       "data": {
         "code": "git add -A -- . ':!.claude' && git commit -m \"Update canvas\" && git push origin feat/studio-foundation && git push origin feat/studio-foundation:main",
@@ -99,15 +83,15 @@
       "id": "3c8bfa17",
       "type": "note",
       "position": {
-        "x": 564,
-        "y": 484
+        "x": -280,
+        "y": 808
       },
       "data": {
-        "html": "",
+        "html": "<p>Shortcuts in Notes</p><p></p><p>Text sizes</p><p><strong>⌘ 1</strong> = Display size (or begin a line with #)</p><p><strong>⌘ 2</strong> = Headline size (or begin a line with ##)</p><p><strong>⌘ 3</strong> = Subheader size (or begin a line with ###)</p><p><strong>⌘ 4</strong> = Normal size</p><p></p><p>Creating lists</p><p>☐\t<strong>⌘ T</strong> = Checkbox</p><p>•\t<strong>⌘ L</strong> = Bullet point</p><p></p><p>Styling text</p><p><strong>⇧⌘ E</strong> = Highlight Marker</p><p><strong>⌘ B</strong> = <strong>Bold</strong></p><p><strong>⌘ I</strong> = <em>Italic</em></p><p><strong>⌘ U</strong> = <strong>Underline</strong></p><p><strong>⇧⌘ X</strong> = <strong><s>Strikethrough</s></strong></p><p><strong>⌘ ⌫</strong> = Clear styling</p>",
         "color": "yellow"
       },
-      "width": 200,
-      "height": 200
+      "width": 824,
+      "height": 640
     },
     {
       "id": "5374e766",
@@ -140,8 +124,8 @@
       "id": "2e7f9ceb",
       "type": "stack",
       "position": {
-        "x": 1300,
-        "y": 528
+        "x": 992,
+        "y": 32
       },
       "data": {
         "items": [
@@ -185,24 +169,6 @@
       "targetHandle": "t",
       "type": "smoothstep",
       "animated": true
-    },
-    {
-      "id": "e2",
-      "source": "idea",
-      "target": "pricing",
-      "sourceHandle": "r",
-      "targetHandle": "l",
-      "type": "default",
-      "label": "hi?",
-      "animated": true
-    },
-    {
-      "id": "e3",
-      "source": "pricing",
-      "target": "toggle",
-      "sourceHandle": "r",
-      "targetHandle": "l",
-      "type": "smoothstep"
     },
     {
       "id": "95a43ff7",

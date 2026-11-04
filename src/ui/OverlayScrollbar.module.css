@@ -1,0 +1,35 @@
+/* A thumb only (no track), floating --scrollbar-inset from the right, top and bottom edges. */
+.thumb {
+  position: absolute;
+  top: 0;
+  right: var(--scrollbar-inset);
+  z-index: 1;
+  width: var(--scrollbar-width);
+  border-radius: var(--radius-full);
+  background: var(--scrollbar-thumb);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--motion-duration-normal) var(--motion-easing-standard),
+    background-color var(--motion-duration-fast);
+  touch-action: none;
+}
+
+.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.thumb:hover,
+.dragging {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* The native scrollbar is replaced by the thumb. */
+.hideNative {
+  scrollbar-width: none;
+}
+
+.hideNative::-webkit-scrollbar {
+  display: none;
+}

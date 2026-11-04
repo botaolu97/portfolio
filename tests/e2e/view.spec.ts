@@ -57,7 +57,62 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('banner')).toHaveCount(0);
 
-  await expect(page.locator('.react-flow__node')).toHaveCount(5);
+  await expect(page.locator('.react-flow__node')).toHaveCount(6);
+
+  // Interactive boxes lift slightly on hover: text, video, demo and stacks (not notes or shapes).
+  const scaleOf = (locator: ReturnType<typeof page.locator>) =>
+    locator.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a);
+  for (const [id, part] of [
+    ['note', '[class*="_text_"]'],
+    ['demo', '[class*="_demo_"]'],
+    ['pile', '[class*="_stack_"]'],
+  ] as const) {
+    const box = page.locator(`.react-flow__node[data-id="${id}"] ${part}`).first();
+    await box.hover();
+    await expect.poll(() => scaleOf(box)).toBeCloseTo(1.02, 3);
+  }
+  await page.locator('.react-flow__node-shape').hover();
+  expect(await scaleOf(page.locator('.react-flow__node-shape > div').first())).toBe(1);
+  await page.mouse.move(8, 8);
+
+  // In the reader the text is a third of the window wide, selection is a subtle gray, and the
+  // custom scrollbar (thumb only, 24px from the edge) fades in on scroll and out 2s later.
+  await page.locator('.react-flow__node[data-id="longread"] [class*="_text_"]').click();
+  const longReader = page.getByRole('dialog', { name: 'Full text' });
+  await expect(longReader).toBeVisible();
+  await page.waitForTimeout(500);
+  const readerText = longReader.locator('[class*="_block_"]');
+  const textWidth = (await readerText.boundingBox())?.width ?? 0;
+  expect(textWidth).toBeGreaterThan(1280 / 3 - 4);
+  expect(textWidth).toBeLessThan(1280 / 3 + 4);
+  expect(
+    await longReader
+      .locator('p')
+      .first()
+      .evaluate((el) => getComputedStyle(el, '::selection').backgroundColor),
+  ).toBe('rgba(28, 28, 26, 0.12)');
+  const thumb = longReader.locator('[class*="_thumb_"]');
+  const thumbOpacity = () => thumb.evaluate((el) => Number(getComputedStyle(el).opacity));
+  expect(await thumbOpacity()).toBe(0);
+  await page.mouse.move(640, 400);
+  await page.mouse.wheel(0, 500);
+  await expect.poll(thumbOpacity).toBe(1);
+  const thumbBox = await thumb.boundingBox();
+  expect(1280 - ((thumbBox?.x ?? 0) + (thumbBox?.width ?? 0))).toBeCloseTo(24, 0);
+  // 24px from the bottom edge once scrolled to the end (and from the top at the start).
+  await page.mouse.wheel(0, 20000);
+  await expect
+    .poll(async () => {
+      const b = await thumb.boundingBox();
+      return Math.round(800 - ((b?.y ?? 0) + (b?.height ?? 0)));
+    })
+    .toBe(24);
+  await page.mouse.wheel(0, -20000);
+  await expect.poll(async () => Math.round((await thumb.boundingBox())?.y ?? 0)).toBe(24);
+  await page.waitForTimeout(2300);
+  await expect.poll(thumbOpacity, { timeout: 2000 }).toBe(0);
+  await page.keyboard.press('Escape');
+  await expect(longReader).toHaveCount(0);
 
   // Clicking a stack spreads it out over a blurred canvas; Esc or a click outside stacks it again.
   const pile = page.locator('.react-flow__node-stack');
@@ -105,6 +160,39 @@ test('published site is read-only and demos still run', async ({ page }) => {
   const frame = page.frameLocator('.react-flow__node-demo iframe');
   await frame.getByRole('button').click();
   await expect(frame.getByRole('button')).toHaveText('Clicked 1');
+
+  // Text boxes: 10% padding except at the bottom, clipped without a scrollbar; a click zooms up
+  // into the full-screen reader (theme switch only), and Esc or Back zooms back.
+  const textBox = page.locator('.react-flow__node[data-id="note"] [class*="_text_"]');
+  const boxStyle = await textBox.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return {
+      overflow: s.overflowY,
+      top: s.paddingTop,
+      bottom: s.paddingBottom,
+      width: (el as HTMLElement).offsetWidth,
+    };
+  });
+  expect(boxStyle).toMatchObject({ overflow: 'hidden', bottom: '0px' });
+  expect(Number.parseFloat(boxStyle.top)).toBeCloseTo(boxStyle.width * 0.1, 0);
+  const reader = page.getByRole('dialog', { name: 'Full text' });
+  await textBox.click();
+  await expect(reader).toBeVisible();
+  await expect(reader).toContainText('Fixture note');
+  await expect(switcher).toHaveCount(0);
+  await expect(page.getByRole('switch', { name: 'Dark theme' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(reader).toHaveCount(0);
+  await expect(switcher).toBeVisible();
+  // Right after landing, the box under the pointer doesn't lift until the pointer leaves and returns.
+  await expect(textBox).toHaveAttribute('data-landing', 'true');
+  expect(await scaleOf(textBox)).toBe(1);
+  await page.mouse.move(8, 8);
+  await textBox.hover();
+  await expect.poll(() => scaleOf(textBox)).toBeCloseTo(1.02, 3);
+  await textBox.click();
+  await reader.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(reader).toHaveCount(0);
 
   // Zoom gestures over the interface zoom the canvas, never the page.
   const viewport = () => page.locator('.react-flow__viewport').evaluate((el) => el.style.transform);

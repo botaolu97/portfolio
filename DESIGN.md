@@ -58,7 +58,8 @@ Tokens come in three tiers:
 
 ## Typography
 
-System font stack (`--font-family-sans`); no web fonts, so the editor loads instantly.
+System font stack (`--font-family-sans`) for the interface; the only web fonts are the bundled
+label fonts (Fasthand, Caveat).
 
 | Role                    | Size               | Weight                                                 |
 | ----------------------- | ------------------ | ------------------------------------------------------ |
@@ -80,8 +81,11 @@ System font stack (`--font-family-sans`); no web fonts, so the editor loads inst
 
 - `--radius-sm` for controls (buttons, inputs, menu items), `--radius-md` for containers (cards,
   panels, nodes), `--radius-full` for pills and circles.
-- `--shadow-raised` only for things that float above the canvas (panels, toasts, demo frames,
-  cards on hover). Flat things get a border instead.
+- `--shadow-raised` for things that float above the canvas (panels, toasts, the switcher).
+- Every box on the canvas gets the very light `--node-shadow` (`--shadow-subtle`): text boxes,
+  code blocks, images, videos and demos; shapes get a matching outline-following drop shadow
+  (`--node-shape-shadow`). Notes and stack prints keep their own paper shadows; text boxes with no
+  background get none.
 - Stacking order uses `--z-*` tokens, never raw numbers.
 
 ## Motion
@@ -160,6 +164,15 @@ Two-finger swipes never become the browser's back/forward gesture or a page boun
 scrollable areas (code blocks, inspector, switcher menu). Keep it that way; add
 navigation UI only if the gestures stop being enough.
 
+### Hover lift (view mode)
+
+Interactive boxes — text nodes, videos, demos and stacks — grow to `--hover-lift-scale` (2%) on
+hover in `--motion-duration-fast`, so visitors can tell they respond to a click. Only the box's
+content scales (React Flow positions the node itself). Notes, shapes and images don't lift, and
+nothing lifts in the editor. A text box the reader has just zoomed back into stays at its normal
+size until the pointer leaves, and the reader always measures the box unlifted, so the zoom lands
+on its real size. No lift with reduced motion.
+
 ### Canvas node chrome (`src/nodes/NodeChrome.tsx`, `src/canvas/Canvas.module.css`)
 
 | State               | Look                                                                                                                      |
@@ -172,18 +185,34 @@ navigation UI only if the gestures stop being enough.
 
 ### Node types
 
+- **Label:** text with no box or background (`--label-color`, `--label-padding`), sized to its
+  content, so it has no resize handles; change its size instead. Fonts: Fasthand (default),
+  Caveat, Sans, Serif, Mono (`--font-family-*`); Fasthand and Caveat are bundled with the app
+  (Fontsource), not loaded from Google. Size 8–240px (default 32), weight Regular/Medium/
+  Semibold/Bold (400–700). Double-click to type (plain text; Enter adds a line, Esc finishes).
 - **Note:** a sticky note for quick thoughts. It's the first item in the palette and defaults to
   yellow. It comes in five `--color-note-*` fills (yellow, pink, green, blue, purple), stored by
   name in the map so the palette can change later. Rich text (see below) in `--note-text` at
   `--note-font-size`, `--note-padding` inside, `--note-radius` corners and `--note-shadow` like
   paper. Notes stay light in dark mode. In the inspector the colors are round
   `--note-swatch-size` swatches (native radio buttons); the chosen one gets the accent focus ring.
+  Notes can be rotated (`rotation`, -180° to 180°): only the paper turns, while the resize and
+  connection handles stay on the unrotated box. In the editor a selected note shows a
+  `--rotate-handle-*` dot `--rotate-handle-offset` above it on a short stem: drag to rotate, Shift
+  snaps to 15°, double-click straightens; focused, arrow keys turn 1° (15° with Shift) and Home
+  straightens. The inspector has a Rotation field and Straighten.
 - **Text:** a surface card with border and `--radius-md`, or a note color, or no background.
+  Padding is `--text-box-padding` (10%) of the box's width on top, left and right, and none at the
+  bottom: long text runs to the edge and is clipped, with no scrollbar. Visitors click it to open
+  the full-screen reader (below). Notes don't do this; they keep their own padding and scroll.
 - **Shape:** SVG shapes with a constant 2px stroke; labels use `--shape-label`, dark in both modes
   because shape fills are light.
 - **Image:** fills the node; rounded with `--radius-sm`.
 - **Video:** `--video-backdrop` behind the player. Embeds show a thumbnail with a
   `--video-play-bg` play button until clicked.
+  The player fills the box and keeps its own drags (seeking), so in the editor a
+  `--video-drag-strip-height` strip along the top, shaded from `--video-drag-strip-shade` with grip
+  dots, is the handle for moving the node; it shows on hover or selection, clear of the controls.
 - **Demo frame:** surface card with `--shadow-raised`. A `--demo-bar-height` title bar
   (`--demo-bar-bg`) with three dots and the title; it's the drag handle in edit mode. The page
   inside is the demo's own and is not styled by Mubu.
@@ -202,6 +231,31 @@ light and dark themes. The editor highlights the code (`src/editor/highlight.ts`
 language) and stores HTML in which every token carries both colors, so the published site needs
 no highlighter and the colors follow the theme switch.
 
+### Full-screen reader (`src/nodes/TextReader.tsx`)
+
+Clicking a text node (view mode; in the editor, double-click or "Edit full screen" in the inspector)
+zooms the box
+up to fill the window in `--motion-duration-zoom`. The text keeps exactly the box's layout and is
+scaled to `--reader-width-ratio` (a third) of the window's width (at least `--reader-min-width` on
+narrow windows, never wider than the window minus `--reader-gutter`), starting `--reader-top` from
+the top. Long text scrolls with the overlay scrollbar (`src/ui/OverlayScrollbar.tsx`): a
+`--scrollbar-*` thumb with no track, `--scrollbar-inset` from the right, top and bottom edges, that
+fades in while scrolling and out `--scrollbar-hide-delay` after scrolling stops (it can be dragged).
+Visitors' text selection is a subtle gray (`--reader-selection`).
+The box's background grows with it: background and text share one clip that grows from the box's
+rectangle, so the zoom is continuous and the text is never re-wrapped. Opening deselects the box
+and the hover outline stays off until the pointer leaves, so the reader lands at exactly the box's
+size. The canvas switcher fades out with the zoom in and back in with the zoom out;
+the theme switch stays (`--z-theme-switch`). A Back pill sits `--reader-inset` from the top-left;
+Back or Esc zooms back out, landing the visible top of the text back in the box, in
+`--motion-duration-zoom-out` with `--motion-easing-zoom-out`: a symmetric curve, because the
+decelerating zoom-in curve leaves a long slow tail that reads as a second shrink.
+Respects reduced motion (no animation).
+
+In the editor this is where text nodes are edited (they aren't edited inside the box on the
+canvas): once the zoom lands, the static text swaps for the editor in exactly the same layout,
+edits save as you type, and Back or Esc swaps back and zooms down.
+
 ### Stack (`src/nodes/StackNode.tsx`)
 
 Select two or more images in the editor and a floating mini toolbar (`src/editor/SelectionToolbar.tsx`)
@@ -219,14 +273,20 @@ laying the images out side by side where the stack was; connectors come back wit
 
 ### Rich text (text nodes and notes)
 
-One editor (`src/editor/richTextExtensions.ts`) with the same shortcuts everywhere. Double-click a
-text node or note to edit; Esc or clicking the canvas finishes.
+One editor (`src/editor/richTextExtensions.ts`) with the same shortcuts everywhere. Text nodes are
+edited in the full-screen reader; notes inside the note (double-click, Esc or a canvas click to
+finish). Pressing Enter on an empty line keeps an empty paragraph, which shows as a blank line.
+
+**Text size.** Each text node and note has a size, S / M / L / XL (M is the default), picked in
+the inspector with a segmented control. It multiplies the node's base size by
+`--rich-text-scale-sm|md|lg|xl`, and headings are relative to it, so a large note keeps its
+proportions.
 
 | Shortcut | Result | Markdown start |
 | --- | --- | --- |
-| ⌘1 | Display (`--rich-text-display-size`, bold) | `# ` |
-| ⌘2 | Headline (`--rich-text-headline-size`, bold) | `## ` |
-| ⌘3 | Subheader (`--rich-text-subheader-size`, semibold) | `### ` |
+| ⌘1 | Display (`--rich-text-display-scale` × text size, bold) | `# ` |
+| ⌘2 | Headline (`--rich-text-headline-scale` × text size, bold) | `## ` |
+| ⌘3 | Subheader (`--rich-text-subheader-scale` × text size, semibold) | `### ` |
 | ⌘4 | Normal text | |
 | ⌘T | Checkbox list; checked items fade and strike through | `[ ] ` |
 | ⌘L | Bullet list | `- ` |
@@ -297,6 +357,9 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--font-family-sans` | `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif` | — | Interface text. |
 | `--font-family-mono` | `ui-monospace, "SF Mono", Menlo, monospace` | — | Code and numbers that must align. |
+| `--font-family-serif` | `ui-serif, Georgia, "Times New Roman", serif` | — | Label font option. |
+| `--font-family-fasthand` | `Fasthand, cursive` | — | Label font option (default); bundled with @fontsource/fasthand. |
+| `--font-family-caveat` | `"Caveat Variable", cursive` | — | Label font option; bundled with @fontsource-variable/caveat. |
 | `--font-size-xs` | `11px` | — | Tags and badges. |
 | `--font-size-sm` | `12px` | — | Labels, hints, field captions. |
 | `--font-size-md` | `13px` | — | Form inputs. |
@@ -347,6 +410,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--shadow-raised` | `0 1px 2px 0 rgb(0 0 0 / 0.06), 0 4px 16px 0 rgb(0 0 0 / 0.06)` | `0 1px 2px 0 rgb(0 0 0 / 0.3), 0 4px 16px 0 rgb(0 0 0 / 0.3)` | Floating panels, cards on hover, demo frames. |
+| `--shadow-subtle` | `0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 8px 0 rgb(0 0 0 / 0.05)` | `0 1px 2px 0 rgb(0 0 0 / 0.25), 0 2px 8px 0 rgb(0 0 0 / 0.22)` | A very light lift for boxes on the canvas. |
 
 #### `motion`
 
@@ -354,7 +418,10 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--motion-duration-fast` | `120ms` | — | Hover and focus feedback. |
 | `--motion-duration-normal` | `200ms` | — | State changes such as toggles. |
+| `--motion-duration-zoom` | `380ms` | — | Zooming a text box into and out of the reader. |
+| `--motion-duration-zoom-out` | `320ms` | — | Zooming a text box back out of the reader: a little quicker than zooming in. |
 | `--motion-easing-standard` | `cubic-bezier(0.2, 0, 0, 1)` | — | Default easing for UI transitions. |
+| `--motion-easing-zoom-out` | `cubic-bezier(0.45, 0, 0.55, 1)` | — | Symmetric ease in and out, so a shrink back reads as one move (the decelerating standard curve leaves a long slow tail that looks like a second shrink). |
 
 #### `size`
 
@@ -373,6 +440,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--z-controls` | `6` | — | Floating controls: canvas switcher and theme switch. |
 | `--z-overlay` | `10` | — | Drop target overlay. |
 | `--z-viewer` | `15` | — | Spread-out stack view and its backdrop, above controls. |
+| `--z-theme-switch` | `16` | — | Theme switch: above the reader and stack viewer. |
 | `--z-toast` | `20` | — | Error toasts. |
 
 #### `component.button`
@@ -434,6 +502,8 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--video-play-bg` | `rgb(0 0 0 / 0.7)` | — |  |
 | `--video-play-bg-hover` | `#ee3333` | — |  |
 | `--video-play-icon` | `#ffffff` | — |  |
+| `--video-drag-strip-height` | `28px` | — | Edit mode: the strip along the top of a video that moves the node. |
+| `--video-drag-strip-shade` | `rgb(0 0 0 / 0.45)` | — | Top of the strip's shade, fading to transparent. |
 
 #### `component.toast`
 
@@ -448,7 +518,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--note-text` | `#1c1c1a` | — | Note text; dark in both modes because note fills are light. |
 | `--note-placeholder` | `#6b6b66` | — |  |
-| `--note-padding` | `var(--space-16) → 16px` | follows alias |  |
+| `--note-padding` | `var(--space-8) → 8px` | follows alias | Space inside a note on every side. |
 | `--note-radius` | `var(--radius-xs) → 2px` | follows alias |  |
 | `--note-font-size` | `var(--font-size-lg) → 15px` | follows alias |  |
 | `--note-shadow` | `0 1px 2px 0 rgb(0 0 0 / 0.08), 0 6px 14px -4px rgb(0 0 0 / 0.1)` | — | Lifts the note off the canvas like paper. |
@@ -458,9 +528,13 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--rich-text-display-size` | `var(--font-size-3xl) → 28px` | follows alias | ⌘1 or # — Display. |
-| `--rich-text-headline-size` | `var(--font-size-2xl) → 20px` | follows alias | ⌘2 or ## — Headline. |
-| `--rich-text-subheader-size` | `var(--font-size-xl) → 16px` | follows alias | ⌘3 or ### — Subheader. |
+| `--rich-text-display-scale` | `2` | — | ⌘1 or # — Display, relative to the node's text size. |
+| `--rich-text-headline-scale` | `1.43` | — | ⌘2 or ## — Headline, relative to the node's text size. |
+| `--rich-text-subheader-scale` | `1.15` | — | ⌘3 or ### — Subheader, relative to the node's text size. |
+| `--rich-text-scale-sm` | `0.86` | — | Text size S (inspector). |
+| `--rich-text-scale-md` | `1` | — | Text size M, the default. |
+| `--rich-text-scale-lg` | `1.3` | — | Text size L. |
+| `--rich-text-scale-xl` | `1.75` | — | Text size XL. |
 | `--rich-text-block-gap` | `var(--space-6) → 6px` | follows alias | Space after paragraphs, headings and lists. |
 | `--rich-text-list-indent` | `var(--space-20) → 20px` | follows alias |  |
 | `--rich-text-highlight` | `rgb(255 196 0 / 0.45)` | — | ⇧⌘E marker. Translucent amber so it reads on white, dark and every note color. |
@@ -523,5 +597,62 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--stack-viewer-blur` | `10px` | — |  |
 | `--stack-viewer-padding` | `var(--space-48) → 48px` | follows alias |  |
 | `--stack-viewer-gap` | `var(--space-24) → 24px` | follows alias |  |
+
+#### `component.text-box`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--text-box-padding` | `0.1` | — | Padding on top, left and right as a share of the text box's width (10%); none at the bottom, where long text is clipped. |
+
+#### `component.reader`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--reader-top` | `72px` | — | Space above the text, below the back button. |
+| `--reader-width-ratio` | `0.3333` | — | Text width as a share of the window (a third). |
+| `--reader-min-width` | `320px` | — | On narrow windows the text never gets narrower than this (or the window minus the gutters). |
+| `--reader-gutter` | `var(--space-24) → 24px` | follows alias | Minimum space beside the text. |
+| `--reader-inset` | `var(--space-16) → 16px` | follows alias | Back button distance from the top-left corner. |
+| `--reader-selection` | `rgb(28 28 26 / 0.12)` | `rgb(236 236 234 / 0.2)` | Text selection for visitors: a subtle gray. |
+
+#### `component.scrollbar`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--scrollbar-thumb` | `rgb(28 28 26 / 0.28)` | `rgb(236 236 234 / 0.32)` |  |
+| `--scrollbar-thumb-hover` | `rgb(28 28 26 / 0.45)` | `rgb(236 236 234 / 0.5)` |  |
+| `--scrollbar-width` | `6px` | — |  |
+| `--scrollbar-inset` | `var(--space-24) → 24px` | follows alias | Distance from the window's right, top and bottom edges. |
+| `--scrollbar-min-thumb` | `40px` | — |  |
+| `--scrollbar-hide-delay` | `2000ms` | — | The thumb fades out this long after scrolling stops. |
+
+#### `component.rotate-handle`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--rotate-handle-size` | `12px` | — |  |
+| `--rotate-handle-offset` | `28px` | — | Distance from the box's top edge to the handle's centre. |
+| `--rotate-handle-color` | `var(--color-accent) → #4f6bed` | follows alias |  |
+| `--rotate-handle-fill` | `var(--color-surface) → #ffffff` | follows alias |  |
+
+#### `component.hover-lift`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--hover-lift-scale` | `1.02` | — |  |
+
+#### `component.node`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--node-shadow` | `var(--shadow-subtle) → 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 8px 0 rgb(0 0 0 / 0.05)` | follows alias | Text boxes, code blocks, images, videos and demos (notes and stack prints have their own). |
+| `--node-shape-shadow` | `rgb(0 0 0 / 0.08)` | `rgb(0 0 0 / 0.35)` | Shapes use a drop-shadow filter in this color so the shadow follows their outline. |
+
+#### `component.label`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--label-color` | `var(--color-text) → #1c1c1a` | follows alias |  |
+| `--label-padding` | `var(--space-4) → 4px` | follows alias | Small inset so the selection outline doesn't touch the letters. |
 
 <!-- tokens:end -->

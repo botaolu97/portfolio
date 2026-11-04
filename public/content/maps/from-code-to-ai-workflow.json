@@ -1,0 +1,161 @@
+{
+  "version": 2,
+  "title": "From Code to AI Workflow",
+  "nodes": [
+    {
+      "id": "f92bb232",
+      "type": "text",
+      "position": {
+        "x": -904,
+        "y": -320
+      },
+      "data": {
+        "html": "<h1>Summary</h1><p></p><p><mark>Our team wanted to accommodate increasing customer's needs in time series data anomaly detection (tsAD).</mark> I helped the team to define the product scope, establish project lifecycle, and design and test the UI from scratch.</p><p></p><p>The MVP was adopted by 300+ customers, quickly validating our initial direction. This may not be a big number in consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.</p><p></p><p>The MVP was adopted by 300+ customers, quickly validating our initial direction. This may not be a big number in consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.The MVP was adopted by 300+ customers, quickly validating our initial direction. This may not be a big number in <mark>consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.</mark></p>",
+        "size": "xl"
+      },
+      "width": 696,
+      "height": 728
+    },
+    {
+      "id": "c019c42b",
+      "type": "video",
+      "position": {
+        "x": 96,
+        "y": -264
+      },
+      "data": {
+        "src": "content/assets/9986327ac757be94.mp4"
+      },
+      "width": 872,
+      "height": 534,
+      "zIndex": 1
+    },
+    {
+      "id": "8c694f61",
+      "type": "note",
+      "position": {
+        "x": -1072,
+        "y": -376
+      },
+      "data": {
+        "html": "<p>🫘      this is team work!</p>",
+        "color": "yellow",
+        "size": "xl",
+        "rotation": -10.2
+      },
+      "width": 240,
+      "height": 216,
+      "zIndex": 2
+    },
+    {
+      "id": "cc8f16e3",
+      "type": "text",
+      "position": {
+        "x": -896,
+        "y": 592
+      },
+      "data": {
+        "html": "<h1>Background</h1><p></p><p>Industrial engineers need to identify anomalous patterns in physical-system data early to prevent equipment failures and reduce operational costs.</p><p></p><p>This need is growing: the global anomaly detection market is estimated at $7–8B in 2026, and our team had also received direct requests from our top customers.</p>",
+        "size": "xl"
+      },
+      "width": 600,
+      "height": 536
+    },
+    {
+      "id": "6e9ce31b",
+      "type": "label",
+      "position": {
+        "x": -1024,
+        "y": -784
+      },
+      "data": {
+        "text": "From Code to AI Workflow",
+        "font": "fasthand",
+        "size": 240,
+        "weight": 400
+      }
+    },
+    {
+      "id": "43aa77d9",
+      "type": "stack",
+      "position": {
+        "x": 72,
+        "y": 608
+      },
+      "data": {
+        "items": [
+          {
+            "id": "f629ce4c",
+            "src": "content/assets/a97bd9cf820569c2.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 365
+          },
+          {
+            "id": "685305a7",
+            "src": "content/assets/36dc6f013cb00fdf.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 365
+          }
+        ],
+        "edges": []
+      },
+      "width": 840,
+      "height": 621
+    },
+    {
+      "id": "5639f36b",
+      "type": "stack",
+      "position": {
+        "x": 976,
+        "y": 504
+      },
+      "data": {
+        "items": [
+          {
+            "id": "1e83621a",
+            "src": "content/assets/641a548708b1e7e6.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 365
+          },
+          {
+            "id": "ba06c807",
+            "src": "content/assets/2fce88c9ba975b33.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 365
+          },
+          {
+            "id": "59427b33",
+            "src": "content/assets/b40708fe2eb470f4.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 365
+          }
+        ],
+        "edges": []
+      },
+      "width": 744,
+      "height": 837
+    }
+  ],
+  "edges": [
+    {
+      "id": "2b258071",
+      "source": "f92bb232",
+      "target": "c019c42b",
+      "sourceHandle": "r",
+      "targetHandle": "l",
+      "type": "default",
+      "label": "What's the look of the plot",
+      "animated": true
+    }
+  ]
+}

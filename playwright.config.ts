@@ -11,15 +11,15 @@ export default defineConfig({
   },
   projects: [
     { name: 'edit', testMatch: 'edit.spec.ts', use: { baseURL: 'http://127.0.0.1:5173' } },
-    { name: 'view', testMatch: 'view.spec.ts', use: { baseURL: 'http://127.0.0.1:4173' } },
+    { name: 'view', testMatch: 'view.spec.ts', use: { baseURL: 'http://127.0.0.1:4174' } },
   ],
   webServer: [
     { command: 'npm run dev', url: 'http://127.0.0.1:5173', reuseExistingServer: true },
     {
       // Always build fresh: a reused preview server would test whatever build it started with.
       // `exec` lets Playwright stop vite itself instead of leaving it orphaned behind npm.
-      command: 'npm run build && exec npx vite preview --host 127.0.0.1 --port 4173 --strictPort',
-      url: 'http://127.0.0.1:4173',
+      command: 'npm run build && exec npx vite preview --host 127.0.0.1 --port 4174 --strictPort',
+      url: 'http://127.0.0.1:4174',
       reuseExistingServer: false,
       timeout: 120_000,
     },

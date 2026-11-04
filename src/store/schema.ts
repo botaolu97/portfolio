@@ -27,9 +27,41 @@ export const NOTE_COLORS = ['yellow', 'pink', 'green', 'blue', 'purple'] as cons
 export type NoteColor = (typeof NOTE_COLORS)[number];
 
 /** A sticky note: rich text on one of the note colors (a token name, not a hex value). */
+/** Text size presets for text nodes and notes (scale tokens --rich-text-scale-*). */
+export const TEXT_SIZES = ['sm', 'md', 'lg', 'xl'] as const;
+export type TextSize = (typeof TEXT_SIZES)[number];
+
 export const noteData = z.object({
   html: z.string().default(''),
   color: z.enum(NOTE_COLORS).default('yellow'),
+  size: z.enum(TEXT_SIZES).default('md'),
+  /** Tilt in degrees, -180 to 180 (clockwise positive). */
+  rotation: z.number().min(-180).max(180).default(0),
+});
+
+export const LABEL_FONTS = {
+  fasthand: 'Fasthand',
+  caveat: 'Caveat',
+  sans: 'Sans',
+  serif: 'Serif',
+  mono: 'Mono',
+} as const;
+export type LabelFont = keyof typeof LABEL_FONTS;
+export const LABEL_WEIGHTS = [400, 500, 600, 700] as const;
+
+/** Text with no box: a font, a size in canvas px and a weight. Sizes itself to the text. */
+export const labelData = z.object({
+  text: z.string().default(''),
+  font: z.enum(Object.keys(LABEL_FONTS) as [LabelFont, ...LabelFont[]]).default('fasthand'),
+  size: z.number().min(8).max(240).default(32),
+  weight: z
+    .union(
+      LABEL_WEIGHTS.map((w) => z.literal(w)) as [
+        z.ZodLiteral<400>,
+        ...z.ZodLiteral<500 | 600 | 700>[],
+      ],
+    )
+    .default(400),
 });
 
 export const CODE_LANGUAGES = {
@@ -69,6 +101,7 @@ export const codeData = z.object({
 export const textData = z.object({
   html: z.string(),
   background: z.string().optional(),
+  size: z.enum(TEXT_SIZES).default('md'),
 });
 
 export const imageData = z.object({
@@ -129,6 +162,7 @@ export const stackData = z.object({
 export const mapNode = z.discriminatedUnion('type', [
   z.object({ ...nodeBase, type: z.literal('text'), data: textData }),
   z.object({ ...nodeBase, type: z.literal('note'), data: noteData }),
+  z.object({ ...nodeBase, type: z.literal('label'), data: labelData }),
   z.object({ ...nodeBase, type: z.literal('code'), data: codeData }),
   z.object({ ...nodeBase, type: z.literal('stack'), data: stackData }),
   z.object({ ...nodeBase, type: z.literal('image'), data: imageData }),

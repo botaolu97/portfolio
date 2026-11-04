@@ -31,6 +31,8 @@ export function CanvasSwitcher({ slug, title }: { slug: string | null; title: st
   const [newTitle, setNewTitle] = useState('');
   const [error, setError] = useState<string | null>(null);
   const saveStatus = useUiStore((s) => s.saveStatus);
+  // The full-screen reader shows only the theme switch: fade out with the zoom in, back in with the zoom out.
+  const hidden = useUiStore((s) => s.readerOpen);
   const root = useRef<HTMLDivElement>(null);
   const menu = useRef<HTMLDivElement>(null);
   const [, navigate] = useLocation();
@@ -93,7 +95,11 @@ export function CanvasSwitcher({ slug, title }: { slug: string | null; title: st
   };
 
   return (
-    <div ref={root} className={`${styles.switcher} ${open ? styles.open : ''}`}>
+    <div
+      ref={root}
+      className={`${styles.switcher} ${open ? styles.open : ''} ${hidden ? styles.hidden : ''}`}
+      inert={hidden}
+    >
       {open && (
         <div
           ref={menu}

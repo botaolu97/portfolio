@@ -1,0 +1,77 @@
+/* Layers: the frame (the box's background with the scrolling text, clipped as one), the back button. */
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-viewer);
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+}
+
+.scroller {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.spacer {
+  position: relative;
+}
+
+/* The text block is laid out at the box's own width (canvas px) and scaled, so it never re-wraps. */
+.block {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.clone {
+  height: auto;
+  overflow: visible;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  padding-bottom: calc(var(--text-box-padding) * 100%);
+}
+
+.back {
+  position: fixed;
+  top: var(--reader-inset);
+  left: var(--reader-inset);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  height: var(--size-control);
+  padding: 0 var(--space-14) 0 var(--space-10);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-full);
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.back:hover {
+  background: var(--color-surface-muted);
+}
+
+/* The editor sits in the same box as the static text, so the layout doesn't move. */
+.editing {
+  cursor: text;
+}
+
+.editing :global(.ProseMirror) {
+  outline: none;
+}
+
+/* Visitors selecting text get a subtle gray highlight (the editor keeps the system color). */
+.viewer ::selection {
+  background: var(--reader-selection);
+  color: inherit;
+}

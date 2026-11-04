@@ -58,6 +58,36 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await expect(note.locator('input[type=checkbox]')).toHaveCount(1);
   await page.getByLabel('Pink').check();
 
+  // Rotate: drag the dot above the selected note; Shift snaps to 15°.
+  await note.click();
+  const handle = page.getByRole('slider', { name: 'Rotate' });
+  const hb = await handle.boundingBox();
+  const nb = await note.boundingBox();
+  if (!hb || !nb) throw new Error('rotate handle not visible');
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2);
+  await page.keyboard.down('Shift');
+  await page.mouse.down();
+  await page.mouse.move(nb.x + nb.width + 60, nb.y + 20, { steps: 10 });
+  await page.mouse.up();
+  await page.keyboard.up('Shift');
+  const paper = note.locator('[class*="_note_"]');
+  await expect(paper).toHaveAttribute('style', /rotate\((-?\d+)deg\)/);
+  const rotated = Number(
+    (await paper.getAttribute('style'))?.match(/rotate\((-?[\d.]+)deg\)/)?.[1],
+  );
+  expect(rotated).not.toBe(0);
+  expect(rotated % 15).toBe(0);
+
+  // Text size: Large scales the note's text (and its headings) up.
+  const noteFontSize = () =>
+    note
+      .locator('p')
+      .first()
+      .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
+  const mediumSize = await noteFontSize();
+  await page.getByLabel('Large', { exact: true }).check();
+  await expect.poll(noteFontSize).toBeGreaterThan(mediumSize);
+
   // Add a code block: highlighted on arrival, editable, re-highlighted for a new language.
   await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Code').click();
   const code = page.locator('.react-flow__node-code');
@@ -68,6 +98,92 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await page.getByLabel('Language').selectOption('python');
   await expect(code.locator('.shiki')).toContainText('def hello');
   await expect(code.getByText('Python')).toBeVisible();
+
+  // Text boxes are edited in the full-screen view: double-click zooms up, the text becomes
+  // editable once landed, and Esc saves and zooms back. Empty lines keep their height.
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Text').click();
+  const textNode = page.locator('.react-flow__node-text');
+  // The hover lift is for visitors only.
+  await textNode.hover();
+  await page.waitForTimeout(200);
+  expect(
+    await textNode.locator('[class*="_text_"]').evaluate((el) => getComputedStyle(el).transform),
+  ).toBe('none');
+  await textNode.dblclick();
+  const reader = page.getByRole('dialog', { name: 'Full text' });
+  await expect(page.getByRole('button', { name: /Switch canvas/ })).toHaveCount(0);
+  const editor = reader.locator('.ProseMirror');
+  await expect(editor).toBeFocused();
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.type('Line one');
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('Line three');
+  await page.keyboard.press('Escape');
+  await expect(reader).toHaveCount(0);
+  await expect(textNode).toContainText('Line three');
+  const blankLine = textNode.locator('p').nth(1);
+  await expect(blankLine).toHaveText('');
+  expect(await blankLine.evaluate((el) => el.getBoundingClientRect().height)).toBeGreaterThan(5);
+  await page.getByRole('button', { name: 'Edit full screen' }).click();
+  await expect(reader).toBeVisible();
+  await reader.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(reader).toHaveCount(0);
+
+  // A file video fills its box, so in the editor it moves by the strip along its top; the
+  // player itself keeps its own drags (seeking) and doesn't move the node.
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Video').click();
+  await page
+    .getByRole('complementary', { name: 'Inspector' })
+    .locator('input[type=file][accept="video/*"]')
+    .setInputFiles({
+      name: 'clip.mp4',
+      mimeType: 'video/mp4',
+      buffer: Buffer.from('not a real video'),
+    });
+  const videoNode = page.locator('.react-flow__node-video');
+  await expect(videoNode.locator('video')).toHaveCount(1);
+  const videoAt = () => videoNode.evaluate((el) => el.style.transform);
+  const dragFrom = async (selector: string, dy: number) => {
+    const b = await videoNode.locator(selector).boundingBox();
+    if (!b) throw new Error(`${selector} not visible`);
+    await page.mouse.move(b.x + b.width / 2, b.y + dy);
+    await page.mouse.down();
+    await page.mouse.move(b.x + b.width / 2 + 90, b.y + dy + 60, { steps: 8 });
+    await page.mouse.up();
+  };
+  const videoBefore = await videoAt();
+  await dragFrom('video', 60);
+  expect(await videoAt()).toBe(videoBefore);
+  await videoNode.hover();
+  await dragFrom('[class*="_dragStrip_"]', 10);
+  expect(await videoAt()).not.toBe(videoBefore);
+
+  // Labels: no box, Fasthand by default; type inline, then change font, size and weight.
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Label').click();
+  const label = page.locator('.react-flow__node-label');
+  const labelText = label.locator('[class*="_label_"]');
+  expect(await labelText.evaluate((el) => getComputedStyle(el).fontFamily)).toContain('Fasthand');
+  expect(await labelText.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
+    'rgba(0, 0, 0, 0)',
+  );
+  await labelText.dblclick();
+  const labelInput = page.getByRole('textbox', { name: 'Label text' });
+  await expect(labelInput).toBeFocused();
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.type('Hello there');
+  await page.keyboard.press('Escape');
+  await expect(labelText).toHaveText('Hello there');
+  await label.click();
+  await page.getByLabel('Font').selectOption('serif');
+  await page
+    .getByRole('spinbutton')
+    .filter({ hasNot: page.locator('[step]') })
+    .last()
+    .fill('48');
+  await page.getByRole('radio', { name: 'Bold', exact: true }).check();
+  await expect.poll(() => labelText.evaluate((el) => getComputedStyle(el).fontSize)).toBe('48px');
+  expect(await labelText.evaluate((el) => getComputedStyle(el).fontWeight)).toBe('700');
 
   // Paste a PNG and SVG markup from the clipboard.
   await page.locator('.react-flow__pane').click({ position: { x: 600, y: 680 } });
@@ -116,18 +232,32 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
     'code',
     'image',
     'image',
+    'label',
     'note',
     'shape',
+    'text',
+    'video',
   ]);
   const codeData = saved.nodes.find((n: { type: string }) => n.type === 'code').data;
   expect(codeData).toMatchObject({ language: 'python', code: 'def hello():\n    return "hi"' });
   expect(codeData.html).toContain('--shiki-dark');
+  expect(saved.nodes.find((n: { type: string }) => n.type === 'label').data).toEqual({
+    text: 'Hello there',
+    font: 'serif',
+    size: 48,
+    weight: 700,
+  });
   const noteData = saved.nodes.find((n: { type: string }) => n.type === 'note').data;
   expect(noteData.color).toBe('pink');
+  expect(noteData.size).toBe('lg');
+  expect(noteData.rotation % 15).toBe(0);
+  expect(noteData.rotation).not.toBe(0);
   expect(noteData.html).toContain('<h1>Plan</h1>');
   expect(noteData.html).toMatch(/data-type="taskList"[\s\S]*Buy milk/);
   expect(noteData.html).toContain('<mark>marked</mark>');
-  for (const n of saved.nodes.filter((n: { type: string }) => n.type === 'image')) {
+  for (const n of saved.nodes.filter((n: { type: string }) =>
+    ['image', 'video'].includes(n.type),
+  )) {
     createdAssets.push(path.join(content, n.data.src.replace(/^content\//, '')));
   }
 

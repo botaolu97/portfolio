@@ -8,15 +8,18 @@ export default function RichTextEditor({
   id,
   html,
   onDone,
+  autofocus = 'end',
 }: {
   id: string;
   html: string;
   onDone: () => void;
+  /** Where the caret starts. */
+  autofocus?: 'start' | 'end';
 }) {
   const editor = useEditor({
     extensions: richTextExtensions,
     content: html,
-    autofocus: 'end',
+    autofocus,
     onUpdate: ({ editor }) =>
       useMapStore.getState().updateNodeData<'text' | 'note'>(id, { html: editor.getHTML() }),
   });

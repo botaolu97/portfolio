@@ -24,7 +24,7 @@ export const StackNode = memo(function StackNode({
 
   return (
     <div
-      className={styles.stack}
+      className={`${styles.stack} ${EDITABLE ? '' : styles.lift}`}
       onClick={EDITABLE ? undefined : () => setOpen(true)}
       onDoubleClick={EDITABLE ? () => setOpen(true) : undefined}
       onKeyDown={(e) => {

@@ -19,6 +19,9 @@
   --color-note-purple: #e2d8ff;
   --font-family-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-family-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-family-serif: ui-serif, Georgia, "Times New Roman", serif;
+  --font-family-fasthand: Fasthand, cursive;
+  --font-family-caveat: "Caveat Variable", cursive;
   --font-size-xs: 11px;
   --font-size-sm: 12px;
   --font-size-md: 13px;
@@ -54,9 +57,13 @@
   --radius-lg: 12px;
   --radius-full: 999px;
   --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 4px 16px 0 rgb(0 0 0 / 0.06);
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 8px 0 rgb(0 0 0 / 0.05);
   --motion-duration-fast: 120ms;
   --motion-duration-normal: 200ms;
+  --motion-duration-zoom: 380ms;
+  --motion-duration-zoom-out: 320ms;
   --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-zoom-out: cubic-bezier(0.45, 0, 0.55, 1);
   --size-control: 32px;
   --size-control-sm: 28px;
   --size-inspector: 260px;
@@ -65,6 +72,7 @@
   --z-controls: 6;
   --z-overlay: 10;
   --z-viewer: 15;
+  --z-theme-switch: 16;
   --z-toast: 20;
   --button-height: var(--size-control);
   --button-padding-x: var(--space-12);
@@ -91,18 +99,24 @@
   --video-play-bg: rgb(0 0 0 / 0.7);
   --video-play-bg-hover: #ee3333;
   --video-play-icon: #ffffff;
+  --video-drag-strip-height: 28px;
+  --video-drag-strip-shade: rgb(0 0 0 / 0.45);
   --toast-bg: var(--color-danger);
   --toast-text: var(--color-text-on-accent);
   --note-text: #1c1c1a;
   --note-placeholder: #6b6b66;
-  --note-padding: var(--space-16);
+  --note-padding: var(--space-8);
   --note-radius: var(--radius-xs);
   --note-font-size: var(--font-size-lg);
   --note-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.08), 0 6px 14px -4px rgb(0 0 0 / 0.1);
   --note-swatch-size: 24px;
-  --rich-text-display-size: var(--font-size-3xl);
-  --rich-text-headline-size: var(--font-size-2xl);
-  --rich-text-subheader-size: var(--font-size-xl);
+  --rich-text-display-scale: 2;
+  --rich-text-headline-scale: 1.43;
+  --rich-text-subheader-scale: 1.15;
+  --rich-text-scale-sm: 0.86;
+  --rich-text-scale-md: 1;
+  --rich-text-scale-lg: 1.3;
+  --rich-text-scale-xl: 1.75;
   --rich-text-block-gap: var(--space-6);
   --rich-text-list-indent: var(--space-20);
   --rich-text-highlight: rgb(255 196 0 / 0.45);
@@ -140,6 +154,28 @@
   --stack-viewer-blur: 10px;
   --stack-viewer-padding: var(--space-48);
   --stack-viewer-gap: var(--space-24);
+  --text-box-padding: 0.1;
+  --reader-top: 72px;
+  --reader-width-ratio: 0.3333;
+  --reader-min-width: 320px;
+  --reader-gutter: var(--space-24);
+  --reader-inset: var(--space-16);
+  --reader-selection: rgb(28 28 26 / 0.12);
+  --scrollbar-thumb: rgb(28 28 26 / 0.28);
+  --scrollbar-thumb-hover: rgb(28 28 26 / 0.45);
+  --scrollbar-width: 6px;
+  --scrollbar-inset: var(--space-24);
+  --scrollbar-min-thumb: 40px;
+  --scrollbar-hide-delay: 2000ms;
+  --rotate-handle-size: 12px;
+  --rotate-handle-offset: 28px;
+  --rotate-handle-color: var(--color-accent);
+  --rotate-handle-fill: var(--color-surface);
+  --hover-lift-scale: 1.02;
+  --node-shadow: var(--shadow-subtle);
+  --node-shape-shadow: rgb(0 0 0 / 0.08);
+  --label-color: var(--color-text);
+  --label-padding: var(--space-4);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -155,6 +191,11 @@
     --color-accent-soft: #2a3156;
     --color-danger: #ef6a5d;
     --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 4px 16px 0 rgb(0 0 0 / 0.3);
+    --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.25), 0 2px 8px 0 rgb(0 0 0 / 0.22);
+    --reader-selection: rgb(236 236 234 / 0.2);
+    --scrollbar-thumb: rgb(236 236 234 / 0.32);
+    --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
+    --node-shape-shadow: rgb(0 0 0 / 0.35);
   }
 }
 
@@ -170,4 +211,9 @@
   --color-accent-soft: #2a3156;
   --color-danger: #ef6a5d;
   --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 4px 16px 0 rgb(0 0 0 / 0.3);
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.25), 0 2px 8px 0 rgb(0 0 0 / 0.22);
+  --reader-selection: rgb(236 236 234 / 0.2);
+  --scrollbar-thumb: rgb(236 236 234 / 0.32);
+  --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
+  --node-shape-shadow: rgb(0 0 0 / 0.35);
 }

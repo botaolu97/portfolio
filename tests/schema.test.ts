@@ -60,6 +60,8 @@ describe('migrateMap', () => {
     expect(doc.nodes[0].data).toEqual({
       html: '<p>Buy milk</p><p></p><p>&lt;b&gt;&amp;</p>',
       color: 'pink',
+      size: 'md',
+      rotation: 0,
     });
   });
 
@@ -85,6 +87,30 @@ describe('migrateMap', () => {
       edges: [],
     });
     expect(() => migrateMap(stack([item]))).toThrow();
+  });
+
+  it('gives text nodes and notes a medium text size by default, and rejects unknown sizes', () => {
+    const text = { id: 't', type: 'text', position: { x: 0, y: 0 }, data: { html: '<p>x</p>' } };
+    const note = { id: 'n', type: 'note', position: { x: 0, y: 0 }, data: { size: 'xl' } };
+    const doc = migrateMap({ ...valid, nodes: [text, note] });
+    expect(doc.nodes.map((n) => (n.data as { size: string }).size)).toEqual(['md', 'xl']);
+    expect(() => migrateMap({ ...valid, nodes: [{ ...note, data: { size: 'huge' } }] })).toThrow();
+  });
+
+  it('defaults labels to Fasthand at 32px regular, and validates font, size and weight', () => {
+    const label = (data: object) => ({
+      ...valid,
+      nodes: [{ id: 'l', type: 'label', position: { x: 0, y: 0 }, data }],
+    });
+    expect(migrateMap(label({ text: 'Hi' })).nodes[0].data).toEqual({
+      text: 'Hi',
+      font: 'fasthand',
+      size: 32,
+      weight: 400,
+    });
+    expect(() => migrateMap(label({ font: 'comic' }))).toThrow();
+    expect(() => migrateMap(label({ size: 500 }))).toThrow();
+    expect(() => migrateMap(label({ weight: 450 }))).toThrow();
   });
 
   it('rejects unknown node types', () => {

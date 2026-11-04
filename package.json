@@ -19,6 +19,8 @@
     "delete-canvas": "node scripts/delete-canvas.ts"
   },
   "dependencies": {
+    "@fontsource-variable/caveat": "^5.3.0",
+    "@fontsource/fasthand": "^5.3.0",
     "@shikijs/langs": "^4.6.0",
     "@shikijs/themes": "^4.6.0",
     "@tiptap/extension-highlight": "^3.32.2",

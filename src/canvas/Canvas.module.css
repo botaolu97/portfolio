@@ -53,6 +53,11 @@
   border-color: color-mix(in srgb, var(--color-accent) 70%, transparent);
 }
 
+/* No hover outline on a text box the reader has just zoomed back into, until the pointer leaves. */
+.canvas :global(.react-flow__node:not(.selected):hover:has([data-landing]))::after {
+  border-color: transparent;
+}
+
 .view :global(.react-flow__node.selected)::after {
   border: 2px solid var(--selection-outline);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--selection-outline) 18%, transparent);

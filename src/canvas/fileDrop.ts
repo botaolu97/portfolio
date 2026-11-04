@@ -75,7 +75,8 @@ export async function addNodesFromFiles(files: File[], at: XYPosition) {
   const demoFiles = files.filter((f) => classifyFile(f.name) === 'demo');
   let offset = 0;
   // Each node is centered on the drop point, cascading when several land at once.
-  const next = (size: { width: number; height: number }) => {
+  const next = ({ width = 0, height = 0 }: { width?: number; height?: number }) => {
+    const size = { width, height };
     const position = { x: at.x - size.width / 2 + offset, y: at.y - size.height / 2 + offset };
     offset += 32;
     return position;

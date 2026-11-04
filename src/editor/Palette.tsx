@@ -7,6 +7,7 @@ import { useViewportCenter } from './useViewportCenter';
 const ICONS = {
   note: '▤',
   text: 'T',
+  label: 'Aa',
   code: '{ }',
   shape: '◇',
   image: '▣',
@@ -33,7 +34,7 @@ export function Palette() {
           }}
           onClick={() => {
             const c = center();
-            const { width, height } = NODE_DEFAULTS[type];
+            const { width = 0, height = 0 } = NODE_DEFAULTS[type];
             addNode(type, { x: c.x - width / 2, y: c.y - height / 2 });
           }}
         >

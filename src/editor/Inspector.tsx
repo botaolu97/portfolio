@@ -2,17 +2,24 @@ import { useReactFlow } from '@xyflow/react';
 import { useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { asset, uploadDemo, uploadFile } from '../content/api';
+import { normalizeAngle } from '../nodes/RotateHandle';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
 import {
   CODE_LANGUAGES,
   type CodeLanguage,
   DEVICES,
+  LABEL_FONTS,
+  LABEL_WEIGHTS,
+  type LabelFont,
   NOTE_COLORS,
   type NodeDataOf,
   type NodeType,
   type NoteColor,
   SHAPE_KINDS,
+  TEXT_SIZES,
+  type TextSize,
 } from '../store/schema';
+import { useUiStore } from '../store/uiStore';
 import { Button } from '../ui/Button';
 import styles from './Editor.module.css';
 
@@ -76,6 +83,116 @@ const NOTE_COLOR_NAMES: Record<NoteColor, string> = {
   purple: 'Purple',
 };
 
+const TEXT_SIZE_LABELS: Record<TextSize, string> = { sm: 'S', md: 'M', lg: 'L', xl: 'XL' };
+
+const TEXT_SIZE_NAMES: Record<TextSize, string> = {
+  sm: 'Small',
+  md: 'Medium',
+  lg: 'Large',
+  xl: 'Extra large',
+};
+
+/** S / M / L / XL segmented control for a text node's or note's text size. */
+function TextSizeField({
+  nodeId,
+  value,
+  onChange,
+}: {
+  nodeId: string;
+  value: TextSize;
+  onChange: (size: TextSize) => void;
+}) {
+  return (
+    <fieldset className={`${styles.field} ${styles.fieldset}`}>
+      <legend className={styles.legend}>Text size</legend>
+      <div className={styles.segmented}>
+        {TEXT_SIZES.map((size) => (
+          <label key={size} className={styles.segment} title={TEXT_SIZE_NAMES[size]}>
+            <input
+              type="radio"
+              name={`text-size-${nodeId}`}
+              value={size}
+              checked={value === size}
+              aria-label={TEXT_SIZE_NAMES[size]}
+              onChange={() => onChange(size)}
+            />
+            <span aria-hidden="true">{TEXT_SIZE_LABELS[size]}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+const WEIGHT_NAMES: Record<(typeof LABEL_WEIGHTS)[number], string> = {
+  400: 'Regular',
+  500: 'Medium',
+  600: 'Semibold',
+  700: 'Bold',
+};
+
+function LabelFields({ node }: { node: Extract<FlowNode, { type: 'label' }> }) {
+  const update = useUpdate<'label'>(node.id);
+  return (
+    <>
+      <Field label="Font">
+        <select
+          value={node.data.font}
+          onChange={(e) => update({ font: e.target.value as LabelFont })}
+        >
+          {Object.entries(LABEL_FONTS).map(([value, name]) => (
+            <option key={value} value={value}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </Field>
+      <Field label="Size (px)">
+        <div className={styles.sizeRow}>
+          <input
+            type="range"
+            min={8}
+            max={240}
+            value={node.data.size}
+            aria-label="Size slider"
+            onChange={(e) => update({ size: Number(e.target.value) })}
+          />
+          <input
+            type="number"
+            min={8}
+            max={240}
+            value={node.data.size}
+            onChange={(e) => {
+              const size = Number(e.target.value);
+              if (size >= 8 && size <= 240) update({ size });
+            }}
+          />
+        </div>
+      </Field>
+      <fieldset className={`${styles.field} ${styles.fieldset}`}>
+        <legend className={styles.legend}>Weight</legend>
+        <div className={styles.segmented}>
+          {LABEL_WEIGHTS.map((weight) => (
+            <label key={weight} className={styles.segment} title={WEIGHT_NAMES[weight]}>
+              <input
+                type="radio"
+                name={`label-weight-${node.id}`}
+                checked={node.data.weight === weight}
+                aria-label={WEIGHT_NAMES[weight]}
+                onChange={() => update({ weight })}
+              />
+              <span aria-hidden="true" style={{ fontWeight: weight }}>
+                Aa
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <p className={styles.hint}>Double-click the label on the canvas to type. Esc to finish.</p>
+    </>
+  );
+}
+
 function NoteFields({ node }: { node: Extract<FlowNode, { type: 'note' }> }) {
   const update = useUpdate<'note'>(node.id);
   return (
@@ -102,7 +219,33 @@ function NoteFields({ node }: { node: Extract<FlowNode, { type: 'note' }> }) {
           ))}
         </div>
       </fieldset>
-      <p className={styles.hint}>Double-click the note on the canvas to write. Esc to finish.</p>
+      <TextSizeField
+        nodeId={node.id}
+        value={node.data.size}
+        onChange={(size) => update({ size })}
+      />
+      <div className={styles.row}>
+        <Field label="Rotation (°)">
+          <input
+            type="number"
+            min={-180}
+            max={180}
+            step={1}
+            value={node.data.rotation}
+            onChange={(e) => {
+              const deg = Number(e.target.value);
+              if (Number.isFinite(deg)) update({ rotation: normalizeAngle(deg) });
+            }}
+          />
+        </Field>
+        <Button className={styles.alignEnd} onClick={() => update({ rotation: 0 })}>
+          Straighten
+        </Button>
+      </div>
+      <p className={styles.hint}>
+        Double-click the note on the canvas to write. Esc to finish. Drag the dot above it to rotate
+        (Shift snaps to 15°).
+      </p>
     </>
   );
 }
@@ -176,7 +319,16 @@ function TextFields({ node }: { node: Extract<FlowNode, { type: 'text' }> }) {
           <option value="transparent">None</option>
         </select>
       </Field>
-      <p className={styles.hint}>Double-click the text on the canvas to edit it. Esc to finish.</p>
+      <TextSizeField
+        nodeId={node.id}
+        value={node.data.size}
+        onChange={(size) => update({ size })}
+      />
+      <Button onClick={() => useUiStore.getState().setReader(node.id)}>Edit full screen</Button>
+      <p className={styles.hint}>
+        Double-click the text to edit it full screen. Back or Esc to finish; visitors open the same
+        view with a click.
+      </p>
     </>
   );
 }
@@ -388,6 +540,7 @@ function EdgeFields({ edge }: { edge: FlowEdge }) {
 const TITLES: Record<NodeType, string> = {
   note: 'Note',
   text: 'Text',
+  label: 'Label',
   code: 'Code',
   stack: 'Stack',
   shape: 'Shape',
@@ -400,6 +553,8 @@ function NodeFields({ node, onError }: { node: FlowNode; onError: OnError }) {
   switch (node.type) {
     case 'note':
       return <NoteFields node={node} />;
+    case 'label':
+      return <LabelFields node={node} />;
     case 'text':
       return <TextFields node={node} />;
     case 'code':

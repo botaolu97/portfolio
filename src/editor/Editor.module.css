@@ -250,3 +250,65 @@
   border-radius: var(--radius-sm);
   text-align: left;
 }
+
+/* Segmented control (text size): native radios styled as one row of buttons. */
+.segmented {
+  display: flex;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-canvas);
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  height: var(--size-control-sm);
+  border-radius: var(--radius-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.segment input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segment:has(input:checked) {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}
+
+.segment:has(input:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.alignEnd {
+  align-self: flex-end;
+  flex: none;
+}
+
+.sizeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.sizeRow input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--color-accent);
+}
+
+.field .sizeRow input[type="number"] {
+  width: 64px;
+  flex: none;
+}

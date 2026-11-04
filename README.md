@@ -10,11 +10,11 @@ npm install
 npm run dev        # edit mode at http://127.0.0.1:5173
 ```
 
-- **Add things:** drag from the left palette (Note is first: a yellow sticky with five colors), add a **Code** block (syntax highlighting for 16 languages), drop files onto the canvas, or paste an image (PNG, JPG, SVG file, or SVG markup) with ⌘V.
+- **Add things:** drag from the left palette (a **Label** is transparent text in Fasthand and other fonts; Note is first: a yellow sticky with five colors), add a **Code** block (syntax highlighting for 16 languages), drop files onto the canvas, or paste an image (PNG, JPG, SVG file, or SVG markup) with ⌘V.
   - Images and SVGs become image nodes. Video files become video nodes.
   - HTML/CSS/JS files dropped together become one **demo**. To keep subfolders, add a Demo from the palette and use "Folder" in the inspector.
 - **Demos** run in a sandboxed iframe and are interactive right away. Drag or select one by its title bar.
-- **Canvas:** scroll to pan, pinch or ⌘-scroll to zoom, drag on empty space to box-select, Space + drag to pan.
+- **Canvas:** scroll to pan, pinch or ⌘-scroll to zoom, drag on empty space to box-select, Space + drag to pan, Shift- or ⌘-click to add to a selection.
 - **Text and notes:** double-click to edit; ⌘1–4 sizes, ⌘T checkboxes, ⌘L bullets, ⇧⌘E highlight, ⌘B/I/U, ⇧⌘X strike, ⌘⌫ clear (full table in `DESIGN.md`).
 - **Shortcuts:** ⌘Z undo (no redo), ⌘C / ⌘V copy/paste, ⌘D duplicate, ⌘A select all, Delete removes.
 - **Canvases:** the switcher in the bottom-left shows the current canvas; click it to switch, or (in edit mode) to create a new one. The site root opens the welcome canvas.

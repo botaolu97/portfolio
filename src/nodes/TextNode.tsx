@@ -1,49 +1,63 @@
 import type { NodeProps } from '@xyflow/react';
-import { lazy, memo, Suspense } from 'react';
+import { memo } from 'react';
 import { EDITABLE } from '../content/api';
 import type { FlowNode } from '../store/mapStore';
-import { useUiStore } from '../store/uiStore';
 import { NodeChrome } from './NodeChrome';
 import styles from './nodes.module.css';
+import { TextReader } from './TextReader';
+import { textSizeStyle } from './textSize';
+import { useReader } from './useReader';
 
-// Tiptap is only needed to edit; the published site renders the stored HTML.
-// Checked inline (not via EDITABLE) so the production build drops the chunk entirely.
-const RichTextEditor = import.meta.env.DEV ? lazy(() => import('../editor/RichTextEditor')) : null;
-
+/**
+ * A text box. On the canvas it only shows the text (clipped, no scrollbar); it opens into the
+ * full-screen reader on click (visitors) or double-click (editor), and in the editor the text is
+ * edited there.
+ */
 export const TextNode = memo(function TextNode({
   id,
   data,
   selected,
 }: NodeProps<Extract<FlowNode, { type: 'text' }>>) {
-  const editing = useUiStore((s) => s.editingTextId === id);
-  const setEditingText = useUiStore((s) => s.setEditingText);
+  const reader = useReader(id);
   const transparent = data.background === 'transparent';
-  const style = data.background && !transparent ? { background: data.background } : undefined;
-  const className = `${styles.text} ${styles.rich} ${transparent ? styles.transparent : ''}`;
-
-  if (RichTextEditor && editing) {
-    return (
-      <>
-        <NodeChrome selected={selected} />
-        <div className={`${className} nodrag nowheel`} style={style}>
-          <Suspense fallback={null}>
-            <RichTextEditor id={id} html={data.html} onDone={() => setEditingText(null)} />
-          </Suspense>
-        </div>
-      </>
-    );
-  }
+  const style = {
+    ...textSizeStyle(data.size),
+    ...(data.background && !transparent ? { background: data.background } : {}),
+  };
+  const className = `${styles.text} ${styles.rich} ${styles.richStatic} ${styles.opensReader} ${EDITABLE ? '' : styles.lift} ${transparent ? styles.transparent : ''}`;
 
   return (
     <>
       <NodeChrome selected={selected} />
       <div
-        className={`${className} ${styles.richStatic}`}
+        ref={reader.box}
+        className={className}
         style={style}
-        onDoubleClick={EDITABLE ? () => setEditingText(id) : undefined}
+        data-landing={reader.landing || undefined}
+        onClick={reader.onClick}
+        onDoubleClick={reader.onDoubleClick}
+        onKeyDown={reader.onKeyDown}
+        onPointerLeave={reader.onPointerLeave}
         // Authored by the site owner in edit mode, never by visitors.
         dangerouslySetInnerHTML={{ __html: data.html }}
       />
+      {reader.reading && reader.box.current && (
+        <TextReader
+          html={data.html}
+          nodeId={id}
+          editable={EDITABLE}
+          background={
+            data.background && !transparent
+              ? data.background
+              : `var(--color-${transparent ? 'canvas' : 'surface'})`
+          }
+          size={data.size}
+          source={reader.box.current}
+          zoom={reader.zoom()}
+          onClosing={reader.closing}
+          onClosed={reader.close}
+        />
+      )}
     </>
   );
 });
