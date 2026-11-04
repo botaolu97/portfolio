@@ -34,6 +34,12 @@ describe('mapStore', () => {
     expect(nodes[1]).toMatchObject({ type: 'text', width: 240, height: 120 });
   });
 
+  it('deselects connectors when adding a node', () => {
+    useMapStore.setState({ edges: [{ id: 'e', source: 'a', target: 'b', selected: true }] });
+    useMapStore.getState().addNode('note', { x: 0, y: 0 });
+    expect(useMapStore.getState().edges[0].selected).toBe(false);
+  });
+
   it('undoes and redoes edits', () => {
     useMapStore.getState().addNode('shape', { x: 0, y: 0 });
     vi.advanceTimersByTime(500);

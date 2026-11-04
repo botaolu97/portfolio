@@ -48,7 +48,8 @@ Tokens come in three tiers:
 
 ## Color
 
-- Backgrounds: `--color-canvas` behind everything, `--color-surface` for anything that sits on it
+- Backgrounds: `--color-canvas` behind everything (a detective-board tan, `#D9C9B8`, in light mode;
+  the dot grid is a darker tan), `--color-surface` for anything that sits on it
   (cards, panels, inputs), `--color-surface-muted` for hover fills, title bars and placeholders.
 - Text: `--color-text` for content, `--color-text-muted` for labels, captions and hints. Use
   `--color-text-on-accent` on accent and danger fills.
@@ -139,7 +140,7 @@ small uppercase muted text, and actions at the bottom above a divider.
 
 ### Field
 
-A caption in `--font-size-sm` muted text above the control. Controls are `--color-canvas` filled
+A caption in `--font-size-sm` muted text above the control. Controls are `--color-field` filled
 with a border and `--radius-sm`, 30px tall.
 
 ### Toast
@@ -183,6 +184,13 @@ content scales (React Flow positions the node itself). Notes, shapes and images 
 nothing lifts in the editor. A text box the reader has just zoomed back into stays at its normal
 size until the pointer leaves, and the reader always measures the box unlifted, so the zoom lands
 on its real size. No lift with reduced motion.
+
+### Connectors
+
+Each connector can have its own color (hex, `#rrggbb`) and thickness (0.5–12px), set in its
+inspector with a color picker plus hex field and a slider plus number; "Use default look" clears
+both. Unset, they use `--connector-color` and `--connector-width`. The arrowhead takes the line's
+color and grows with its thickness.
 
 ### Canvas node chrome (`src/nodes/NodeChrome.tsx`, `src/canvas/Canvas.module.css`)
 
@@ -345,10 +353,11 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--color-canvas` | `#f6f6f4` | `#161615` | Page and canvas background. |
-| `--color-canvas-dot` | `#d4d4cf` | `#3a3a37` | Dot grid on the canvas. |
+| `--color-canvas` | `#d9c9b8` | `#161615` | Page and canvas background (a detective-board tan in light mode). |
+| `--color-canvas-dot` | `#bfa98f` | `#3a3a37` | Dot grid on the canvas. |
 | `--color-surface` | `#ffffff` | `#1f1f1e` | Cards, panels, inputs on the canvas. |
 | `--color-surface-muted` | `#f0f0ed` | `#2a2a28` | Hover fills, title bars, placeholders. |
+| `--color-field` | `#f6f6f4` | `#161615` | Inside text inputs, selects and segmented controls. |
 | `--color-border` | `#e2e2dd` | `#353532` | Default 1px borders and dividers. |
 | `--color-text` | `#1c1c1a` | `#ececea` | Primary text. |
 | `--color-text-muted` | `#6b6b66` | `#9a9a94` | Secondary text, labels, hints. |
@@ -673,5 +682,12 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--canvas-slide-shadow` | `0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12)` | `0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45)` |  |
+
+#### `component.connector`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--connector-color` | `#9a9a94` | `#6b6b66` | Default line and arrow color. |
+| `--connector-width` | `1.5` | — | Default thickness in px. |
 
 <!-- tokens:end -->

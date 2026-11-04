@@ -37,6 +37,33 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Shape').click();
   await expect(shapes).toHaveCount(1);
 
+  // Connectors: draw one from the shape to a second shape, then give it a hex color and thickness.
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Shape').click();
+  const [first, second] = [shapes.nth(0), shapes.nth(1)];
+  // The new shape lands on top of the first: move it to the right.
+  const sb = await second.boundingBox();
+  if (!sb) throw new Error('second shape not visible');
+  await page.mouse.move(sb.x + sb.width / 2, sb.y + sb.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(sb.x + sb.width / 2 + 320, sb.y + sb.height / 2, { steps: 10 });
+  await page.mouse.up();
+  const from = await first.locator('.react-flow__handle-right').boundingBox();
+  const to = await second.locator('.react-flow__handle-left').boundingBox();
+  if (!from || !to) throw new Error('handles not found');
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+  await page.mouse.up();
+  const edge = page.locator('.react-flow__edge');
+  await expect(edge).toHaveCount(1);
+  await edge.locator('.react-flow__edge-interaction').click({ force: true });
+  await page.getByLabel('Hex color').fill('#c0392b');
+  await page.getByRole('spinbutton', { name: 'Thickness' }).fill('6');
+  const edgePath = edge.locator('.react-flow__edge-path');
+  await expect.poll(() => edgePath.evaluate((el) => getComputedStyle(el).strokeWidth)).toBe('6px');
+  expect(await edgePath.evaluate((el) => getComputedStyle(el).stroke)).toBe('rgb(192, 57, 43)');
+  await page.locator('.react-flow__pane').click({ position: { x: 600, y: 680 } });
+
   // Add a sticky note (yellow by default), write in it with the text shortcuts, make it pink.
   await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Note').click();
   const note = page.locator('.react-flow__node-note');
@@ -235,6 +262,7 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
     'label',
     'note',
     'shape',
+    'shape',
     'text',
     'video',
   ]);
@@ -247,6 +275,7 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
     size: 48,
     weight: 700,
   });
+  expect(saved.edges[0]).toMatchObject({ color: '#c0392b', width: 6 });
   const noteData = saved.nodes.find((n: { type: string }) => n.type === 'note').data;
   expect(noteData.color).toBe('pink');
   expect(noteData.size).toBe('lg');

@@ -22,7 +22,7 @@ import {
 } from './schema';
 
 export type FlowNode = { [T in NodeType]: Node<NodeDataOf<T>, T> }[NodeType];
-export type FlowEdge = Edge & Pick<MapEdge, 'type'>;
+export type FlowEdge = Edge & Pick<MapEdge, 'type' | 'color' | 'width'>;
 
 export interface MapState {
   slug: string | null;
@@ -40,7 +40,10 @@ export interface MapState {
     overrides?: { data?: Partial<NodeDataOf<T>>; width?: number; height?: number },
   ) => string;
   updateNodeData: <T extends NodeType>(id: string, patch: Partial<NodeDataOf<T>>) => void;
-  updateEdge: (id: string, patch: Partial<Pick<FlowEdge, 'label' | 'type' | 'animated'>>) => void;
+  updateEdge: (
+    id: string,
+    patch: Partial<Pick<FlowEdge, 'label' | 'type' | 'animated' | 'color' | 'width'>>,
+  ) => void;
   insertClones: (nodes: FlowNode[], edges: FlowEdge[], offset: number) => void;
   /** Turns two or more image nodes into one stack node; returns its id. */
   stackImages: (ids: string[]) => string | null;
@@ -76,6 +79,8 @@ function toMapEdge(edge: FlowEdge): MapEdge {
   if (edge.type) out.type = edge.type;
   if (typeof edge.label === 'string' && edge.label) out.label = edge.label;
   if (edge.animated) out.animated = true;
+  if (edge.color) out.color = edge.color;
+  if (edge.width) out.width = edge.width;
   return out;
 }
 
@@ -177,8 +182,10 @@ export const useMapStore = create<MapState>()(
           data: { ...defaults.data, ...overrides.data },
           selected: true,
         } as FlowNode;
+        // The new node becomes the only selection (connectors included), so the inspector shows it.
         set({
           nodes: [...get().nodes.map((n) => (n.selected ? { ...n, selected: false } : n)), node],
+          edges: get().edges.map((e) => (e.selected ? { ...e, selected: false } : e)),
         });
         return id;
       },

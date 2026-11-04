@@ -1,4 +1,6 @@
 .handle {
+  /* Above the node's own content (e.g. a shape's SVG), so connectors can always be dragged out. */
+  z-index: var(--z-node-adornment);
   width: var(--handle-size);
   height: var(--handle-size);
   border: 2px solid var(--color-surface);

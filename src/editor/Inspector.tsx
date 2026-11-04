@@ -1,5 +1,5 @@
 import { useReactFlow } from '@xyflow/react';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { asset, uploadDemo, uploadFile } from '../content/api';
 import { normalizeAngle } from '../nodes/RotateHandle';
@@ -21,6 +21,7 @@ import {
 } from '../store/schema';
 import { useUiStore } from '../store/uiStore';
 import { Button } from '../ui/Button';
+import { tokenValues } from '../ui/tokens';
 import styles from './Editor.module.css';
 
 type OnError = (message: string) => void;
@@ -533,6 +534,81 @@ function EdgeFields({ edge }: { edge: FlowEdge }) {
         />
         Animated
       </label>
+      <ConnectorLook edge={edge} />
+    </>
+  );
+}
+
+const HEX = /^#[0-9a-fA-F]{6}$/;
+const DEFAULT_CONNECTOR_COLOR = tokenValues['component.connector.color'];
+const DEFAULT_CONNECTOR_WIDTH = Number.parseFloat(tokenValues['component.connector.width']);
+
+/** Color (picker + hex) and thickness for one connector, with a way back to the defaults. */
+function ConnectorLook({ edge }: { edge: FlowEdge }) {
+  const updateEdge = useMapStore((s) => s.updateEdge);
+  const color = edge.color ?? DEFAULT_CONNECTOR_COLOR;
+  const width = edge.width ?? DEFAULT_CONNECTOR_WIDTH;
+  // The hex field keeps what you type until it's a full #rrggbb.
+  const [hex, setHex] = useState(color);
+  useEffect(() => setHex(color), [color]);
+
+  return (
+    <>
+      <Field label="Color">
+        <div className={styles.sizeRow}>
+          <input
+            type="color"
+            className={styles.colorSwatch}
+            value={color}
+            aria-label="Color picker"
+            onChange={(e) => updateEdge(edge.id, { color: e.target.value })}
+          />
+          <input
+            value={hex}
+            spellCheck={false}
+            aria-label="Hex color"
+            placeholder="#rrggbb"
+            onChange={(e) => {
+              const value = e.target.value.trim();
+              setHex(value);
+              const full = value.startsWith('#') ? value : `#${value}`;
+              if (HEX.test(full)) updateEdge(edge.id, { color: full.toLowerCase() });
+            }}
+          />
+        </div>
+      </Field>
+      <Field label="Thickness (px)">
+        <div className={styles.sizeRow}>
+          <input
+            type="range"
+            min={0.5}
+            max={12}
+            step={0.5}
+            value={width}
+            aria-label="Thickness slider"
+            onChange={(e) => updateEdge(edge.id, { width: Number(e.target.value) })}
+          />
+          <input
+            type="number"
+            min={0.5}
+            max={12}
+            step={0.5}
+            value={width}
+            aria-label="Thickness"
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (value >= 0.5 && value <= 12) updateEdge(edge.id, { width: value });
+            }}
+          />
+        </div>
+      </Field>
+      {(edge.color || edge.width) && (
+        <div className={styles.actions}>
+          <Button onClick={() => updateEdge(edge.id, { color: undefined, width: undefined })}>
+            Use default look
+          </Button>
+        </div>
+      )}
     </>
   );
 }

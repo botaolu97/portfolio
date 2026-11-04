@@ -16,7 +16,8 @@
     "tokens": "node scripts/tokens.ts",
     "predev": "npm run tokens",
     "prebuild": "npm run tokens -- --check",
-    "delete-canvas": "node scripts/delete-canvas.ts"
+    "delete-canvas": "node scripts/delete-canvas.ts",
+    "start": "npm run build && (npm run preview & npm run dev)"
   },
   "dependencies": {
     "@fontsource-variable/caveat": "^5.3.0",

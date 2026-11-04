@@ -8,7 +8,16 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { type DragEvent, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type DragEvent,
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { EDITABLE } from '../content/api';
 import { nodeTypes } from '../nodes/nodeTypes';
@@ -16,6 +25,7 @@ import type { AddableNodeType } from '../store/defaults';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
 import { useUiStore } from '../store/uiStore';
 import { useTheme } from '../ui/theme';
+import { tokenValues } from '../ui/tokens';
 import styles from './Canvas.module.css';
 import { addNodesFromFiles } from './fileDrop';
 import { usePageZoomGuard } from './usePageZoomGuard';
@@ -29,11 +39,30 @@ const SelectionToolbar = import.meta.env.DEV
 
 export const PALETTE_MIME = 'application/x-mubu-node';
 
-const defaultEdgeOptions = {
-  type: 'smoothstep',
-  markerEnd: { type: MarkerType.ArrowClosed, width: 18, height: 18 },
-  style: { strokeWidth: 1.5 },
-};
+const defaultEdgeOptions = { type: 'smoothstep' };
+
+const DEFAULT_CONNECTOR_WIDTH = Number.parseFloat(tokenValues['component.connector.width']);
+
+/**
+ * Gives each connector its own color and thickness (or the --connector-* defaults). The arrow is
+ * sized in screen units, growing gently with the line, so thick lines don't get giant arrows.
+ */
+function styleEdge(edge: FlowEdge): FlowEdge {
+  const stroke = edge.color ?? 'var(--connector-color)';
+  const width = edge.width ?? DEFAULT_CONNECTOR_WIDTH;
+  const arrow = 12 + width * 4;
+  return {
+    ...edge,
+    style: { ...edge.style, stroke, strokeWidth: width },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: stroke,
+      width: arrow,
+      height: arrow,
+      markerUnits: 'userSpaceOnUse',
+    },
+  };
+}
 
 // View mode keeps selection (to show nodes could be edited) but drops every change that would edit.
 const selectOnly = <C extends { type: string }>(changes: C[]) =>
@@ -56,6 +85,7 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
     })),
   );
   const { screenToFlowPosition } = useReactFlow<FlowNode, FlowEdge>();
+  const styledEdges = useMemo(() => edges.map(styleEdge), [edges]);
   const theme = useTheme((s) => s.theme);
   usePageZoomGuard();
   const handleNodesChange = useCallback(
@@ -144,7 +174,7 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
       {EDITABLE && <ShortcutsHost onPasteImages={onPasteImages} />}
       <ReactFlow<FlowNode, FlowEdge>
         nodes={nodes}
-        edges={edges}
+        edges={styledEdges}
         nodeTypes={nodeTypes}
         onNodesChange={handleNodesChange}
         onEdgesChange={handleEdgesChange}

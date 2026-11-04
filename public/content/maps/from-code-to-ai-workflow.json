@@ -20,8 +20,8 @@
       "id": "c019c42b",
       "type": "video",
       "position": {
-        "x": 96,
-        "y": -264
+        "x": 280,
+        "y": -272
       },
       "data": {
         "src": "content/assets/9986327ac757be94.mp4"
@@ -51,7 +51,7 @@
       "id": "cc8f16e3",
       "type": "text",
       "position": {
-        "x": -896,
+        "x": -904,
         "y": 592
       },
       "data": {
@@ -65,8 +65,8 @@
       "id": "6e9ce31b",
       "type": "label",
       "position": {
-        "x": -1024,
-        "y": -784
+        "x": -1032,
+        "y": -1232
       },
       "data": {
         "text": "From Code to AI Workflow",
@@ -159,6 +159,22 @@
       },
       "width": 1024,
       "height": 796
+    },
+    {
+      "id": "da19b597",
+      "type": "shape",
+      "position": {
+        "x": 1616,
+        "y": -280
+      },
+      "data": {
+        "shape": "ellipse",
+        "fill": "#a1bff2",
+        "stroke": "#4f6bed",
+        "label": ""
+      },
+      "width": 504,
+      "height": 500
     }
   ],
   "edges": [
@@ -170,7 +186,28 @@
       "targetHandle": "l",
       "type": "default",
       "label": "What's the look of the plot",
-      "animated": true
+      "color": "#ff2700",
+      "width": 4
+    },
+    {
+      "id": "43dfaab0",
+      "source": "cc8f16e3",
+      "target": "c019c42b",
+      "sourceHandle": "r",
+      "targetHandle": "l",
+      "type": "default",
+      "color": "#ff2700",
+      "width": 4
+    },
+    {
+      "id": "ef7f2abf",
+      "source": "6e9ce31b",
+      "target": "f92bb232",
+      "sourceHandle": "r",
+      "targetHandle": "t",
+      "type": "default",
+      "color": "#ff2700",
+      "width": 4
     }
   ]
 }

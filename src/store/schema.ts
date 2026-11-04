@@ -141,6 +141,13 @@ export const mapEdge = z.object({
   type: z.enum(['default', 'smoothstep', 'straight']).optional(),
   label: z.string().optional(),
   animated: z.boolean().optional(),
+  /** Line and arrow color as #rrggbb; the --connector-color default when unset. */
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .optional(),
+  /** Thickness in px; the --connector-width default when unset. */
+  width: z.number().min(0.5).max(12).optional(),
 });
 
 export const stackItem = z.object({

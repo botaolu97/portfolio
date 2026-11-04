@@ -113,6 +113,19 @@ describe('migrateMap', () => {
     expect(() => migrateMap(label({ weight: 450 }))).toThrow();
   });
 
+  it('accepts a connector color (#rrggbb) and thickness, and rejects bad ones', () => {
+    const withEdge = (edge: object) => ({
+      ...valid,
+      edges: [{ id: 'e', source: 'a', target: 'b', ...edge }],
+    });
+    expect(migrateMap(withEdge({ color: '#c0392b', width: 4 })).edges[0]).toMatchObject({
+      color: '#c0392b',
+      width: 4,
+    });
+    expect(() => migrateMap(withEdge({ color: 'red' }))).toThrow();
+    expect(() => migrateMap(withEdge({ width: 30 }))).toThrow();
+  });
+
   it('rejects unknown node types', () => {
     expect(() =>
       migrateMap({ ...valid, nodes: [{ id: 'x', type: 'blob', position: { x: 0, y: 0 } }] }),

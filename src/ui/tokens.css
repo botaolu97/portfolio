@@ -1,10 +1,11 @@
 /* Generated from design/tokens.json by `npm run tokens`. Do not edit. */
 
 :root {
-  --color-canvas: #f6f6f4;
-  --color-canvas-dot: #d4d4cf;
+  --color-canvas: #d9c9b8;
+  --color-canvas-dot: #bfa98f;
   --color-surface: #ffffff;
   --color-surface-muted: #f0f0ed;
+  --color-field: #f6f6f4;
   --color-border: #e2e2dd;
   --color-text: #1c1c1a;
   --color-text-muted: #6b6b66;
@@ -179,6 +180,8 @@
   --label-color: var(--color-text);
   --label-padding: var(--space-4);
   --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12);
+  --connector-color: #9a9a94;
+  --connector-width: 1.5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -187,6 +190,7 @@
     --color-canvas-dot: #3a3a37;
     --color-surface: #1f1f1e;
     --color-surface-muted: #2a2a28;
+    --color-field: #161615;
     --color-border: #353532;
     --color-text: #ececea;
     --color-text-muted: #9a9a94;
@@ -200,6 +204,7 @@
     --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
     --node-shape-shadow: rgb(0 0 0 / 0.35);
     --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45);
+    --connector-color: #6b6b66;
   }
 }
 
@@ -208,6 +213,7 @@
   --color-canvas-dot: #3a3a37;
   --color-surface: #1f1f1e;
   --color-surface-muted: #2a2a28;
+  --color-field: #161615;
   --color-border: #353532;
   --color-text: #ececea;
   --color-text-muted: #9a9a94;
@@ -221,4 +227,5 @@
   --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
   --node-shape-shadow: rgb(0 0 0 / 0.35);
   --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45);
+  --connector-color: #6b6b66;
 }

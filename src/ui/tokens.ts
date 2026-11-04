@@ -2,10 +2,11 @@
 // Light-mode values, for code that stores a token as data (e.g. a note color in a map).
 
 export const tokenValues = {
-  'color.canvas': "#f6f6f4",
-  'color.canvas-dot': "#d4d4cf",
+  'color.canvas': "#d9c9b8",
+  'color.canvas-dot': "#bfa98f",
   'color.surface': "#ffffff",
   'color.surface-muted': "#f0f0ed",
+  'color.field': "#f6f6f4",
   'color.border': "#e2e2dd",
   'color.text': "#1c1c1a",
   'color.text-muted': "#6b6b66",
@@ -180,4 +181,6 @@ export const tokenValues = {
   'component.label.color': "#1c1c1a",
   'component.label.padding': "4px",
   'component.canvas-slide.shadow': "0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12)",
+  'component.connector.color': "#9a9a94",
+  'component.connector.width': "1.5",
 } as const;

@@ -8,6 +8,7 @@ You edit locally; everyone else sees a read-only static site.
 ```bash
 npm install
 npm run dev        # edit mode at http://127.0.0.1:5173
+npm start          # both: editor (5173) and the view-only preview (4173); Ctrl-C stops both
 ```
 
 - **Add things:** drag from the left palette (a **Label** is transparent text in Fasthand and other fonts; Note is first: a yellow sticky with five colors), add a **Code** block (syntax highlighting for 16 languages), drop files onto the canvas, or paste an image (PNG, JPG, SVG file, or SVG markup) with ⌘V.

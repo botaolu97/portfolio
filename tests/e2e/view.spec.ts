@@ -233,7 +233,7 @@ test('published site is read-only and demos still run', async ({ page }) => {
     'true',
   );
   await page.getByRole('switch', { name: 'Dark theme' }).click();
-  expect(await canvasColor()).toBe('rgb(246, 246, 244)');
+  expect(await canvasColor()).toBe('rgb(217, 201, 184)');
 
   expect(editorRequests).toEqual([]);
 
