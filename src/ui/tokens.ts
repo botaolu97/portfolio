@@ -66,7 +66,7 @@ export const tokenValues = {
   'motion.duration.zoom-out': "320ms",
   'motion.duration.slide': "640ms",
   'motion.easing.standard': "cubic-bezier(0.2, 0, 0, 1)",
-  'motion.easing.zoom-out': "cubic-bezier(0.45, 0, 0.55, 1)",
+  'motion.easing.zoom-out': "cubic-bezier(0.3, 0, 0.15, 1)",
   'motion.easing.slide': "cubic-bezier(0.65, 0, 0.35, 1)",
   'size.control': "32px",
   'size.control-sm': "28px",

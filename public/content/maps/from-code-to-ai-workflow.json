@@ -10,11 +10,11 @@
         "y": -320
       },
       "data": {
-        "html": "<h1>Summary</h1><p></p><p><mark>Our team wanted to accommodate increasing customer's needs in time series data anomaly detection (tsAD).</mark> I helped the team to define the product scope, establish project lifecycle, and design and test the UI from scratch.</p><p></p><p>The MVP was adopted by 300+ customers, quickly validating our initial direction. This may not be a big number in consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.</p><p></p><p>The MVP was adopted by 300+ customers, quickly validating our initial direction. This may not be a big number in consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.The MVP was adopted by 300+ customers, quickly validating our initial direction. This may not be a big number in <mark>consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.</mark></p>",
+        "html": "<h1>Summary</h1><p></p><p>Our team wanted to <mark>accommodate increasing customer's needs in time series data anomaly detection (tsAD)</mark>. I helped the team to define the product scope, establish project lifecycle, and design and test the UI from scratch.</p><p></p><p>The MVP was adopted by <mark>600+ customers</mark>, quickly validating our initial direction. This may not be a big number in consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.</p>",
         "size": "xl"
       },
-      "width": 696,
-      "height": 728
+      "width": 600,
+      "height": 488
     },
     {
       "id": "c019c42b",
@@ -52,7 +52,7 @@
       "type": "text",
       "position": {
         "x": -904,
-        "y": 592
+        "y": 352
       },
       "data": {
         "html": "<h1>Background</h1><p></p><p>Industrial engineers need to identify anomalous patterns in physical-system data early to prevent equipment failures and reduce operational costs.</p><p></p><p>This need is growing: the global anomaly detection market is estimated at $7–8B in 2026, and our team had also received direct requests from our top customers.</p>",
@@ -65,8 +65,8 @@
       "id": "6e9ce31b",
       "type": "label",
       "position": {
-        "x": -1032,
-        "y": -1232
+        "x": -1064,
+        "y": -1064
       },
       "data": {
         "text": "From Code to AI Workflow",

@@ -37,6 +37,17 @@ interface Layout {
 }
 
 const px = (value: string) => Number.parseFloat(value);
+const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
+/** From a to b at an even rate on a log scale: equal ratios per step, so it looks evenly paced. */
+const geometric = (a: number, b: number, t: number) => a * (b / a) ** t;
+/**
+ * How far a size v is from a to b (0–1). Moving the position by this fraction keeps one point
+ * fixed on screen, as a camera zoom does. Falls back to t when the size doesn't change.
+ */
+const along = (a: number, b: number, v: number, t: number) =>
+  Math.abs(b - a) < 1e-6 ? t : (v - a) / (b - a);
+/** Keyframes per zoom: enough that the straight segments between them don't show. */
+const ZOOM_STEPS = 24;
 
 /**
  * The box's rectangle on screen at its normal size: if the reader opens while the box is lifted
@@ -104,22 +115,42 @@ export function TextReader({
     };
   }, []);
 
-  /** Keyframes at the box (canvas) end and the reader end. */
+  /**
+   * Keyframes from the reader (first) to the box (last). Sizes change on a log scale — equal ratios
+   * per step — about a fixed point, for the text and the background alike. The background shrinks
+   * far more than the text (window to box, vs. a third of the window to box); interpolated linearly
+   * in pixels, most of its visible shrink would land in the last frames, after the text has
+   * settled, and read as a second shrink.
+   */
   const frames = useCallback(
     (l: Layout, scrollTop: number) => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const { src } = l;
-      return {
-        blockAtBox: {
-          transform: `translate(${src.left}px, ${src.top + scrollTop}px) scale(${zoom})`,
-        },
-        blockAtReader: { transform: `translate(${l.left}px, ${l.top}px) scale(${l.scale})` },
-        frameAtBox: {
-          clipPath: `inset(${src.top}px ${vw - src.right}px ${vh - src.bottom}px ${src.left}px round ${l.radius * zoom}px)`,
-        },
-        frameAtReader: { clipPath: 'inset(0px 0px 0px 0px round 0px)' },
-      };
+      const block: Keyframe[] = [];
+      const frame: Keyframe[] = [];
+      for (let i = 0; i <= ZOOM_STEPS; i++) {
+        const t = i / ZOOM_STEPS;
+        // Text: its scale goes from the reader's to the canvas zoom.
+        const scale = geometric(l.scale, zoom, t);
+        const k = along(l.scale, zoom, scale, t);
+        const x = lerp(l.left, src.left, k);
+        // The block sits in the scroller, so its position counts from the top of the scrolled text.
+        const y = lerp(l.top - scrollTop, src.top, k) + scrollTop;
+        block.push({ transform: `translate(${x}px, ${y}px) scale(${scale})` });
+        // Background: from the whole window to the box.
+        const w = geometric(vw, Math.max(src.width, 1), t);
+        const h = geometric(vh, Math.max(src.height, 1), t);
+        const kx = along(vw, src.width, w, t);
+        const ky = along(vh, src.height, h, t);
+        const left = lerp(0, src.left, kx);
+        const top = lerp(0, src.top, ky);
+        const radius = lerp(0, l.radius * zoom, kx);
+        frame.push({
+          clipPath: `inset(${top}px ${vw - left - w}px ${vh - top - h}px ${left}px round ${radius}px)`,
+        });
+      }
+      return { block, frame };
     },
     [zoom],
   );
@@ -148,11 +179,11 @@ export function TextReader({
     spacer.current.style.height = `${top * 2 + block.current.offsetHeight * scale}px`;
     const f = frames(l, 0);
     const t = timing();
-    block.current.animate([f.blockAtBox, f.blockAtReader], t).finished.then(
+    block.current.animate(f.block.toReversed(), t).finished.then(
       () => editable && !closing.current && setEditing(true),
       () => {},
     );
-    frame.current?.animate([f.frameAtBox, f.frameAtReader], t);
+    frame.current?.animate(f.frame.toReversed(), t);
     back.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
       ...t,
       delay: (t.duration as number) * 0.5,
@@ -186,8 +217,8 @@ export function TextReader({
       ...t,
       duration: (t.duration as number) * 0.4,
     });
-    frame.current?.animate([f.frameAtReader, f.frameAtBox], t);
-    block.current.animate([f.blockAtReader, f.blockAtBox], t).finished.then(onClosed, onClosed);
+    frame.current?.animate(f.frame, t);
+    block.current.animate(f.block, t).finished.then(onClosed, onClosed);
   }, [frames, timing, onClosing, onClosed]);
 
   // Focus and Esc are set up once: the parent re-renders on every keystroke while editing, and

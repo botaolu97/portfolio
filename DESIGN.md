@@ -267,8 +267,11 @@ and the hover outline stays off until the pointer leaves, so the reader lands at
 size. The canvas switcher fades out with the zoom in and back in with the zoom out;
 the theme switch stays (`--z-theme-switch`). A Back pill sits `--reader-inset` from the top-left;
 Back or Esc zooms back out, landing the visible top of the text back in the box, in
-`--motion-duration-zoom-out` with `--motion-easing-zoom-out`: a symmetric curve, because the
-decelerating zoom-in curve leaves a long slow tail that reads as a second shrink.
+`--motion-duration-zoom-out` with `--motion-easing-zoom-out`. Both directions scale on a log
+scale (equal ratios per frame) about a fixed point, for the text and the background alike: the
+background changes size far more than the text (window to box vs. a third of the window to box),
+and interpolating pixels linearly would cram its visible shrink into the last frames, after the
+text has settled, which reads as a second shrink.
 Respects reduced motion (no animation).
 
 In the editor this is where text nodes are edited (they aren't edited inside the box on the
@@ -442,7 +445,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--motion-duration-zoom-out` | `320ms` | — | Zooming a text box back out of the reader: a little quicker than zooming in. |
 | `--motion-duration-slide` | `640ms` | — | Sliding from one canvas to the next. |
 | `--motion-easing-standard` | `cubic-bezier(0.2, 0, 0, 1)` | — | Default easing for UI transitions. |
-| `--motion-easing-zoom-out` | `cubic-bezier(0.45, 0, 0.55, 1)` | — | Symmetric ease in and out, so a shrink back reads as one move (the decelerating standard curve leaves a long slow tail that looks like a second shrink). |
+| `--motion-easing-zoom-out` | `cubic-bezier(0.3, 0, 0.15, 1)` | — | Zooming back out of the reader: starts right away and settles onto the box, with a shorter tail than the standard curve. |
 | `--motion-easing-slide` | `cubic-bezier(0.65, 0, 0.35, 1)` | — | Symmetric ease for two canvases moving together. |
 
 #### `size`
