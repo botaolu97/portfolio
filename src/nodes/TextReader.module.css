@@ -1,4 +1,5 @@
-/* Layers: the frame (the box's background with the scrolling text, clipped as one), the back button. */
+/* Layers: the frame (the box's background with the scrolling text, clipped as one), the back button.
+   The frame zooms with a transform (not a clip) so it runs on the GPU in step with the text. */
 .root {
   position: fixed;
   inset: 0;
@@ -8,6 +9,8 @@
 .frame {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
 }
 
 .scroller {

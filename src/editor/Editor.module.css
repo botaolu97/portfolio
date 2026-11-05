@@ -138,6 +138,10 @@
   color: var(--color-accent);
 }
 
+.hint.fieldError {
+  color: var(--color-danger);
+}
+
 .status {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);

@@ -2,6 +2,7 @@ import { useReactFlow } from '@xyflow/react';
 import { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { asset, uploadDemo, uploadFile } from '../content/api';
+import { loadLinkPreview, safeHref, useLinkStatus } from '../nodes/linkPreview';
 import { normalizeAngle } from '../nodes/RotateHandle';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
 import {
@@ -225,24 +226,7 @@ function NoteFields({ node }: { node: Extract<FlowNode, { type: 'note' }> }) {
         value={node.data.size}
         onChange={(size) => update({ size })}
       />
-      <div className={styles.row}>
-        <Field label="Rotation (°)">
-          <input
-            type="number"
-            min={-180}
-            max={180}
-            step={1}
-            value={node.data.rotation}
-            onChange={(e) => {
-              const deg = Number(e.target.value);
-              if (Number.isFinite(deg)) update({ rotation: normalizeAngle(deg) });
-            }}
-          />
-        </Field>
-        <Button className={styles.alignEnd} onClick={() => update({ rotation: 0 })}>
-          Straighten
-        </Button>
-      </div>
+      <RotationField value={node.data.rotation} onChange={(rotation) => update({ rotation })} />
       <p className={styles.hint}>
         Double-click the note on the canvas to write. Esc to finish. Drag the dot above it to rotate
         (Shift snaps to 15°).
@@ -350,6 +334,7 @@ function ShapeFields({ node }: { node: Extract<FlowNode, { type: 'shape' }> }) {
           ))}
         </select>
       </Field>
+      <RotationField value={node.data.rotation} onChange={(rotation) => update({ rotation })} />
       <div className={styles.row}>
         <Field label="Fill">
           <input
@@ -505,6 +490,86 @@ function DemoFields({
   );
 }
 
+function LinkFields({
+  node,
+  onError,
+}: {
+  node: Extract<FlowNode, { type: 'link' }>;
+  onError: OnError;
+}) {
+  const update = useUpdate<'link'>(node.id);
+  const status = useLinkStatus((s) => s[node.id]);
+  const href = safeHref(node.data.url);
+  // The address field keeps what you type; Enter or leaving the field fetches the preview.
+  const [url, setUrl] = useState(node.data.url);
+  useEffect(() => setUrl(node.data.url), [node.data.url]);
+  const commit = () => {
+    if (url.trim() && url.trim() !== node.data.url) loadLinkPreview(node.id, url);
+  };
+  return (
+    <>
+      <Field label="Web address">
+        <input
+          value={url}
+          spellCheck={false}
+          placeholder="https://example.com"
+          onChange={(e) => setUrl(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') commit();
+          }}
+        />
+      </Field>
+      <Field label="Title">
+        <input
+          value={node.data.title}
+          placeholder="From the page"
+          onChange={(e) => update({ title: e.target.value })}
+        />
+      </Field>
+      {status?.loading && <p className={styles.hint}>Fetching preview…</p>}
+      {status && !status.loading && (
+        <p className={`${styles.hint} ${styles.fieldError}`}>{status.error}</p>
+      )}
+      <div className={styles.row}>
+        <Button
+          disabled={!href || status?.loading}
+          onClick={() => href && loadLinkPreview(node.id, href)}
+        >
+          Refresh preview
+        </Button>
+      </div>
+      <div className={styles.row}>
+        <UploadButton
+          label={node.data.image ? 'Replace image' : 'Choose image'}
+          accept="image/*"
+          onFiles={([file]) =>
+            uploadFile(file)
+              .then(({ src }) => update({ image: src }))
+              .catch((err: Error) => onError(err.message))
+          }
+        />
+        {node.data.image && (
+          <Button onClick={() => update({ image: undefined })}>Remove image</Button>
+        )}
+      </div>
+      <p className={styles.hint}>
+        The preview (the page's share image, a screenshot, or an image you choose) is saved with the
+        canvas; Refresh preview replaces a chosen image. Visitors click the card to open the page in
+        a new tab; here, use ↗ on the card or double-click it to change the address.
+        {href && (
+          <>
+            {' '}
+            <a href={href} target="_blank" rel="noopener noreferrer">
+              Open in a new tab
+            </a>
+          </>
+        )}
+      </p>
+    </>
+  );
+}
+
 function EdgeFields({ edge }: { edge: FlowEdge }) {
   const updateEdge = useMapStore((s) => s.updateEdge);
   return (
@@ -623,6 +688,7 @@ const TITLES: Record<NodeType, string> = {
   image: 'Image',
   video: 'Video',
   demo: 'Demo',
+  link: 'Web page',
 };
 
 function NodeFields({ node, onError }: { node: FlowNode; onError: OnError }) {
@@ -645,6 +711,8 @@ function NodeFields({ node, onError }: { node: FlowNode; onError: OnError }) {
       return <VideoFields node={node} onError={onError} />;
     case 'demo':
       return <DemoFields node={node} onError={onError} />;
+    case 'link':
+      return <LinkFields node={node} onError={onError} />;
   }
 }
 
@@ -684,5 +752,29 @@ export function Inspector({ onError }: { onError: OnError }) {
         <EdgeFields edge={edges[0]} />
       )}
     </aside>
+  );
+}
+
+/** Degrees, -180 to 180, with a button back to 0. Notes and shapes; the canvas has a drag handle too. */
+function RotationField({ value, onChange }: { value: number; onChange: (deg: number) => void }) {
+  return (
+    <div className={styles.row}>
+      <Field label="Rotation (°)">
+        <input
+          type="number"
+          min={-180}
+          max={180}
+          step={1}
+          value={value}
+          onChange={(e) => {
+            const deg = Number(e.target.value);
+            if (Number.isFinite(deg)) onChange(normalizeAngle(deg));
+          }}
+        />
+      </Field>
+      <Button className={styles.alignEnd} onClick={() => onChange(0)}>
+        Straighten
+      </Button>
+    </div>
   );
 }

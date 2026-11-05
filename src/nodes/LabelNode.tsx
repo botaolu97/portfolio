@@ -10,6 +10,8 @@ import styles from './nodes.module.css';
 const FONT_FAMILIES: Record<LabelFont, string> = {
   fasthand: 'var(--font-family-fasthand)',
   caveat: 'var(--font-family-caveat)',
+  handjet: 'var(--font-family-handjet)',
+  instrumentSerif: 'var(--font-family-instrument-serif)',
   sans: 'var(--font-family-sans)',
   serif: 'var(--font-family-serif)',
   mono: 'var(--font-family-mono)',

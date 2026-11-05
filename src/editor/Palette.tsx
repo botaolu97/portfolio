@@ -13,6 +13,7 @@ const ICONS = {
   image: '▣',
   video: '▶',
   demo: '</>',
+  link: '↗',
 } as const;
 
 /** Drag an item onto the canvas, or click to drop it in the middle of the view. */

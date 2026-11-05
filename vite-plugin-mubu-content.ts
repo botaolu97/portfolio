@@ -11,6 +11,7 @@ import type { Plugin } from 'vite';
  *   POST /__mubu/delete?slug=…                          → removes that map
  *   POST /__mubu/upload?name=…   body: raw file bytes   → public/content/assets/<hash>.<ext>
  *   POST /__mubu/demo            body: { files }        → public/content/demos/<id>/…
+ *   POST /__mubu/link            body: { url }          → page title, icon and image (saved as assets)
  * The production build is a static site that only reads public/content.
  */
 
@@ -120,6 +121,270 @@ export async function saveDemo(demosDir: string, files: DemoFile[]) {
   return { demoId, entry };
 }
 
+/** Saves bytes as public/content/assets/<hash><ext> (same content, same file) and returns its path. */
+export async function saveAsset(assetsDir: string, body: Buffer, ext: string): Promise<string> {
+  const clean = ext.toLowerCase().replace(/[^.a-z0-9]/g, '');
+  const file = `${createHash('sha256').update(body).digest('hex').slice(0, 16)}${clean}`;
+  await mkdir(assetsDir, { recursive: true });
+  const target = path.join(assetsDir, file);
+  if (!existsSync(target)) await writeFile(target, body);
+  return `content/assets/${file}`;
+}
+
+/* ---------- Link previews ---------- */
+
+export interface LinkMeta {
+  title: string;
+  description: string;
+  siteName: string;
+  /** Absolute URL of the page's preview image (Open Graph / Twitter card), if any. */
+  imageUrl?: string;
+  /** Absolute icon URLs, best first; /favicon.ico is always the last resort. */
+  iconUrls: string[];
+}
+
+export interface LinkPreview {
+  url: string;
+  title: string;
+  description: string;
+  siteName: string;
+  image?: string;
+  favicon?: string;
+}
+
+/** Accepts "example.com/x" or a full URL; returns a normalized http(s) URL or null. */
+export function normalizeUrl(input: string): string | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  try {
+    const url = new URL(withScheme);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+    if (!url.hostname.includes('.') && url.hostname !== 'localhost') return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+const ENTITIES: Record<string, string> = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+  mdash: '—',
+  ndash: '–',
+  hellip: '…',
+  rsquo: '’',
+  lsquo: '‘',
+  rdquo: '”',
+  ldquo: '“',
+  middot: '·',
+};
+
+export function decodeEntities(text: string): string {
+  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, code: string) => {
+    if (code[0] === '#') {
+      const n =
+        code[1].toLowerCase() === 'x' ? Number.parseInt(code.slice(2), 16) : Number(code.slice(1));
+      return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : match;
+    }
+    return ENTITIES[code.toLowerCase()] ?? match;
+  });
+}
+
+function parseAttributes(tag: string): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  for (const m of tag.matchAll(/([^\s=/>]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g)) {
+    attrs[m[1].toLowerCase()] = decodeEntities(m[2] ?? m[3] ?? m[4] ?? '');
+  }
+  return attrs;
+}
+
+const clean = (text: string | undefined, max: number) =>
+  (text ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+
+/** Reads title, description, site name, preview image and icons from a page's <head>. */
+export function parseLinkMeta(html: string, pageUrl: string): LinkMeta {
+  const headEnd = html.search(/<\/head>/i);
+  const head = headEnd > 0 ? html.slice(0, headEnd) : html;
+  const meta: Record<string, string> = {};
+  for (const [tag] of head.matchAll(/<meta\b[^>]*>/gi)) {
+    const a = parseAttributes(tag);
+    const key = (a.property ?? a.name ?? a.itemprop ?? '').toLowerCase();
+    if (key && a.content && !(key in meta)) meta[key] = a.content;
+  }
+  const resolve = (href: string | undefined) => {
+    if (!href) return undefined;
+    try {
+      const url = new URL(href, pageUrl);
+      return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : undefined;
+    } catch {
+      return undefined;
+    }
+  };
+
+  const icons: { href: string; rank: number }[] = [];
+  for (const [tag] of head.matchAll(/<link\b[^>]*>/gi)) {
+    const a = parseAttributes(tag);
+    const rel = (a.rel ?? '').toLowerCase().split(/\s+/);
+    const href = resolve(a.href);
+    if (!href || !rel.some((r) => r === 'icon' || r.startsWith('apple-touch-icon'))) continue;
+    // Bigger is better (the fallback card shows it large); SVG scales; apple-touch-icons are 180px.
+    const size = Math.max(
+      0,
+      ...(a.sizes ?? '').split(/\s+/).map((s) => Number.parseInt(s, 10) || 0),
+    );
+    const rank =
+      a.type === 'image/svg+xml' || href.endsWith('.svg')
+        ? 1000
+        : size || (rel.includes('icon') ? 16 : 180);
+    icons.push({ href, rank });
+  }
+  icons.sort((x, y) => y.rank - x.rank);
+  const fallbackIcon = resolve('/favicon.ico');
+
+  const titleTag = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(head)?.[1];
+  return {
+    title: clean(meta['og:title'] ?? meta['twitter:title'] ?? decodeEntities(titleTag ?? ''), 300),
+    description: clean(
+      meta['og:description'] ?? meta['twitter:description'] ?? meta.description,
+      500,
+    ),
+    siteName: clean(meta['og:site_name'] ?? meta['application-name'], 100),
+    imageUrl: resolve(
+      meta['og:image:secure_url'] ??
+        meta['og:image'] ??
+        meta['og:image:url'] ??
+        meta['twitter:image'] ??
+        meta['twitter:image:src'],
+    ),
+    iconUrls: [...new Set([...icons.map((i) => i.href), ...(fallbackIcon ? [fallbackIcon] : [])])],
+  };
+}
+
+const USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
+
+const IMAGE_EXT: Record<string, string> = {
+  'image/png': '.png',
+  'image/jpeg': '.jpg',
+  'image/gif': '.gif',
+  'image/webp': '.webp',
+  'image/avif': '.avif',
+  'image/svg+xml': '.svg',
+  'image/x-icon': '.ico',
+  'image/vnd.microsoft.icon': '.ico',
+};
+
+/** GETs a URL with a timeout and a size cap; returns null on any failure. */
+async function fetchLimited(url: string, maxBytes: number, accept: string) {
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': USER_AGENT, Accept: accept, 'Accept-Language': 'en' },
+      redirect: 'follow',
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok || !res.body) return null;
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    for await (const chunk of res.body) {
+      size += chunk.length;
+      if (size > maxBytes) break;
+      chunks.push(chunk);
+    }
+    return {
+      url: res.url || url,
+      type: (res.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase(),
+      body: Buffer.concat(chunks),
+      complete: size <= maxBytes,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Downloads an image into the assets folder; null unless it really is an image. */
+async function downloadImage(assetsDir: string, url: string, maxBytes: number) {
+  const res = await fetchLimited(
+    url,
+    maxBytes,
+    'image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8',
+  );
+  if (!res?.complete || res.body.length === 0) return null;
+  let ext = IMAGE_EXT[res.type];
+  // Some servers send icons as octet-stream or text/plain.
+  if (
+    !ext &&
+    /\.ico(\?|$)/i.test(res.url) &&
+    res.body.subarray(0, 4).equals(Buffer.from([0, 0, 1, 0]))
+  ) {
+    ext = '.ico';
+  }
+  if (!ext) return null;
+  return saveAsset(assetsDir, res.body, ext);
+}
+
+/**
+ * A screenshot of the page's first screen, for pages with no preview image. Uses the Chromium that
+ * Playwright installs for the e2e tests; returns null if it isn't available or the page won't load.
+ */
+async function screenshot(url: string): Promise<Buffer | null> {
+  let browser: { close(): Promise<void> } | undefined;
+  try {
+    const { chromium } = await import('@playwright/test');
+    const b = await chromium.launch();
+    browser = b;
+    const page = await b.newPage({ viewport: { width: 1280, height: 800 }, userAgent: USER_AGENT });
+    // A page that fails to load (no such host, an error status) would screenshot an error page.
+    const response = await page
+      .goto(url, { waitUntil: 'load', timeout: 15_000 })
+      .catch((err) => (/Timeout/i.test(String(err)) ? undefined : null));
+    if (response === null || (response && response.status() >= 400)) return null;
+    await page.waitForTimeout(800);
+    return await page.screenshot({ type: 'jpeg', quality: 80 });
+  } catch {
+    return null;
+  } finally {
+    await browser?.close().catch(() => undefined);
+  }
+}
+
+export async function fetchLinkPreview(assetsDir: string, input: string): Promise<LinkPreview> {
+  const url = normalizeUrl(input);
+  if (!url) throw new HttpError(400, 'Enter a web address (http or https)');
+  const page = await fetchLimited(
+    url,
+    2 * 1024 * 1024,
+    'text/html,application/xhtml+xml;q=0.9,*/*;q=0.5',
+  );
+  const html = page && /html|xml/.test(page.type) ? page.body.toString('utf8') : '';
+  const meta = parseLinkMeta(html, page?.url ?? url);
+
+  let favicon: string | undefined;
+  for (const icon of meta.iconUrls.slice(0, 4)) {
+    favicon = (await downloadImage(assetsDir, icon, 1024 * 1024)) ?? undefined;
+    if (favicon) break;
+  }
+  let image = meta.imageUrl
+    ? ((await downloadImage(assetsDir, meta.imageUrl, 10 * 1024 * 1024)) ?? undefined)
+    : undefined;
+  if (!image) {
+    const shot = await screenshot(url);
+    if (shot) image = await saveAsset(assetsDir, shot, '.jpg');
+  }
+  return {
+    url,
+    title: meta.title,
+    description: meta.description,
+    siteName: meta.siteName,
+    image,
+    favicon,
+  };
+}
+
 class HttpError extends Error {
   readonly status: number;
   constructor(status: number, message: string) {
@@ -165,6 +430,7 @@ const MIME: Record<string, string> = {
   '.m4v': 'video/mp4',
   '.ogv': 'video/ogg',
   '.woff2': 'font/woff2',
+  '.ico': 'image/x-icon',
 };
 
 /**
@@ -314,15 +580,8 @@ export function mubuContent(): Plugin {
               const name = safeRelativePath(url.searchParams.get('name') ?? '');
               if (!name) throw new HttpError(400, 'Invalid file name');
               const body = await readBody(req);
-              const ext = path
-                .extname(name)
-                .toLowerCase()
-                .replace(/[^.a-z0-9]/g, '');
-              const file = `${createHash('sha256').update(body).digest('hex').slice(0, 16)}${ext}`;
-              await mkdir(dirs.assets, { recursive: true });
-              const target = path.join(dirs.assets, file);
-              if (!existsSync(target)) await writeFile(target, body);
-              return sendJson(res, 200, { src: `content/assets/${file}` });
+              const src = await saveAsset(dirs.assets, body, path.extname(name));
+              return sendJson(res, 200, { src });
             }
             case '/__mubu/demo': {
               const { files } = JSON.parse((await readBody(req)).toString('utf8')) as {
@@ -330,6 +589,13 @@ export function mubuContent(): Plugin {
               };
               if (!Array.isArray(files)) throw new HttpError(400, 'Expected { files: [] }');
               return sendJson(res, 200, await saveDemo(dirs.demos, files));
+            }
+            case '/__mubu/link': {
+              const { url: link } = JSON.parse((await readBody(req)).toString('utf8')) as {
+                url?: unknown;
+              };
+              if (typeof link !== 'string') throw new HttpError(400, 'Expected { url }');
+              return sendJson(res, 200, await fetchLinkPreview(dirs.assets, link));
             }
             default:
               return sendJson(res, 404, { error: 'Unknown endpoint' });

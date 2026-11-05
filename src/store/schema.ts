@@ -9,6 +9,7 @@ export const SHAPE_KINDS = [
   'diamond',
   'triangle',
   'hexagon',
+  'arrow',
 ] as const;
 export const DEVICES = { desktop: 1280, tablet: 768, mobile: 390 } as const;
 export type Device = keyof typeof DEVICES;
@@ -42,6 +43,8 @@ export const noteData = z.object({
 export const LABEL_FONTS = {
   fasthand: 'Fasthand',
   caveat: 'Caveat',
+  handjet: 'Handjet',
+  instrumentSerif: 'Instrument Serif',
   sans: 'Sans',
   serif: 'Serif',
   mono: 'Mono',
@@ -121,6 +124,8 @@ export const shapeData = z.object({
   fill: z.string(),
   stroke: z.string(),
   label: z.string().default(''),
+  /** Turn in degrees, -180 to 180 (clockwise positive). */
+  rotation: z.number().min(-180).max(180).default(0),
 });
 
 export const demoData = z.object({
@@ -130,6 +135,21 @@ export const demoData = z.object({
   title: z.string().default('Demo'),
   device: z.enum(Object.keys(DEVICES) as [Device, ...Device[]]).default('desktop'),
   poster: z.string().optional(),
+});
+
+/**
+ * A web page preview card. `url` is the link (http/https only); the rest is fetched at edit time by
+ * the dev server and saved with the map, so visitors need no network call except the link itself.
+ */
+export const linkData = z.object({
+  url: z.string().default(''),
+  title: z.string().default(''),
+  description: z.string().default(''),
+  siteName: z.string().default(''),
+  /** Stored asset: the page's Open Graph image, or a screenshot when it has none. */
+  image: z.string().optional(),
+  /** Stored asset: the site's icon. */
+  favicon: z.string().optional(),
 });
 
 export const mapEdge = z.object({
@@ -176,6 +196,7 @@ export const mapNode = z.discriminatedUnion('type', [
   z.object({ ...nodeBase, type: z.literal('video'), data: videoData }),
   z.object({ ...nodeBase, type: z.literal('shape'), data: shapeData }),
   z.object({ ...nodeBase, type: z.literal('demo'), data: demoData }),
+  z.object({ ...nodeBase, type: z.literal('link'), data: linkData }),
 ]);
 
 export const mapDoc = z.object({

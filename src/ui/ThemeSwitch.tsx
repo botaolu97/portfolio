@@ -1,5 +1,5 @@
 import styles from './ThemeSwitch.module.css';
-import { useTheme } from './theme';
+import { switchTheme, useTheme } from './theme';
 
 const Sun = () => (
   <svg
@@ -36,7 +36,6 @@ const Moon = () => (
 /** Light/dark switch fixed to the bottom-right corner, on every page and in both modes. */
 export function ThemeSwitch() {
   const theme = useTheme((s) => s.theme);
-  const setTheme = useTheme((s) => s.setTheme);
   const dark = theme === 'dark';
   return (
     <button
@@ -46,7 +45,7 @@ export function ThemeSwitch() {
       aria-label="Dark theme"
       title={dark ? 'Switch to light theme' : 'Switch to dark theme'}
       className={styles.switch}
-      onClick={() => setTheme(dark ? 'light' : 'dark')}
+      onClick={() => switchTheme(dark ? 'light' : 'dark')}
     >
       <span className={styles.knob} />
       <span className={`${styles.icon} ${styles.sun}`}>

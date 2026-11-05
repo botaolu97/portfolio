@@ -20,6 +20,7 @@ const TYPE_LABELS: Record<NodeType, string> = {
   image: 'Image',
   video: 'Video',
   demo: 'Demo',
+  link: 'Web page',
 };
 
 const CORNERS = ['tl', 'tr', 'br', 'bl'] as const;

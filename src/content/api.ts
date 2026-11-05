@@ -70,3 +70,15 @@ export async function uploadDemo(files: File[]) {
   );
   return post<{ demoId: string; entry: string }>('demo', JSON.stringify({ files: payload }));
 }
+
+export interface LinkPreview {
+  url: string;
+  title: string;
+  description: string;
+  siteName: string;
+  image?: string;
+  favicon?: string;
+}
+
+/** Edit mode: the dev server reads the page and saves its image and icon as assets. */
+export const fetchLinkPreview = (url: string) => post<LinkPreview>('link', JSON.stringify({ url }));

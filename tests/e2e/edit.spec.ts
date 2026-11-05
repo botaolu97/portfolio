@@ -212,6 +212,71 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await expect.poll(() => labelText.evaluate((el) => getComputedStyle(el).fontSize)).toBe('48px');
   expect(await labelText.evaluate((el) => getComputedStyle(el).fontWeight)).toBe('700');
 
+  // Web page: paste a link on the new card; the dev server's preview (mocked here, so the test
+  // needs no network) fills in the title and domain.
+  await page.route('**/__mubu/link', async (route) => {
+    const { url } = route.request().postDataJSON() as { url: string };
+    await route.fulfill({
+      json: { url, title: 'Example Domain', description: 'For examples.', siteName: '' },
+    });
+  });
+  await page.locator('.react-flow__pane').click({ position: { x: 600, y: 680 } });
+  await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Web page').click();
+  const site = page.locator('.react-flow__node-link');
+  await expect(site.getByLabel('Web page URL')).toBeFocused();
+  await page.keyboard.type('example.com');
+  await page.keyboard.press('Enter');
+  await expect(site).toContainText('Example Domain');
+  await expect(site).toContainText('example.com');
+  const inspector = page.getByRole('complementary', { name: 'Inspector' });
+  await expect(inspector.getByLabel('Web address')).toHaveValue('https://example.com/');
+  // In the editor a click selects and a drag moves the card; ↗ is what opens the page.
+  const open = site.getByRole('link', { name: 'Open in a new tab' });
+  await expect(open).toHaveAttribute('href', 'https://example.com/');
+  await expect(open).toHaveAttribute('target', '_blank');
+  await expect(open).toHaveAttribute('rel', 'noopener noreferrer');
+  const siteAt = () => site.evaluate((el) => el.style.transform);
+  const siteBefore = await siteAt();
+  const sb2 = await site.boundingBox();
+  if (!sb2) throw new Error('web page card not visible');
+  await page.mouse.move(sb2.x + sb2.width / 2, sb2.y + sb2.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(sb2.x + sb2.width / 2 + 80, sb2.y + sb2.height / 2 + 40, { steps: 8 });
+  await page.mouse.up();
+  expect(await siteAt()).not.toBe(siteBefore);
+  await site.click();
+  await expect(site).toHaveClass(/selected/);
+  expect(page.context().pages()).toHaveLength(1);
+  // Double-click changes the address; the old one is selected, so typing replaces it.
+  await site.dblclick();
+  await expect(site.getByLabel('Web page URL')).toBeFocused();
+  await page.keyboard.type('example.org');
+  await page.keyboard.press('Enter');
+  await expect(inspector.getByLabel('Web address')).toHaveValue('https://example.org/');
+  await expect(site).toContainText('example.org');
+  // A preview image can also be chosen by hand.
+  await inspector.getByRole('button', { name: 'Choose image' }).waitFor();
+  await inspector.locator('input[type=file][accept="image/*"]').setInputFiles({
+    name: 'cover.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==',
+      'base64',
+    ),
+  });
+  await expect(site.locator('[class*="_linkImage_"] img')).toHaveAttribute(
+    'src',
+    /content\/assets\/\w+\.png$/,
+  );
+  await expect(inspector.getByRole('button', { name: 'Replace image' })).toBeVisible();
+  const coverSrc = await site.locator('[class*="_linkImage_"] img').getAttribute('src');
+  createdAssets.push(path.join(content, (coverSrc ?? '').replace(/^\/?content\//, '')));
+  await page.unroute('**/__mubu/link');
+  // Out of the way of the steps below.
+  await site.click();
+  await page.keyboard.press('Backspace');
+  await expect(site).toHaveCount(0);
+
   // Paste a PNG and SVG markup from the clipboard.
   await page.locator('.react-flow__pane').click({ position: { x: 600, y: 680 } });
   await page.evaluate(() => {

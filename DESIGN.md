@@ -60,7 +60,7 @@ Tokens come in three tiers:
 ## Typography
 
 System font stack (`--font-family-sans`) for the interface; the only web fonts are the bundled
-label fonts (Fasthand, Caveat).
+label fonts (Fasthand, Caveat, Handjet, Instrument Serif).
 
 | Role                    | Size               | Weight                                                 |
 | ----------------------- | ------------------ | ------------------------------------------------------ |
@@ -84,7 +84,7 @@ label fonts (Fasthand, Caveat).
   panels, nodes), `--radius-full` for pills and circles.
 - `--shadow-raised` for things that float above the canvas (panels, toasts, the switcher).
 - Every box on the canvas gets the very light `--node-shadow` (`--shadow-subtle`): text boxes,
-  code blocks, images, videos and demos; shapes get a matching outline-following drop shadow
+  code blocks, images, videos, demos and web pages; shapes get a matching outline-following drop shadow
   (`--node-shape-shadow`). Notes and stack prints keep their own paper shadows; text boxes with no
   background get none.
 - Stacking order uses `--z-*` tokens, never raw numbers.
@@ -153,6 +153,12 @@ A `--theme-switch-*` pill fixed `--theme-switch-inset` from the bottom-right cor
 in edit and view mode. A sun and a moon sit in the track; the knob slides over the current theme
 in `--motion-duration-normal`. It's a native button with `role="switch"` (checked = dark).
 
+Flipping it reveals the new theme as an ellipse growing from the bottom-right corner until it
+fills the screen (`--motion-duration-theme`, `--motion-easing-theme`: slow at first, then faster).
+It's a view transition: the old page is a frozen snapshot and the new theme shows through the
+growing clip, so nothing re-colors mid-way. Instant where view transitions aren't supported, with
+reduced motion, and when the theme follows a system change.
+
 The choice sets `data-theme` on `<html>` and is saved in `localStorage` (`mubu.theme`); a small
 inline script in `index.html` applies it before first paint. Until the viewer chooses, the
 theme follows the system. `npm run tokens` emits each dark value twice: under
@@ -178,7 +184,7 @@ navigation UI only if the gestures stop being enough.
 
 ### Hover lift (view mode)
 
-Interactive boxes — text nodes, videos, demos and stacks — grow to `--hover-lift-scale` (2%) on
+Interactive boxes — text nodes, videos, demos, web pages and stacks — grow to `--hover-lift-scale` (2%) on
 hover in `--motion-duration-fast`, so visitors can tell they respond to a click. Only the box's
 content scales (React Flow positions the node itself). Notes, shapes and images don't lift, and
 nothing lifts in the editor. A text box the reader has just zoomed back into stays at its normal
@@ -206,8 +212,9 @@ color and grows with its thickness.
 
 - **Label:** text with no box or background (`--label-color`, `--label-padding`), sized to its
   content, so it has no resize handles; change its size instead. Fonts: Fasthand (default),
-  Caveat, Sans, Serif, Mono (`--font-family-*`); Fasthand and Caveat are bundled with the app
-  (Fontsource), not loaded from Google. Size 8–240px (default 32), weight Regular/Medium/
+  Caveat, Handjet, Instrument Serif, Sans, Serif, Mono (`--font-family-*`); Fasthand, Caveat,
+  Handjet and Instrument Serif are bundled with the app (Fontsource), not loaded from Google.
+  Instrument Serif has only a regular weight, so heavier weights are synthesized. Size 8–240px (default 32), weight Regular/Medium/
   Semibold/Bold (400–700). Double-click to type (plain text; Enter adds a line, Esc finishes).
 - **Note:** a sticky note for quick thoughts. It's the first item in the palette and defaults to
   yellow. It comes in five `--color-note-*` fills (yellow, pink, green, blue, purple), stored by
@@ -224,7 +231,7 @@ color and grows with its thickness.
   Padding is `--text-box-padding` (10%) of the box's width on top, left and right, and none at the
   bottom: long text runs to the edge and is clipped, with no scrollbar. Visitors click it to open
   the full-screen reader (below). Notes don't do this; they keep their own padding and scroll.
-- **Shape:** SVG shapes with a constant 2px stroke; labels use `--shape-label`, dark in both modes
+- **Shape:** SVG shapes (rectangle, rounded, ellipse, diamond, triangle, hexagon, right-pointing block arrow) with a constant 2px stroke; they rotate like notes (drag the dot above a selected shape, Shift snaps to 15°, or set degrees in the inspector), and only the drawing and label turn, not the resize and connection handles; labels use `--shape-label`, dark in both modes
   because shape fills are light.
 - **Image:** fills the node; rounded with `--radius-sm`.
 - **Video:** `--video-backdrop` behind the player. Embeds show a thumbnail with a
@@ -235,6 +242,31 @@ color and grows with its thickness.
 - **Demo frame:** surface card with `--shadow-raised`. A `--demo-bar-height` title bar
   (`--demo-bar-bg`) with three dots and the title; it's the drag handle in edit mode. The page
   inside is the demo's own and is not styled by Mubu.
+
+### Web page (`src/nodes/LinkNode.tsx`)
+
+A `--link-*` card that previews a web page: the page's share image on top (`object-fit: cover`,
+anchored to the top) over `--link-image-bg`, then a `--link-padding` text area with the favicon
+(`--link-favicon-size`) and domain in `--link-meta-size` muted text, the title (semibold
+`--link-title-size`, two lines at most) and the description (muted, two lines at most). The image
+area takes whatever height is left, so resizing the card trims the image, never the text. When the
+page has no share image, the dev server saves a screenshot of its first screen instead (through
+Playwright's Chromium). With neither an image nor a title, the whole card is the fallback: the
+site's icon at `--link-fallback-icon-size` (or its initial on a muted tile) above the domain.
+
+Everything is fetched once, in the editor, by the dev server (`POST /__mubu/link`): the image and
+icon are saved under `public/content/assets/` and the text in the map, so the published site makes
+no requests to the linked site until a visitor clicks. Only `http:` and `https:` links are ever
+rendered as links.
+
+- **View mode:** the card is a link: a click opens the page in a new tab
+  (`target="_blank" rel="noopener noreferrer"`). It gets the hover lift and pointer cursor.
+- **Edit mode:** a click selects and a drag moves it, like any node. A `--link-open-size` ↗ button,
+  `--link-open-inset` from the top-right corner, shows on hover or selection and opens the page.
+  Double-click the card (or use the inspector's Web address field) to change the address; a new
+  card starts with the address field. Enter fetches the preview, Esc cancels. The inspector can
+  also override the title, choose a preview image of your own (uploaded like any image; Refresh
+  preview goes back to the fetched one), refresh the preview or remove the image.
 
 ### Code block (`src/nodes/CodeNode.tsx`)
 
@@ -261,8 +293,8 @@ the top. Long text scrolls with the overlay scrollbar (`src/ui/OverlayScrollbar.
 `--scrollbar-*` thumb with no track, `--scrollbar-inset` from the right, top and bottom edges, that
 fades in while scrolling and out `--scrollbar-hide-delay` after scrolling stops (it can be dragged).
 Visitors' text selection is a subtle gray (`--reader-selection`).
-The box's background grows with it: background and text share one clip that grows from the box's
-rectangle, so the zoom is continuous and the text is never re-wrapped. Opening deselects the box
+The box's background grows with it: background and text share one frame that grows from the box's
+rectangle and clips the text, so the zoom is continuous and the text is never re-wrapped. Opening deselects the box
 and the hover outline stays off until the pointer leaves, so the reader lands at exactly the box's
 size. The canvas switcher fades out with the zoom in and back in with the zoom out;
 the theme switch stays (`--z-theme-switch`). A Back pill sits `--reader-inset` from the top-left;
@@ -271,7 +303,9 @@ Back or Esc zooms back out, landing the visible top of the text back in the box,
 scale (equal ratios per frame) about a fixed point, for the text and the background alike: the
 background changes size far more than the text (window to box vs. a third of the window to box),
 and interpolating pixels linearly would cram its visible shrink into the last frames, after the
-text has settled, which reads as a second shrink.
+text has settled, which reads as a second shrink. Both move by transform only (the background
+frame scales to the box; the text's transform undoes that scale), so they run on the GPU in the
+same frames: a clip-path runs on Chrome's main thread and falls behind the text when it's busy.
 Respects reduced motion (no animation).
 
 In the editor this is where text nodes are edited (they aren't edited inside the box on the
@@ -383,6 +417,8 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--font-family-serif` | `ui-serif, Georgia, "Times New Roman", serif` | — | Label font option. |
 | `--font-family-fasthand` | `Fasthand, cursive` | — | Label font option (default); bundled with @fontsource/fasthand. |
 | `--font-family-caveat` | `"Caveat Variable", cursive` | — | Label font option; bundled with @fontsource-variable/caveat. |
+| `--font-family-handjet` | `"Handjet Variable", monospace` | — | Label font option: a dot-matrix display face; bundled with @fontsource-variable/handjet (weights 100–900). |
+| `--font-family-instrument-serif` | `"Instrument Serif", ui-serif, Georgia, serif` | — | Label font option: a condensed display serif; bundled with @fontsource/instrument-serif (regular weight only, so heavier weights are synthesized). |
 | `--font-size-xs` | `11px` | — | Tags and badges. |
 | `--font-size-sm` | `12px` | — | Labels, hints, field captions. |
 | `--font-size-md` | `13px` | — | Form inputs. |
@@ -443,8 +479,10 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--motion-duration-normal` | `200ms` | — | State changes such as toggles. |
 | `--motion-duration-zoom` | `380ms` | — | Zooming a text box into and out of the reader. |
 | `--motion-duration-zoom-out` | `320ms` | — | Zooming a text box back out of the reader: a little quicker than zooming in. |
+| `--motion-duration-theme` | `540ms` | — | Switching between light and dark: the new theme grows as an ellipse from the bottom-right corner. With the browser's ~60 ms snapshot before it starts, the whole switch takes about 600 ms. |
 | `--motion-duration-slide` | `640ms` | — | Sliding from one canvas to the next. |
 | `--motion-easing-standard` | `cubic-bezier(0.2, 0, 0, 1)` | — | Default easing for UI transitions. |
+| `--motion-easing-theme` | `cubic-bezier(0.5, 0, 0.85, 0.35)` | — | The theme ellipse starts slowly and speeds up until it fills the screen. |
 | `--motion-easing-zoom-out` | `cubic-bezier(0.3, 0, 0.15, 1)` | — | Zooming back out of the reader: starts right away and settles onto the box, with a shorter tail than the standard curve. |
 | `--motion-easing-slide` | `cubic-bezier(0.65, 0, 0.35, 1)` | — | Symmetric ease for two canvases moving together. |
 
@@ -692,5 +730,22 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--connector-color` | `#9a9a94` | `#6b6b66` | Default line and arrow color. |
 | `--connector-width` | `1.5` | — | Default thickness in px. |
+
+#### `component.link`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--link-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
+| `--link-border` | `var(--color-border) → #e2e2dd` | follows alias |  |
+| `--link-radius` | `var(--radius-md) → 8px` | follows alias |  |
+| `--link-image-bg` | `var(--color-surface-muted) → #f0f0ed` | follows alias | Behind the preview image, and the fallback panel when there is none. |
+| `--link-padding` | `var(--space-12) → 12px` | follows alias | Inside the text area below the image. |
+| `--link-gap` | `var(--space-4) → 4px` | follows alias | Between the site row, title and description. |
+| `--link-title-size` | `var(--font-size-base) → 14px` | follows alias |  |
+| `--link-meta-size` | `var(--font-size-sm) → 12px` | follows alias | Site name, domain and description. |
+| `--link-favicon-size` | `16px` | — |  |
+| `--link-fallback-icon-size` | `40px` | — | The large icon (or initial) on a card with no preview image. |
+| `--link-open-size` | `var(--size-control-sm) → 28px` | follows alias | Edit mode: the open-in-new-tab button in the card's corner. |
+| `--link-open-inset` | `var(--space-8) → 8px` | follows alias |  |
 
 <!-- tokens:end -->

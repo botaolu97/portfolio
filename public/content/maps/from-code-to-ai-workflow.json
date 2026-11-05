@@ -17,20 +17,6 @@
       "height": 488
     },
     {
-      "id": "c019c42b",
-      "type": "video",
-      "position": {
-        "x": 280,
-        "y": -272
-      },
-      "data": {
-        "src": "content/assets/9986327ac757be94.mp4"
-      },
-      "width": 872,
-      "height": 534,
-      "zIndex": 1
-    },
-    {
       "id": "8c694f61",
       "type": "note",
       "position": {
@@ -55,23 +41,23 @@
         "y": 352
       },
       "data": {
-        "html": "<h1>Background</h1><p></p><p>Industrial engineers need to identify anomalous patterns in physical-system data early to prevent equipment failures and reduce operational costs.</p><p></p><p>This need is growing: the global anomaly detection market is estimated at $7–8B in 2026, and our team had also received direct requests from our top customers.</p>",
+        "html": "<h1>Background</h1><p></p><p>Industrial engineers need to identify anomalous patterns in physical-system data early to prevent equipment failures and reduce operational costs.</p><p></p><p>This need is growing: <mark>the global anomaly detection market is estimated at $7–8B in 2026</mark>, and our team had also received direct requests from our top customers.</p>",
         "size": "xl"
       },
       "width": 600,
-      "height": 536
+      "height": 448
     },
     {
       "id": "6e9ce31b",
       "type": "label",
       "position": {
-        "x": -1064,
-        "y": -1064
+        "x": 32,
+        "y": -656
       },
       "data": {
-        "text": "From Code to AI Workflow",
-        "font": "fasthand",
-        "size": 240,
+        "text": "🫶 From Code to AI Apps",
+        "font": "handjet",
+        "size": 176,
         "weight": 400
       }
     },
@@ -79,8 +65,8 @@
       "id": "43aa77d9",
       "type": "stack",
       "position": {
-        "x": 72,
-        "y": 608
+        "x": 2504,
+        "y": 2384
       },
       "data": {
         "items": [
@@ -110,8 +96,8 @@
       "id": "5639f36b",
       "type": "stack",
       "position": {
-        "x": 976,
-        "y": 504
+        "x": 2528,
+        "y": 2968
       },
       "data": {
         "items": [
@@ -149,65 +135,242 @@
       "id": "474d7971",
       "type": "image",
       "position": {
-        "x": -400,
-        "y": 1400
+        "x": 1480,
+        "y": 1192
       },
       "data": {
         "src": "content/assets/44e0c0dade8f8cde.png",
         "alt": "image",
         "fit": "contain"
       },
-      "width": 1024,
-      "height": 796
+      "width": 1352,
+      "height": 1052
     },
     {
-      "id": "da19b597",
-      "type": "shape",
+      "id": "6aaa6d1e",
+      "type": "image",
       "position": {
-        "x": 1616,
-        "y": -280
+        "x": -1456,
+        "y": 152
       },
       "data": {
-        "shape": "ellipse",
-        "fill": "#a1bff2",
-        "stroke": "#4f6bed",
-        "label": ""
+        "src": "content/assets/02cb390ffa0020ea.png",
+        "alt": "image",
+        "fit": "contain"
       },
-      "width": 504,
-      "height": 500
+      "width": 288,
+      "height": 416
+    },
+    {
+      "id": "e0c7d3b1",
+      "type": "text",
+      "position": {
+        "x": -912,
+        "y": 984
+      },
+      "data": {
+        "html": "<h1>User Pain Points</h1><p></p><p>Previously, users rely on fragmented technical documentation to identify the right model, then learn and write MATLAB code to configure and run it. Much of their time is spent debugging, while comparing results requires manually generating plots with limited interactivity.</p><p></p><ul><li><p>Scattered documentations</p></li><li><p>Endless Debugging</p></li><li><p>Static outcomes</p></li></ul><p></p>",
+        "size": "xl"
+      },
+      "width": 600,
+      "height": 520
+    },
+    {
+      "id": "a78d2ed8",
+      "type": "link",
+      "position": {
+        "x": 376,
+        "y": -248
+      },
+      "data": {
+        "url": "https://www.mathworks.com/products/time-series-anomaly-detection.html",
+        "title": "Time Series Anomaly Detection for MATLAB",
+        "description": "Interactively design and test anomaly detection algorithms for time series data using MATLAB.",
+        "siteName": "",
+        "image": "content/assets/de4fb705b062a37c.gif",
+        "favicon": "content/assets/ef0eca8b5b903f64.ico"
+      },
+      "width": 600,
+      "height": 596
+    },
+    {
+      "id": "71b6d480",
+      "type": "stack",
+      "position": {
+        "x": -1576,
+        "y": 656
+      },
+      "data": {
+        "items": [
+          {
+            "id": "cd97b85a",
+            "src": "content/assets/adace258abbebcd1.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 285
+          },
+          {
+            "id": "3535855b",
+            "src": "content/assets/405424b48fe503b5.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 285
+          },
+          {
+            "id": "ae6369e0",
+            "src": "content/assets/06ae575da09a2da2.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 285
+          }
+        ],
+        "edges": []
+      },
+      "width": 480,
+      "height": 285
+    },
+    {
+      "id": "011d8974",
+      "type": "image",
+      "position": {
+        "x": 1472,
+        "y": 576
+      },
+      "data": {
+        "src": "content/assets/a541ae9a87460ff0.png",
+        "alt": "image",
+        "fit": "contain"
+      },
+      "width": 1887,
+      "height": 397
+    },
+    {
+      "id": "792aa628",
+      "type": "note",
+      "position": {
+        "x": 1312,
+        "y": 472
+      },
+      "data": {
+        "html": "<p>I started with a slide deck from the technical document</p>",
+        "color": "pink",
+        "size": "xl",
+        "rotation": -10.2
+      },
+      "width": 240,
+      "height": 216,
+      "zIndex": 2
+    },
+    {
+      "id": "33ee15c5",
+      "type": "note",
+      "position": {
+        "x": 2688,
+        "y": 2056
+      },
+      "data": {
+        "html": "<p>Worked with developers to draft the basic happy path</p>",
+        "color": "pink",
+        "size": "xl",
+        "rotation": -10.2
+      },
+      "width": 240,
+      "height": 216,
+      "zIndex": 2
+    },
+    {
+      "id": "329ea05c",
+      "type": "text",
+      "position": {
+        "x": 1496,
+        "y": -240
+      },
+      "data": {
+        "html": "<h1>Design Challenges</h1><p></p><p>Fundamentally, there're three:</p><p></p><ul><li><p>Mapping out the user workflow behind the technical languages</p></li><li><p>Bringing the team to a shared understanding</p></li><li><p>Designing for amateur and advanced user at the same time</p></li></ul><p></p>",
+        "size": "xl"
+      },
+      "width": 600,
+      "height": 520
+    },
+    {
+      "id": "e752dff2",
+      "type": "shape",
+      "position": {
+        "x": 1552,
+        "y": 1040
+      },
+      "data": {
+        "shape": "arrow",
+        "fill": "#e8f0fe",
+        "stroke": "#4f6bed",
+        "label": "",
+        "rotation": 90
+      },
+      "width": 160,
+      "height": 100
+    },
+    {
+      "id": "55a80d0a",
+      "type": "shape",
+      "position": {
+        "x": 2432,
+        "y": 2320
+      },
+      "data": {
+        "shape": "arrow",
+        "fill": "#e8f0fe",
+        "stroke": "#4f6bed",
+        "label": "",
+        "rotation": 44.1
+      },
+      "width": 160,
+      "height": 100
     }
   ],
   "edges": [
     {
-      "id": "2b258071",
-      "source": "f92bb232",
-      "target": "c019c42b",
-      "sourceHandle": "r",
-      "targetHandle": "l",
-      "type": "default",
-      "label": "What's the look of the plot",
-      "color": "#ff2700",
-      "width": 4
-    },
-    {
-      "id": "43dfaab0",
+      "id": "47e4afd3",
       "source": "cc8f16e3",
-      "target": "c019c42b",
-      "sourceHandle": "r",
-      "targetHandle": "l",
+      "target": "6aaa6d1e",
+      "sourceHandle": "l",
+      "targetHandle": "r",
       "type": "default",
-      "color": "#ff2700",
-      "width": 4
+      "label": "Anomaly detection"
     },
     {
-      "id": "ef7f2abf",
-      "source": "6e9ce31b",
-      "target": "f92bb232",
+      "id": "42594d5a",
+      "source": "cc8f16e3",
+      "target": "71b6d480",
+      "sourceHandle": "l",
+      "targetHandle": "r",
+      "type": "default"
+    },
+    {
+      "id": "dec9370a",
+      "source": "f92bb232",
+      "target": "a78d2ed8",
       "sourceHandle": "r",
-      "targetHandle": "t",
-      "type": "default",
-      "color": "#ff2700",
-      "width": 4
+      "targetHandle": "l",
+      "type": "default"
+    },
+    {
+      "id": "ee716a15",
+      "source": "cc8f16e3",
+      "target": "a78d2ed8",
+      "sourceHandle": "r",
+      "targetHandle": "l",
+      "type": "default"
+    },
+    {
+      "id": "48882f5d",
+      "source": "e0c7d3b1",
+      "target": "a78d2ed8",
+      "sourceHandle": "r",
+      "targetHandle": "l",
+      "type": "default"
     }
   ]
 }

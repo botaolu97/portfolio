@@ -146,6 +146,11 @@
   height: 100%;
 }
 
+.shapeBody {
+  position: absolute;
+  inset: 0;
+}
+
 .shape svg {
   position: absolute;
   inset: 0;
@@ -680,4 +685,217 @@
   min-width: 1ch;
   outline: none;
   cursor: text;
+}
+
+/* Link: a web page preview card. Visitors click it to open the page in a new tab. */
+.link {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--link-radius);
+  background: var(--link-bg);
+  border: 1px solid var(--link-border);
+  box-shadow: var(--node-shadow);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.linkImage {
+  flex: 1;
+  min-height: 0;
+  background: var(--link-image-bg);
+  border-bottom: 1px solid var(--link-border);
+}
+
+.linkImage img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  /* Screenshots and most share images read from the top. */
+  object-position: top;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.linkBody {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--link-gap);
+  padding: var(--link-padding);
+  min-width: 0;
+}
+
+.linkSite {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-width: 0;
+  font-size: var(--link-meta-size);
+  color: var(--color-text-muted);
+}
+
+.linkSite span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkFavicon {
+  flex: none;
+  width: var(--link-favicon-size);
+  height: var(--link-favicon-size);
+  border-radius: var(--radius-xs);
+  object-fit: contain;
+}
+
+.linkTitle,
+.linkDescription {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.linkTitle {
+  font-size: var(--link-title-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-line-height-snug);
+}
+
+.linkDescription {
+  font-size: var(--link-meta-size);
+  line-height: var(--font-line-height-snug);
+  color: var(--color-text-muted);
+}
+
+/* No preview image: the site's icon (or initial) and its domain, centered. */
+.linkFallback {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--link-padding);
+  background: var(--link-image-bg);
+}
+
+.linkFallbackIcon {
+  flex: none;
+  width: var(--link-fallback-icon-size);
+  height: var(--link-fallback-icon-size);
+  border-radius: var(--radius-md);
+  object-fit: contain;
+}
+
+.linkFallbackDomain {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--font-weight-medium);
+}
+
+.linkInitial {
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--link-border);
+  color: var(--color-text-muted);
+  font-size: calc(var(--link-fallback-icon-size) / 2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-line-height-tight);
+}
+
+.linkFavicon.linkInitial {
+  font-size: var(--font-size-xs);
+}
+
+/* Edit mode: the address field on an empty (or double-clicked) card. */
+.linkForm {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--link-padding);
+  background: var(--link-image-bg);
+  cursor: default;
+}
+
+.linkFormTitle {
+  font-size: var(--link-meta-size);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.linkForm input {
+  width: 100%;
+  height: var(--size-control);
+  padding: 0 var(--space-8);
+  border: 1px solid var(--link-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-field);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-md);
+}
+
+.linkHint,
+.linkError {
+  font-size: var(--link-meta-size);
+  color: var(--color-text-muted);
+}
+
+.linkError {
+  color: var(--color-danger);
+}
+
+.linkLoading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--link-image-bg);
+  color: var(--color-text-muted);
+  font-size: var(--link-meta-size);
+}
+
+/* Edit mode: opens the page in a new tab (a click on the card itself selects it). */
+.linkOpen {
+  position: absolute;
+  top: var(--link-open-inset);
+  right: var(--link-open-inset);
+  display: grid;
+  place-items: center;
+  width: var(--link-open-size);
+  height: var(--link-open-size);
+  border: 1px solid var(--link-border);
+  border-radius: var(--radius-sm);
+  background: var(--link-bg);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast);
+}
+
+:global(.react-flow__node):hover .linkOpen,
+:global(.react-flow__node.selected) .linkOpen,
+.linkOpen:focus-visible {
+  opacity: 1;
+}
+
+.linkOpen:hover {
+  background: var(--color-surface-muted);
 }

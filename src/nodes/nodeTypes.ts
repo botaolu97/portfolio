@@ -3,6 +3,7 @@ import { CodeNode } from './CodeNode';
 import { DemoNode } from './DemoNode';
 import { ImageNode } from './ImageNode';
 import { LabelNode } from './LabelNode';
+import { LinkNode } from './LinkNode';
 import { NoteNode } from './NoteNode';
 import { ShapeNode } from './ShapeNode';
 import { StackNode } from './StackNode';
@@ -20,4 +21,5 @@ export const nodeTypes = {
   video: VideoNode,
   shape: ShapeNode,
   demo: DemoNode,
+  link: LinkNode,
 } satisfies NodeTypes;

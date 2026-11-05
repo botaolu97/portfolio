@@ -1,6 +1,86 @@
 {
-  "version": 1,
+  "version": 2,
   "title": "Untitled map",
-  "nodes": [],
+  "nodes": [
+    {
+      "id": "c99d300e",
+      "type": "text",
+      "position": {
+        "x": 1224,
+        "y": 296
+      },
+      "data": {
+        "html": "<p>Senior product designer at</p><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"framer-1mbagem framer-lux5qc\" href=\"https://mathworks.com/\"><u>MathWorks</u><mark>↗</mark></a></p><p>I have 4 year of experience working on engineering tools &amp; design systems for 5M+ technical users.</p><p>I design beyond the interface — investing in user research, product strategy, and design engineering.</p>",
+        "size": "md"
+      },
+      "width": 456,
+      "height": 248
+    },
+    {
+      "id": "d4bdd765",
+      "type": "link",
+      "position": {
+        "x": 1224,
+        "y": 600
+      },
+      "data": {
+        "url": "https://drive.google.com/file/d/1NS0f4OdL_CIRJ85JGcZZnQnA24D3co9L/view?pli=1",
+        "title": "botao_UX.pdf",
+        "description": "",
+        "siteName": "Google Docs",
+        "image": "content/assets/a96b09a587164849.jpg",
+        "favicon": "content/assets/4559312557d667bf.png"
+      },
+      "width": 360,
+      "height": 300
+    },
+    {
+      "id": "c711e2e8",
+      "type": "stack",
+      "position": {
+        "x": 1680,
+        "y": 584
+      },
+      "data": {
+        "items": [
+          {
+            "id": "3412e710",
+            "src": "content/assets/806ce638c0f2ee1a.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 480
+          },
+          {
+            "id": "6b25fda3",
+            "src": "content/assets/545f44930c3c596f.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 480
+          },
+          {
+            "id": "bb33247b",
+            "src": "content/assets/348030d4f9d36d4b.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 480
+          },
+          {
+            "id": "4c049018",
+            "src": "content/assets/9b6cc84ae7bfe01a.png",
+            "alt": "image",
+            "fit": "contain",
+            "width": 480,
+            "height": 480
+          }
+        ],
+        "edges": []
+      },
+      "width": 480,
+      "height": 480
+    }
+  ],
   "edges": []
 }

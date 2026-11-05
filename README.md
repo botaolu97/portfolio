@@ -14,6 +14,7 @@ npm start          # both: editor (5173) and the view-only preview (4173); Ctrl-
 - **Add things:** drag from the left palette (a **Label** is transparent text in Fasthand and other fonts; Note is first: a yellow sticky with five colors), add a **Code** block (syntax highlighting for 16 languages), drop files onto the canvas, or paste an image (PNG, JPG, SVG file, or SVG markup) with ⌘V.
   - Images and SVGs become image nodes. Video files become video nodes.
   - HTML/CSS/JS files dropped together become one **demo**. To keep subfolders, add a Demo from the palette and use "Folder" in the inspector.
+- **Web pages:** add a **Web page** from the palette and paste a link on the card (or in the inspector). The editor fetches the page's title, icon and share image (or a screenshot) once and saves them with the canvas (or choose your own preview image in the inspector); visitors click the card to open the page in a new tab. In the editor, ↗ opens it and double-click changes the address.
 - **Demos** run in a sandboxed iframe and are interactive right away. Drag or select one by its title bar.
 - **Canvas:** scroll to pan, pinch or ⌘-scroll to zoom, drag on empty space to box-select, Space + drag to pan, Shift- or ⌘-click to add to a selection.
 - **Text and notes:** double-click to edit; ⌘1–4 sizes, ⌘T checkboxes, ⌘L bullets, ⇧⌘E highlight, ⌘B/I/U, ⇧⌘X strike, ⌘⌫ clear (full table in `DESIGN.md`).
@@ -41,7 +42,7 @@ npm run e2e        # Playwright: edit mode (dev server) and view mode (preview b
 | Path                          | What                                                                        |
 | ----------------------------- | --------------------------------------------------------------------------- |
 | `src/canvas/`                 | React Flow canvas, file drops, shortcuts                                    |
-| `src/nodes/`                  | One component per node type (text, shape, image, video, demo)               |
+| `src/nodes/`                  | One component per node type (text, shape, image, video, demo, web page)     |
 | `src/editor/`                 | Palette, inspector, autosave, highlighter — dev only, left out of the build |
 | `design/tokens.json`          | Design tokens (DTCG): the source of truth for UI values; see `DESIGN.md`    |
 | `src/store/`                  | Map schema (zod), migrations, zustand store with undo history               |

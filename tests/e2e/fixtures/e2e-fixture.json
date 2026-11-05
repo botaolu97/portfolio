@@ -106,6 +106,23 @@
       "data": {
         "html": "<p>Long read paragraph 1. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 2. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 3. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 4. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 5. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 6. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 7. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 8. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 9. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 10. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 11. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 12. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 13. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 14. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 15. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 16. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 17. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 18. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 19. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 20. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 21. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 22. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 23. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p><p>Long read paragraph 24. Mubu keeps the canvas calm so the work stands out, and the reader lets visitors dive into the long parts.</p>"
       }
+    },
+    {
+      "id": "site",
+      "type": "link",
+      "position": {
+        "x": -320,
+        "y": 200
+      },
+      "width": 260,
+      "height": 220,
+      "data": {
+        "url": "https://example.com/",
+        "title": "Example Domain",
+        "description": "This domain is for use in examples.",
+        "siteName": "",
+        "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='63'%3E%3Crect width='120' height='63' fill='%23cfe4ff'/%3E%3C/svg%3E"
+      }
     }
   ],
   "edges": [

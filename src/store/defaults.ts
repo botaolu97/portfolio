@@ -27,7 +27,7 @@ export const NODE_DEFAULTS: Defaults = {
   image: { data: { src: '', alt: '', fit: 'contain' }, width: 320, height: 240 },
   video: { data: { src: '' }, width: 480, height: 270 },
   shape: {
-    data: { shape: 'rounded', fill: '#e8f0fe', stroke: '#4f6bed', label: '' },
+    data: { shape: 'rounded', fill: '#e8f0fe', stroke: '#4f6bed', label: '', rotation: 0 },
     width: 160,
     height: 100,
   },
@@ -36,6 +36,7 @@ export const NODE_DEFAULTS: Defaults = {
     width: 640,
     height: 440,
   },
+  link: { data: { url: '', title: '', description: '', siteName: '' }, width: 360, height: 300 },
 };
 
 export const PALETTE: { type: AddableNodeType; label: string }[] = [
@@ -47,4 +48,5 @@ export const PALETTE: { type: AddableNodeType; label: string }[] = [
   { type: 'image', label: 'Image' },
   { type: 'video', label: 'Video' },
   { type: 'demo', label: 'Demo' },
+  { type: 'link', label: 'Web page' },
 ];

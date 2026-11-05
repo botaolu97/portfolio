@@ -57,15 +57,36 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('banner')).toHaveCount(0);
 
-  await expect(page.locator('.react-flow__node')).toHaveCount(6);
+  await expect(page.locator('.react-flow__node')).toHaveCount(7);
 
-  // Interactive boxes lift slightly on hover: text, video, demo and stacks (not notes or shapes).
+  // A web page card is a link: a click opens the page in a new tab, with no opener.
+  await page
+    .context()
+    .route('https://example.com/**', (route) =>
+      route.fulfill({ contentType: 'text/html', body: '<title>Example</title>' }),
+    );
+  const site = page.locator('.react-flow__node-link a');
+  await expect(site).toHaveAttribute('href', 'https://example.com/');
+  await expect(site).toHaveAttribute('target', '_blank');
+  await expect(site).toHaveAttribute('rel', 'noopener noreferrer');
+  await expect(site).toContainText('Example Domain');
+  await expect(site).toContainText('example.com');
+  expect(await site.evaluate((el) => getComputedStyle(el).cursor)).toBe('pointer');
+  const [popup] = await Promise.all([page.waitForEvent('popup'), site.click()]);
+  await popup.waitForLoadState();
+  expect(popup.url()).toBe('https://example.com/');
+  expect(await popup.evaluate(() => window.opener)).toBeNull();
+  await popup.close();
+  await page.mouse.move(8, 8);
+
+  // Interactive boxes lift slightly on hover: text, video, demo, web pages and stacks (not notes or shapes).
   const scaleOf = (locator: ReturnType<typeof page.locator>) =>
     locator.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a);
   for (const [id, part] of [
     ['note', '[class*="_text_"]'],
     ['demo', '[class*="_demo_"]'],
     ['pile', '[class*="_stack_"]'],
+    ['site', 'a'],
   ] as const) {
     const box = page.locator(`.react-flow__node[data-id="${id}"] ${part}`).first();
     await box.hover();
@@ -225,7 +246,8 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await themeSwitch.click();
   await expect(html).toHaveAttribute('data-theme', 'dark');
   const canvasColor = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  expect(await canvasColor()).toBe('rgb(22, 22, 21)');
+  // The switch animates (a view transition), so the new colors land a moment after the click.
+  await expect.poll(canvasColor).toBe('rgb(22, 22, 21)');
   await page.reload();
   await expect(html).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByRole('switch', { name: 'Dark theme' })).toHaveAttribute(
@@ -233,7 +255,7 @@ test('published site is read-only and demos still run', async ({ page }) => {
     'true',
   );
   await page.getByRole('switch', { name: 'Dark theme' }).click();
-  expect(await canvasColor()).toBe('rgb(217, 201, 184)');
+  await expect.poll(canvasColor).toBe('rgb(217, 201, 184)');
 
   expect(editorRequests).toEqual([]);
 

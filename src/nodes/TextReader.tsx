@@ -74,8 +74,8 @@ const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 /**
  * Full-screen reader for a text node. The box zooms up into it: the text block — the same layout
  * as on the canvas, just scaled — moves and scales to its reading position, inside one frame (the
- * box's background) whose clip grows from the box's rectangle to the window, so the text is cut
- * off exactly like the box at the start. Back or Esc runs the same animation in reverse. In edit
+ * box's background) that grows from the box's rectangle to the window and clips the text, so the
+ * text is cut off exactly like the box at the start. Back or Esc runs the same animation in reverse. In edit
  * mode the text turns into the editor once the zoom has landed; edits save as you type.
  */
 export function TextReader({
@@ -121,36 +121,44 @@ export function TextReader({
    * far more than the text (window to box, vs. a third of the window to box); interpolated linearly
    * in pixels, most of its visible shrink would land in the last frames, after the text has
    * settled, and read as a second shrink.
+   *
+   * Everything moves by transform only, so the browser runs it all on the GPU in the same frames.
+   * (A clip-path on the background runs on the main thread in Chrome and falls behind the text
+   * whenever the page is busy.) The frame — the window-sized background that holds the text —
+   * scales to the box's rectangle; the text's transform undoes that scale and applies its own.
    */
   const frames = useCallback(
     (l: Layout, scrollTop: number) => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
+      const vw = frame.current?.clientWidth || window.innerWidth;
+      const vh = frame.current?.clientHeight || window.innerHeight;
       const { src } = l;
       const block: Keyframe[] = [];
-      const frame: Keyframe[] = [];
+      const sheet: Keyframe[] = [];
+      const corners: Keyframe[] = [];
       for (let i = 0; i <= ZOOM_STEPS; i++) {
         const t = i / ZOOM_STEPS;
-        // Text: its scale goes from the reader's to the canvas zoom.
+        // Background: from the whole window to the box, on screen.
+        const w = geometric(vw, Math.max(src.width, 1), t);
+        const h = geometric(vh, Math.max(src.height, 1), t);
+        const left = lerp(0, src.left, along(vw, src.width, w, t));
+        const top = lerp(0, src.top, along(vh, src.height, h, t));
+        const sx = w / vw;
+        const sy = h / vh;
+        sheet.push({ transform: `translate(${left}px, ${top}px) scale(${sx}, ${sy})` });
+        // Rounded like the box once it gets there (in the frame's own, unscaled coordinates).
+        const radius = lerp(0, l.radius * zoom, along(vw, src.width, w, t));
+        corners.push({ borderRadius: `${radius / sx}px / ${radius / sy}px` });
+        // Text: its scale goes from the reader's to the canvas zoom, on screen.
         const scale = geometric(l.scale, zoom, t);
         const k = along(l.scale, zoom, scale, t);
         const x = lerp(l.left, src.left, k);
-        // The block sits in the scroller, so its position counts from the top of the scrolled text.
-        const y = lerp(l.top - scrollTop, src.top, k) + scrollTop;
-        block.push({ transform: `translate(${x}px, ${y}px) scale(${scale})` });
-        // Background: from the whole window to the box.
-        const w = geometric(vw, Math.max(src.width, 1), t);
-        const h = geometric(vh, Math.max(src.height, 1), t);
-        const kx = along(vw, src.width, w, t);
-        const ky = along(vh, src.height, h, t);
-        const left = lerp(0, src.left, kx);
-        const top = lerp(0, src.top, ky);
-        const radius = lerp(0, l.radius * zoom, kx);
-        frame.push({
-          clipPath: `inset(${top}px ${vw - left - w}px ${vh - top - h}px ${left}px round ${radius}px)`,
+        const y = lerp(l.top - scrollTop, src.top, k);
+        // …expressed inside the scaled frame and the scrolled text.
+        block.push({
+          transform: `translate(${(x - left) / sx}px, ${(y - top) / sy + scrollTop}px) scale(${scale / sx}, ${scale / sy})`,
         });
       }
-      return { block, frame };
+      return { block, sheet, corners };
     },
     [zoom],
   );
@@ -183,7 +191,8 @@ export function TextReader({
       () => editable && !closing.current && setEditing(true),
       () => {},
     );
-    frame.current?.animate(f.frame.toReversed(), t);
+    frame.current?.animate(f.sheet.toReversed(), t);
+    frame.current?.animate(f.corners.toReversed(), t);
     back.current?.animate([{ opacity: 0 }, { opacity: 1 }], {
       ...t,
       delay: (t.duration as number) * 0.5,
@@ -217,7 +226,8 @@ export function TextReader({
       ...t,
       duration: (t.duration as number) * 0.4,
     });
-    frame.current?.animate(f.frame, t);
+    frame.current?.animate(f.sheet, t);
+    frame.current?.animate(f.corners, t);
     block.current.animate(f.block, t).finished.then(onClosed, onClosed);
   }, [frames, timing, onClosing, onClosed]);
 

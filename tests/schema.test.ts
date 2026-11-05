@@ -31,6 +31,19 @@ describe('migrateMap', () => {
     });
   });
 
+  it('parses a web page node and fills its defaults', () => {
+    const link = {
+      id: 'l',
+      type: 'link',
+      position: { x: 0, y: 0 },
+      data: { url: 'https://a.dev/' },
+    };
+    expect(migrateMap({ ...valid, nodes: [link] }).nodes[0]).toMatchObject({
+      type: 'link',
+      data: { url: 'https://a.dev/', title: '', description: '', siteName: '' },
+    });
+  });
+
   it('defaults a note to yellow and rejects unknown colors', () => {
     const note = { id: 'n', type: 'note', position: { x: 0, y: 0 }, data: {} };
     expect(migrateMap({ ...valid, nodes: [note] }).nodes[0]).toMatchObject({

@@ -4,8 +4,11 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   DEMO_BRIDGE,
+  decodeEntities,
   injectDemoBridge,
   injectDemoBridgeInto,
+  normalizeUrl,
+  parseLinkMeta,
   resolveDemoEntry,
   safeRelativePath,
   saveDemo,
@@ -132,5 +135,61 @@ describe('demo bridge', () => {
     expect(await readFile(path.join(dir, 'd-1', 'app.js'), 'utf8')).toBe('console.log(1)');
     expect(await injectDemoBridgeInto(dir)).toBe(0);
     await rm(dir, { recursive: true, force: true });
+  });
+});
+
+describe('link previews', () => {
+  it('normalizes addresses and refuses anything but http(s)', () => {
+    expect(normalizeUrl('example.com/a b')).toBe('https://example.com/a%20b');
+    expect(normalizeUrl(' http://example.com ')).toBe('http://example.com/');
+    expect(normalizeUrl('localhost:3000')).toBe('https://localhost:3000/');
+    expect(normalizeUrl('javascript:alert(1)')).toBeNull();
+    expect(normalizeUrl('ftp://example.com')).toBeNull();
+    expect(normalizeUrl('not a url')).toBeNull();
+    expect(normalizeUrl('')).toBeNull();
+  });
+
+  it('decodes HTML entities', () => {
+    expect(decodeEntities('Tom &amp; Jerry &#8212; &#x27;hi&#x27; &bogus;')).toBe(
+      "Tom & Jerry — 'hi' &bogus;",
+    );
+  });
+
+  it('reads Open Graph data, falling back to the title tag', () => {
+    const html = `<!doctype html><html><head>
+      <title>Plain &amp; simple</title>
+      <meta property="og:title" content="OG title">
+      <meta name='description' content='A  page
+        about things'>
+      <meta property="og:site_name" content="Example">
+      <meta property="og:image" content="/img/share.png">
+      <link rel="icon" href="/favicon-16.png" sizes="16x16">
+      <link rel="apple-touch-icon" href="https://cdn.example.com/touch.png">
+      <link rel="icon" type="image/svg+xml" href="icon.svg">
+    </head><body><meta property="og:title" content="ignored"></body></html>`;
+    expect(parseLinkMeta(html, 'https://example.com/blog/post')).toEqual({
+      title: 'OG title',
+      description: 'A page about things',
+      siteName: 'Example',
+      imageUrl: 'https://example.com/img/share.png',
+      iconUrls: [
+        'https://example.com/blog/icon.svg',
+        'https://cdn.example.com/touch.png',
+        'https://example.com/favicon-16.png',
+        'https://example.com/favicon.ico',
+      ],
+    });
+    expect(parseLinkMeta('<title>Only &lt;this&gt;</title>', 'https://a.dev/').title).toBe(
+      'Only <this>',
+    );
+  });
+
+  it('ignores non-http image and icon links', () => {
+    const meta = parseLinkMeta(
+      '<meta property="og:image" content="javascript:alert(1)"><link rel="icon" href="data:image/png;base64,AA">',
+      'https://a.dev/',
+    );
+    expect(meta.imageUrl).toBeUndefined();
+    expect(meta.iconUrls).toEqual(['https://a.dev/favicon.ico']);
   });
 });
