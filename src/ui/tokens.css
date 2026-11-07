@@ -184,8 +184,12 @@
   --label-color: var(--color-text);
   --label-padding: var(--space-4);
   --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12);
+  --rich-text-indent: 1.5em;
+  --rich-link-color: var(--color-text);
+  --rich-link-underline: var(--color-text-muted);
   --connector-color: #9a9a94;
   --connector-width: 1.5;
+  --connector-label-size: 12;
   --link-bg: var(--color-surface);
   --link-border: var(--color-border);
   --link-radius: var(--radius-md);

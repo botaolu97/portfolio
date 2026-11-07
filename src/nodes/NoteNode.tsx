@@ -6,6 +6,7 @@ import { useUiStore } from '../store/uiStore';
 import { NodeChrome } from './NodeChrome';
 import styles from './nodes.module.css';
 import { RotateHandle } from './RotateHandle';
+import { withLinkIcons } from './richLinks';
 import { textSizeStyle } from './textSize';
 
 // Same editor as text nodes; checked inline so the production build drops it.
@@ -42,7 +43,7 @@ export const NoteNode = memo(function NoteNode({
       <div
         className={`${styles.noteText} ${styles.rich} ${styles.richStatic}`}
         // Authored by the site owner in edit mode, never by visitors.
-        dangerouslySetInnerHTML={{ __html: data.html }}
+        dangerouslySetInnerHTML={{ __html: withLinkIcons(data.html) }}
       />
     );
   }

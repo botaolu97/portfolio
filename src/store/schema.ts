@@ -84,6 +84,7 @@ export const CODE_LANGUAGES = {
   sql: 'SQL',
   markdown: 'Markdown',
   yaml: 'YAML',
+  matlab: 'MATLAB',
   text: 'Plain text',
 } as const;
 export type CodeLanguage = keyof typeof CODE_LANGUAGES;
@@ -152,22 +153,36 @@ export const linkData = z.object({
   favicon: z.string().optional(),
 });
 
-export const mapEdge = z.object({
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/);
+
+export const CONNECTOR_ARROWS = ['end', 'start', 'both', 'none'] as const;
+export type ConnectorArrow = (typeof CONNECTOR_ARROWS)[number];
+
+/** How a connector looks: everything "Apply to all connectors" copies (not its label text). */
+export const connectorStyle = z.object({
+  type: z.enum(['default', 'smoothstep', 'straight']).optional(),
+  animated: z.boolean().optional(),
+  /** Which end has an arrowhead: the target (default), the source, both or neither. */
+  arrow: z.enum(CONNECTOR_ARROWS).optional(),
+  /** Line and arrow color in the light theme, #rrggbb; the --connector-color default when unset. */
+  color: hexColor.optional(),
+  /** Line and arrow color in the dark theme; the dark --connector-color default when unset. */
+  colorDark: hexColor.optional(),
+  /** Thickness in px; the --connector-width default when unset. */
+  width: z.number().min(0.5).max(12).optional(),
+  /** Label font size in px; the --connector-label-size default when unset. */
+  labelSize: z.number().min(6).max(48).optional(),
+});
+export type ConnectorStyle = z.infer<typeof connectorStyle>;
+export const CONNECTOR_STYLE_KEYS = Object.keys(connectorStyle.shape) as (keyof ConnectorStyle)[];
+
+export const mapEdge = connectorStyle.extend({
   id: z.string().min(1),
   source: z.string(),
   target: z.string(),
   sourceHandle: z.string().nullish(),
   targetHandle: z.string().nullish(),
-  type: z.enum(['default', 'smoothstep', 'straight']).optional(),
   label: z.string().optional(),
-  animated: z.boolean().optional(),
-  /** Line and arrow color as #rrggbb; the --connector-color default when unset. */
-  color: z
-    .string()
-    .regex(/^#[0-9a-fA-F]{6}$/)
-    .optional(),
-  /** Thickness in px; the --connector-width default when unset. */
-  width: z.number().min(0.5).max(12).optional(),
 });
 
 export const stackItem = z.object({
@@ -204,6 +219,8 @@ export const mapDoc = z.object({
   title: z.string(),
   nodes: z.array(mapNode),
   edges: z.array(mapEdge),
+  /** The look new connectors get on this canvas (set by "Apply to all connectors"). */
+  connector: connectorStyle.optional(),
 });
 
 export const mapIndexEntry = z.object({

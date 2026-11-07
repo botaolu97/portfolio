@@ -55,6 +55,10 @@
 }
 
 /* An empty paragraph (Enter on an empty line) keeps one line of height, as it does while editing. */
+.rich :is(p, h1, h2, h3)[data-indent] {
+  margin-inline-start: calc(var(--_text-indent) * var(--rich-text-indent));
+}
+
 .rich p:empty::before {
   content: "\00a0";
 }
@@ -83,6 +87,29 @@
 
 .rich :is(ul, ol) {
   padding-left: var(--rich-text-list-indent);
+}
+
+/* Links read as their page: its icon, then its title (or the words the link was given). */
+.rich a {
+  color: var(--rich-link-color);
+  text-decoration: underline;
+  text-decoration-color: var(--rich-link-underline);
+  text-underline-offset: 0.18em;
+}
+
+.rich a:hover {
+  text-decoration-color: currentColor;
+}
+
+.rich a[data-favicon]::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.3em;
+  vertical-align: -0.14em;
+  border-radius: var(--radius-xs);
+  background: var(--_favicon) center / contain no-repeat;
 }
 
 .rich mark {

@@ -17,6 +17,7 @@
     "predev": "npm run tokens",
     "prebuild": "npm run tokens -- --check",
     "delete-canvas": "node scripts/delete-canvas.ts",
+    "encode-videos": "node scripts/encode-videos.ts",
     "start": "npm run build && (npm run preview & npm run dev)"
   },
   "dependencies": {
@@ -27,6 +28,7 @@
     "@shikijs/langs": "^4.6.0",
     "@shikijs/themes": "^4.6.0",
     "@tiptap/extension-highlight": "^3.32.2",
+    "@tiptap/extension-link": "^3.32.2",
     "@tiptap/extension-list": "^3.32.2",
     "@tiptap/pm": "^3.32.2",
     "@tiptap/react": "^3.32.2",

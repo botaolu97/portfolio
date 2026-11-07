@@ -193,10 +193,19 @@ on its real size. No lift with reduced motion.
 
 ### Connectors
 
-Each connector can have its own color (hex, `#rrggbb`) and thickness (0.5–12px), set in its
-inspector with a color picker plus hex field and a slider plus number; "Use default look" clears
-both. Unset, they use `--connector-color` and `--connector-width`. The arrowhead takes the line's
-color and grows with its thickness.
+Each connector can have its own color, one for the light theme and one for the dark theme (hex,
+`#rrggbb`; with only a light color set, dark uses it too), thickness (0.5–12px) and label size
+(6–48px), set in its inspector with a color picker plus hex field and a slider plus number;
+"Use default look" clears them. Unset, they use `--connector-color` (which has its own dark
+value), `--connector-width` and `--connector-label-size`. The arrowhead takes the line's color and
+grows with its thickness.
+
+The arrowhead sits at the end (the target) by default; "Arrow" moves it to the start, both ends or
+none, and "Flip" points it the other way.
+
+"Apply to all connectors" copies the selected connector's look — style, animation, arrow, both colors,
+thickness and label size, not its label text — to every connector on the canvas, and saves it
+with the canvas (`connector` in the map file) as the look for connectors drawn from then on.
 
 ### Canvas node chrome (`src/nodes/NodeChrome.tsx`, `src/canvas/Canvas.module.css`)
 
@@ -333,6 +342,15 @@ One editor (`src/editor/richTextExtensions.ts`) with the same shortcuts everywhe
 edited in the full-screen reader; notes inside the note (double-click, Esc or a canvas click to
 finish). Pressing Enter on an empty line keeps an empty paragraph, which shows as a blank line.
 
+**Links.** Type or paste a web address (it becomes a link when you type a space after it). The
+dev server looks the page up once (`src/editor/linkPreviews.ts`, `/__mubu/link` with `iconOnly`)
+and saves its icon as an asset; the link then shows the page's icon followed by its title. A
+link whose text is just its address is renamed to the page title; a link with words of its own
+keeps them and gains the icon. Links are in the text color with a `--rich-link-underline`
+underline, and open in a new tab. Icons are stored as content paths (`data-favicon`) and resolved
+against the deploy base when shown (`src/nodes/richLinks.ts`). If the page can't be read, the link
+stays as it is.
+
 **Text size.** Each text node and note has a size, S / M / L / XL (M is the default), picked in
 the inspector with a segmented control. It multiplies the node's base size by
 `--rich-text-scale-sm|md|lg|xl`, and headings are relative to it, so a large note keeps its
@@ -350,6 +368,7 @@ proportions.
 | ⌘B / ⌘I / ⌘U | Bold / italic / underline | |
 | ⇧⌘X | Strikethrough | |
 | ⌘⌫ | Clear styling (marks and block type) | |
+| Tab / ⇧Tab | Indent / outdent the selected paragraphs and headings (`--rich-text-indent` per step, up to 8); in a list, nest / un-nest the item. Tab never moves focus out of the editor; Esc leaves it. | |
 
 Browsers keep some shortcuts for themselves: Chrome always opens a new tab on ⌘T, so use `[ ] `
 there; ⌘⌥1–3 also set headings. Rendered (not editing), checkboxes show their state but can't be
@@ -724,12 +743,26 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--canvas-slide-shadow` | `0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12)` | `0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45)` |  |
 
+#### `component.rich-text-indent`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--rich-text-indent` | `1.5em` | — | One indent step (Tab) for a paragraph or heading in rich text. |
+
+#### `component.rich-link`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--rich-link-color` | `var(--color-text) → #1c1c1a` | follows alias | Link text: the text color, so a link reads as part of the sentence. |
+| `--rich-link-underline` | `var(--color-text-muted) → #6b6b66` | follows alias | Underline under a link; it darkens to the text color on hover. |
+
 #### `component.connector`
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--connector-color` | `#9a9a94` | `#6b6b66` | Default line and arrow color. |
 | `--connector-width` | `1.5` | — | Default thickness in px. |
+| `--connector-label-size` | `12` | — | Default connector label font size in px. |
 
 #### `component.link`
 

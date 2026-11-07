@@ -20,6 +20,7 @@ const GRAMMARS: Record<Exclude<CodeLanguage, 'text'>, () => Promise<unknown>> = 
   sql: () => import('@shikijs/langs/sql'),
   markdown: () => import('@shikijs/langs/markdown'),
   yaml: () => import('@shikijs/langs/yaml'),
+  matlab: () => import('@shikijs/langs/matlab'),
 };
 
 let highlighter: Promise<HighlighterCore> | undefined;

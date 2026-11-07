@@ -34,6 +34,65 @@ describe('mapStore', () => {
     expect(nodes[1]).toMatchObject({ type: 'text', width: 240, height: 120 });
   });
 
+  it('applies one connector look to all connectors and to new ones', () => {
+    useMapStore.setState({
+      edges: [
+        {
+          id: 'a',
+          source: 'n1',
+          target: 'n2',
+          label: 'keep me',
+          type: 'straight',
+          animated: true,
+          arrow: 'both',
+          color: '#c0392b',
+          colorDark: '#ff8a7a',
+          width: 4,
+          labelSize: 18,
+        },
+        { id: 'b', source: 'n2', target: 'n3', label: 'mine', type: 'default', color: '#000000' },
+      ],
+    });
+    useMapStore.getState().applyConnectorStyleToAll('a');
+    const look = {
+      type: 'straight',
+      animated: true,
+      arrow: 'both',
+      color: '#c0392b',
+      colorDark: '#ff8a7a',
+      width: 4,
+      labelSize: 18,
+    };
+    const { edges, connector } = useMapStore.getState();
+    expect(connector).toEqual(look);
+    expect(edges[1]).toMatchObject({ ...look, label: 'mine' });
+    useMapStore.getState().onConnect({
+      source: 'n3',
+      target: 'n4',
+      sourceHandle: null,
+      targetHandle: null,
+    });
+    expect(useMapStore.getState().edges[2]).toMatchObject(look);
+    // Saved with the canvas, and loaded back.
+    const doc = toDoc(useMapStore.getState());
+    expect(doc.connector).toEqual(look);
+    useMapStore.getState().load('test', doc);
+    expect(useMapStore.getState().connector).toEqual(look);
+  });
+
+  it('clears looks a synced connector does not set', () => {
+    useMapStore.setState({
+      edges: [
+        { id: 'a', source: 'n1', target: 'n2' },
+        { id: 'b', source: 'n2', target: 'n3', color: '#000000', width: 6, animated: true },
+      ],
+    });
+    useMapStore.getState().applyConnectorStyleToAll('a');
+    const b = useMapStore.getState().edges[1];
+    expect([b.color, b.width, b.animated]).toEqual([undefined, undefined, undefined]);
+    expect(toDoc(useMapStore.getState()).connector).toBeUndefined();
+  });
+
   it('deselects connectors when adding a node', () => {
     useMapStore.setState({ edges: [{ id: 'e', source: 'a', target: 'b', selected: true }] });
     useMapStore.getState().addNode('note', { x: 0, y: 0 });

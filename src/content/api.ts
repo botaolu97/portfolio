@@ -81,4 +81,5 @@ export interface LinkPreview {
 }
 
 /** Edit mode: the dev server reads the page and saves its image and icon as assets. */
-export const fetchLinkPreview = (url: string) => post<LinkPreview>('link', JSON.stringify({ url }));
+export const fetchLinkPreview = (url: string, options: { iconOnly?: boolean } = {}) =>
+  post<LinkPreview>('link', JSON.stringify({ url, ...options }));

@@ -8,3 +8,5 @@ playwright-report/
 *.tsbuildinfo
 2026 job hunting/
 .vite/
+# Source and encoded videos for `npm run encode-videos` (upload the encoded file in the editor).
+videos/

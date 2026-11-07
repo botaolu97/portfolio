@@ -11,17 +11,33 @@ npm run dev        # edit mode at http://127.0.0.1:5173
 npm start          # both: editor (5173) and the view-only preview (4173); Ctrl-C stops both
 ```
 
-- **Add things:** drag from the left palette (a **Label** is transparent text in Fasthand and other fonts; Note is first: a yellow sticky with five colors), add a **Code** block (syntax highlighting for 16 languages), drop files onto the canvas, or paste an image (PNG, JPG, SVG file, or SVG markup) with ⌘V.
+- **Add things:** drag from the left palette (a **Label** is transparent text in Fasthand and other fonts; Note is first: a yellow sticky with five colors), add a **Code** block (syntax highlighting for 17 languages, MATLAB included), drop files onto the canvas, or paste an image (PNG, JPG, SVG file, or SVG markup) with ⌘V.
   - Images and SVGs become image nodes. Video files become video nodes.
   - HTML/CSS/JS files dropped together become one **demo**. To keep subfolders, add a Demo from the palette and use "Folder" in the inspector.
 - **Web pages:** add a **Web page** from the palette and paste a link on the card (or in the inspector). The editor fetches the page's title, icon and share image (or a screenshot) once and saves them with the canvas (or choose your own preview image in the inspector); visitors click the card to open the page in a new tab. In the editor, ↗ opens it and double-click changes the address.
 - **Demos** run in a sandboxed iframe and are interactive right away. Drag or select one by its title bar.
 - **Canvas:** scroll to pan, pinch or ⌘-scroll to zoom, drag on empty space to box-select, Space + drag to pan, Shift- or ⌘-click to add to a selection.
-- **Text and notes:** double-click to edit; ⌘1–4 sizes, ⌘T checkboxes, ⌘L bullets, ⇧⌘E highlight, ⌘B/I/U, ⇧⌘X strike, ⌘⌫ clear (full table in `DESIGN.md`).
+- **Links in text:** type or paste a web address; it turns into the page's icon and title, and opens in a new tab.
+- **Text and notes:** double-click to edit; ⌘1–4 sizes, ⌘T checkboxes, ⌘L bullets, ⇧⌘E highlight, ⌘B/I/U, ⇧⌘X strike, ⌘⌫ clear, Tab / ⇧Tab indent (full table in `DESIGN.md`).
 - **Shortcuts:** ⌘Z undo (no redo), ⌘C / ⌘V copy/paste, ⌘D duplicate, ⌘A select all, Delete removes.
+- **Connectors:** select one to set its style, animation, arrow direction (end, start, both, none, or Flip), colors (light and dark), thickness and label size; "Apply to all connectors" gives every connector on the canvas, and every new one, that look.
 - **Canvases:** the switcher in the bottom-left shows the current canvas; click it to switch, or (in edit mode) to create a new one. The site root opens the welcome canvas.
 - **Delete a canvas:** `npm run delete-canvas -- "Exact canvas name"` (or its slug). The name must match exactly; uploaded files stay.
 - Changes autosave to `public/content/` (maps, uploaded assets and demos), so everything lives in git.
+
+## Videos
+
+Big screen recordings (100 MB+) are too heavy to commit; compress them first (macOS, no ffmpeg needed):
+
+1. Put the videos (mp4, mov or m4v) in `videos/` at the repo root. The folder is git-ignored.
+2. Run `npm run encode-videos`. Each one is written to `videos/encoded/<name>.mp4`: H.264 at about
+   1.7 Mbps for a 1080p recording (scaled with the picture size), at most 1920px wide, AAC audio,
+   and fast start so it plays before it has fully downloaded. Videos already encoded are skipped.
+3. Upload the encoded file through a Video node's inspector (or drop it on the canvas).
+
+Options: `--kbps 2500` for sharper (bigger) files, `--max-width 1280` for smaller ones, `--force` to
+encode again. A 109 MB, 88-second recording came out at 19 MB with text that looks the same at
+100%. For long walkthroughs, an unlisted YouTube or Vimeo link is lighter still.
 
 ## Publish
 

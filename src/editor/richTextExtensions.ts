@@ -2,6 +2,8 @@ import { Extension } from '@tiptap/core';
 import Highlight from '@tiptap/extension-highlight';
 import { TaskItem, TaskList } from '@tiptap/extension-list';
 import StarterKit from '@tiptap/starter-kit';
+import { Indent } from './indent';
+import { LinkPreviews, PreviewLink } from './linkPreviews';
 
 /**
  * Mubu's text shortcuts, shared by text nodes and notes (see DESIGN.md → Rich text).
@@ -32,10 +34,14 @@ const Shortcuts = Extension.create({
 export const richTextExtensions = [
   StarterKit.configure({
     heading: { levels: [1, 2, 3] },
-    link: { openOnClick: false },
+    link: false,
   }),
+  // Links show their page's icon and title (looked up when added; see linkPreviews.ts).
+  PreviewLink.configure({ openOnClick: false }),
+  LinkPreviews,
   Highlight,
   TaskList,
   TaskItem.configure({ nested: true }),
   Shortcuts,
+  Indent,
 ];

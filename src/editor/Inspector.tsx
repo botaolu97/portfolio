@@ -4,10 +4,11 @@ import { useShallow } from 'zustand/react/shallow';
 import { asset, uploadDemo, uploadFile } from '../content/api';
 import { loadLinkPreview, safeHref, useLinkStatus } from '../nodes/linkPreview';
 import { normalizeAngle } from '../nodes/RotateHandle';
-import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
+import { connectorStyleOf, type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
 import {
   CODE_LANGUAGES,
   type CodeLanguage,
+  type ConnectorArrow,
   DEVICES,
   LABEL_FONTS,
   LABEL_WEIGHTS,
@@ -22,7 +23,7 @@ import {
 } from '../store/schema';
 import { useUiStore } from '../store/uiStore';
 import { Button } from '../ui/Button';
-import { tokenValues } from '../ui/tokens';
+import { tokenDarkValues, tokenValues } from '../ui/tokens';
 import styles from './Editor.module.css';
 
 type OnError = (message: string) => void;
@@ -599,6 +600,28 @@ function EdgeFields({ edge }: { edge: FlowEdge }) {
         />
         Animated
       </label>
+      <Field label="Arrow">
+        <div className={styles.sizeRow}>
+          <select
+            value={edge.arrow ?? 'end'}
+            onChange={(e) => updateEdge(edge.id, { arrow: e.target.value as ConnectorArrow })}
+          >
+            <option value="end">At the end →</option>
+            <option value="start">At the start ←</option>
+            <option value="both">Both ends ↔</option>
+            <option value="none">None</option>
+          </select>
+          <Button
+            title="Point the arrow the other way"
+            disabled={edge.arrow === 'both' || edge.arrow === 'none'}
+            onClick={() =>
+              updateEdge(edge.id, { arrow: (edge.arrow ?? 'end') === 'end' ? 'start' : 'end' })
+            }
+          >
+            Flip
+          </Button>
+        </div>
+      </Field>
       <ConnectorLook edge={edge} />
     </>
   );
@@ -606,74 +629,172 @@ function EdgeFields({ edge }: { edge: FlowEdge }) {
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 const DEFAULT_CONNECTOR_COLOR = tokenValues['component.connector.color'];
+const DEFAULT_CONNECTOR_COLOR_DARK =
+  tokenDarkValues['component.connector.color'] ?? DEFAULT_CONNECTOR_COLOR;
 const DEFAULT_CONNECTOR_WIDTH = Number.parseFloat(tokenValues['component.connector.width']);
+const DEFAULT_LABEL_SIZE = Number.parseFloat(tokenValues['component.connector.label-size']);
 
-/** Color (picker + hex) and thickness for one connector, with a way back to the defaults. */
+/** A color picker plus a hex field that keeps what you type until it's a full #rrggbb. */
+function HexColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (hex: string) => void;
+}) {
+  const [hex, setHex] = useState(value);
+  useEffect(() => setHex(value), [value]);
+  return (
+    <Field label={label}>
+      <div className={styles.sizeRow}>
+        <input
+          type="color"
+          className={styles.colorSwatch}
+          value={value}
+          aria-label={`${label} picker`}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        <input
+          value={hex}
+          spellCheck={false}
+          aria-label={`${label} hex`}
+          placeholder="#rrggbb"
+          onChange={(e) => {
+            const next = e.target.value.trim();
+            setHex(next);
+            const full = next.startsWith('#') ? next : `#${next}`;
+            if (HEX.test(full)) onChange(full.toLowerCase());
+          }}
+        />
+      </div>
+    </Field>
+  );
+}
+
+/** A slider plus a number field, within [min, max]. */
+function RangeField({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <Field label={label}>
+      <div className={styles.sizeRow}>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          aria-label={`${label} slider`}
+          onChange={(e) => onChange(Number(e.target.value))}
+        />
+        <input
+          type="number"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          aria-label={label}
+          onChange={(e) => {
+            const next = Number(e.target.value);
+            if (next >= min && next <= max) onChange(next);
+          }}
+        />
+      </div>
+    </Field>
+  );
+}
+
+/**
+ * Color (one per theme), thickness and label size for one connector, a way back to the defaults,
+ * and a way to give every connector on the canvas (and every new one) this look.
+ */
 function ConnectorLook({ edge }: { edge: FlowEdge }) {
   const updateEdge = useMapStore((s) => s.updateEdge);
-  const color = edge.color ?? DEFAULT_CONNECTOR_COLOR;
-  const width = edge.width ?? DEFAULT_CONNECTOR_WIDTH;
-  // The hex field keeps what you type until it's a full #rrggbb.
-  const [hex, setHex] = useState(color);
-  useEffect(() => setHex(color), [color]);
+  const applyToAll = useMapStore((s) => s.applyConnectorStyleToAll);
+  const count = useMapStore((s) => s.edges.length);
+  const [applied, setApplied] = useState(false);
+  // The confirmation stays until you pick another connector or change this one.
+  const look = JSON.stringify(connectorStyleOf(edge));
+  const appliedLook = useRef<string | null>(null);
+  useEffect(() => {
+    if (appliedLook.current !== look) setApplied(false);
+  }, [look]);
+  useEffect(() => setApplied(false), [edge.id]);
+  const light = edge.color ?? DEFAULT_CONNECTOR_COLOR;
+  const custom = edge.color || edge.colorDark || edge.width || edge.labelSize;
 
   return (
     <>
-      <Field label="Color">
-        <div className={styles.sizeRow}>
-          <input
-            type="color"
-            className={styles.colorSwatch}
-            value={color}
-            aria-label="Color picker"
-            onChange={(e) => updateEdge(edge.id, { color: e.target.value })}
-          />
-          <input
-            value={hex}
-            spellCheck={false}
-            aria-label="Hex color"
-            placeholder="#rrggbb"
-            onChange={(e) => {
-              const value = e.target.value.trim();
-              setHex(value);
-              const full = value.startsWith('#') ? value : `#${value}`;
-              if (HEX.test(full)) updateEdge(edge.id, { color: full.toLowerCase() });
-            }}
-          />
-        </div>
-      </Field>
-      <Field label="Thickness (px)">
-        <div className={styles.sizeRow}>
-          <input
-            type="range"
-            min={0.5}
-            max={12}
-            step={0.5}
-            value={width}
-            aria-label="Thickness slider"
-            onChange={(e) => updateEdge(edge.id, { width: Number(e.target.value) })}
-          />
-          <input
-            type="number"
-            min={0.5}
-            max={12}
-            step={0.5}
-            value={width}
-            aria-label="Thickness"
-            onChange={(e) => {
-              const value = Number(e.target.value);
-              if (value >= 0.5 && value <= 12) updateEdge(edge.id, { width: value });
-            }}
-          />
-        </div>
-      </Field>
-      {(edge.color || edge.width) && (
-        <div className={styles.actions}>
-          <Button onClick={() => updateEdge(edge.id, { color: undefined, width: undefined })}>
+      <HexColorField
+        label="Color (light)"
+        value={light}
+        onChange={(color) => updateEdge(edge.id, { color })}
+      />
+      <HexColorField
+        label="Color (dark)"
+        value={edge.colorDark ?? edge.color ?? DEFAULT_CONNECTOR_COLOR_DARK}
+        onChange={(colorDark) => updateEdge(edge.id, { colorDark })}
+      />
+      <RangeField
+        label="Thickness (px)"
+        value={edge.width ?? DEFAULT_CONNECTOR_WIDTH}
+        min={0.5}
+        max={12}
+        step={0.5}
+        onChange={(width) => updateEdge(edge.id, { width })}
+      />
+      <RangeField
+        label="Label size (px)"
+        value={edge.labelSize ?? DEFAULT_LABEL_SIZE}
+        min={6}
+        max={48}
+        step={1}
+        onChange={(labelSize) => updateEdge(edge.id, { labelSize })}
+      />
+      <div className={styles.actions}>
+        {custom && (
+          <Button
+            onClick={() =>
+              updateEdge(edge.id, {
+                color: undefined,
+                colorDark: undefined,
+                width: undefined,
+                labelSize: undefined,
+              })
+            }
+          >
             Use default look
           </Button>
-        </div>
-      )}
+        )}
+        <Button
+          onClick={() => {
+            applyToAll(edge.id);
+            appliedLook.current = look;
+            setApplied(true);
+          }}
+        >
+          Apply to all connectors
+        </Button>
+      </div>
+      <p className={styles.hint}>
+        {applied
+          ? `Applied to ${count} connector${count === 1 ? '' : 's'}; new connectors on this canvas look the same.`
+          : 'Copies style, animation, arrow, colors, thickness and label size (not the label text) to every connector on this canvas, and to new ones.'}
+      </p>
     </>
   );
 }

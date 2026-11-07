@@ -57,7 +57,7 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   const edge = page.locator('.react-flow__edge');
   await expect(edge).toHaveCount(1);
   await edge.locator('.react-flow__edge-interaction').click({ force: true });
-  await page.getByLabel('Hex color').fill('#c0392b');
+  await page.getByLabel('Color (light) hex').fill('#c0392b');
   await page.getByRole('spinbutton', { name: 'Thickness' }).fill('6');
   const edgePath = edge.locator('.react-flow__edge-path');
   await expect.poll(() => edgePath.evaluate((el) => getComputedStyle(el).strokeWidth)).toBe('6px');

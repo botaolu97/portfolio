@@ -4,6 +4,7 @@ import { EDITABLE } from '../content/api';
 import type { FlowNode } from '../store/mapStore';
 import { NodeChrome } from './NodeChrome';
 import styles from './nodes.module.css';
+import { withLinkIcons } from './richLinks';
 import { TextReader } from './TextReader';
 import { textSizeStyle } from './textSize';
 import { useReader } from './useReader';
@@ -39,7 +40,7 @@ export const TextNode = memo(function TextNode({
         onKeyDown={reader.onKeyDown}
         onPointerLeave={reader.onPointerLeave}
         // Authored by the site owner in edit mode, never by visitors.
-        dangerouslySetInnerHTML={{ __html: data.html }}
+        dangerouslySetInnerHTML={{ __html: withLinkIcons(data.html) }}
       />
       {reader.reading && reader.box.current && (
         <TextReader

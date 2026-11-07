@@ -207,6 +207,14 @@ export function build(tree: Record<string, unknown>) {
     ...rows.map((r) => `  '${r.token.path.join('.')}': ${JSON.stringify(r.resolved)},`),
     '} as const;',
     '',
+    '// Dark-mode values, for tokens that have one (resolved, like tokenValues).',
+    'export const tokenDarkValues: Partial<Record<keyof typeof tokenValues, string>> = {',
+    ...darkRows.map(
+      (r) =>
+        `  '${r.token.path.join('.')}': ${JSON.stringify(toCss(r.token.type, resolve(r.token.dark)))},`,
+    ),
+    '};',
+    '',
   ].join('\n');
 
   const groups = new Map<string, typeof rows>();

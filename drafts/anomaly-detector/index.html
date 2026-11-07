@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anomaly Detector</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <!-- Tab strip -->
+  <div class="tabstrip"><div class="apptab">ANOMALY DETECTOR</div></div>
+
+  <!-- Toolstrip ribbon -->
+  <div class="ribbon">
+    <div class="group">
+      <div class="items">
+        <button class="btn big" id="btnNew" title="New Session">
+          <svg class="ic" viewBox="0 0 28 28"><path d="M11 3h6v8h8v6h-8v8h-6v-8H3v-6h8z" fill="#f5d84a" stroke="#b39a1e"/></svg>
+          <span>New<br>Session</span>
+        </button>
+        <div class="stack">
+          <button class="btn small" id="btnOpen">
+            <svg class="ics" viewBox="0 0 16 16"><path d="M1.5 4.5h5l1 1.5h7v7.5h-13z" fill="#f3e3a0" stroke="#666"/></svg>Open
+          </button>
+          <button class="btn small" id="btnSave">
+            <svg class="ics" viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="13" height="13" fill="#fff" stroke="#555"/><rect x="4" y="2" width="8" height="4" fill="#bbb"/><rect x="4" y="9" width="8" height="5" fill="none" stroke="#555"/></svg>Save
+          </button>
+        </div>
+      </div>
+      <div class="label">FILE</div>
+    </div>
+
+    <div class="group">
+      <div class="items">
+        <button class="btn big" id="btnPlot" disabled>
+          <svg class="ic" viewBox="0 0 28 28"><rect x="2.5" y="2.5" width="23" height="23" fill="#fff" stroke="#777"/><path d="M4 20c4 0 5-12 10-12s6 12 10 6" fill="none" stroke="#3a78c2" stroke-width="1.5"/></svg>
+          <span>Plot</span>
+        </button>
+      </div>
+      <div class="label">PLOT</div>
+    </div>
+
+    <div class="group">
+      <div class="items">
+        <div class="gallery">
+          <div class="tiles" id="tiles">
+            <button class="tile" data-algo="tcnAD"><svg viewBox="0 0 24 24"><rect x=".5" y=".5" width="23" height="23" fill="#fff" stroke="#555"/><path d="M1 1l22 22M23 1L1 23" stroke="#555"/></svg><span>tcnAD</span></button>
+            <button class="tile" data-algo="deepantAD"><svg viewBox="0 0 24 24"><rect x=".5" y=".5" width="23" height="23" fill="#fff" stroke="#555"/><path d="M1 1l22 22M23 1L1 23" stroke="#555"/></svg><span>deepantAD</span></button>
+            <button class="tile" data-algo="usAD"><svg viewBox="0 0 24 24"><rect x=".5" y=".5" width="23" height="23" fill="#fff" stroke="#555"/><path d="M1 1l22 22M23 1L1 23" stroke="#555"/></svg><span>usAD</span></button>
+          </div>
+          <button class="more" id="btnMore" title="More algorithms" aria-expanded="false"><i class="caret"></i></button>
+        </div>
+        <button class="btn big" id="btnTrain" disabled>
+          <svg class="ic" viewBox="0 0 28 28"><path d="M7 4l17 10L7 24z" fill="#dff3d8" stroke="#3a9a3a"/></svg>
+          <span>Train<br>All<i class="caret"></i></span>
+        </button>
+      </div>
+      <div class="label">ALGORITHM</div>
+    </div>
+
+    <div class="group">
+      <div class="items">
+        <button class="btn big" id="btnImport">
+          <svg class="ic" viewBox="0 0 28 28"><rect x="4" y="13" width="20" height="10" fill="#fff" stroke="#555"/><path d="M8 2h6v6h4l-7 7-7-7h4z" fill="#5cc35c" stroke="#2c7a2c"/><circle cx="20" cy="19" r="1.2" fill="#555"/></svg>
+          <span>Import<br>Data</span>
+        </button>
+        <button class="btn big" id="btnDetect" disabled>
+          <svg class="ic" viewBox="0 0 28 28"><rect x="5" y="3" width="14" height="19" fill="#fff" stroke="#555"/><path d="M8 8h8M8 11h8M8 14h6" stroke="#555"/><path d="M16 15l8 5-8 5z" fill="#dff3d8" stroke="#3a9a3a"/></svg>
+          <span>Detect</span>
+        </button>
+        <button class="btn big" id="btnCompare" disabled>
+          <svg class="ic" viewBox="0 0 28 28"><rect x="9" y="3" width="14" height="17" fill="#fff" stroke="#555"/><rect x="5" y="8" width="14" height="17" fill="#fff" stroke="#555"/><path d="M8 13h8M8 16h8M8 19h6" stroke="#555"/></svg>
+          <span>Compare</span>
+        </button>
+      </div>
+      <div class="label">DETECT</div>
+    </div>
+
+    <div class="group">
+      <div class="items">
+        <button class="btn big" id="btnExport" disabled>
+          <svg class="ic" viewBox="0 0 28 28"><rect x="4" y="13" width="20" height="10" fill="#fff" stroke="#555"/><path d="M8 16c0-6 5-9 10-9V3l7 6-7 6v-4c-4 0-8 1-10 5z" fill="#5cc35c" stroke="#2c7a2c"/></svg>
+          <span>Export<br><i class="caret"></i></span>
+        </button>
+      </div>
+      <div class="label">EXPORT</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+    <div class="side">
+      <section class="panel" id="panelData">
+        <header>
+          <button class="toggle" aria-label="Collapse"><svg class="tri" viewBox="0 0 10 8"><path d="M1 1h8L5 7z" fill="none" stroke="#555"/></svg></button>
+          <span class="ptitle">DATA SET</span>
+          <button class="pmenu" aria-label="Menu"></button>
+        </header>
+        <ul class="plist" id="dataList"></ul>
+      </section>
+      <section class="panel" id="panelAlgo">
+        <header>
+          <button class="toggle" aria-label="Collapse"><svg class="tri" viewBox="0 0 10 8"><path d="M1 1h8L5 7z" fill="none" stroke="#555"/></svg></button>
+          <span class="ptitle">ALGORITHM</span>
+          <button class="pmenu" aria-label="Menu"></button>
+        </header>
+        <ul class="plist" id="algoList"></ul>
+      </section>
+    </div>
+
+    <div class="docs">
+      <div class="doctabs"><span class="grip"></span><div id="docTabs" class="doctablist"></div></div>
+      <div class="docarea" id="docArea"></div>
+    </div>
+  </div>
+</div>
+<!-- Algorithm gallery popup -->
+<div class="galpop" id="galPop" hidden></div>
+
+<!-- New Session dialog -->
+<div class="modal" id="dlgNew" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgNewTitle">
+    <div class="dtitle"><span id="dlgNewTitle">New Session</span><button class="dclose" data-close aria-label="Close">&times;</button></div>
+    <div class="dbody">
+      <div class="dleft">
+        <h3>Import Data</h3>
+        <label class="radio"><input type="radio" name="src" value="workspace" checked><i></i>From workspace</label>
+        <label class="radio"><input type="radio" name="src" value="file"><i></i>From file</label>
+        <div class="field" id="srcWorkspace">
+          <span class="flabel">Select dataset</span>
+          <div class="selectwrap"><select id="selDataset"></select></div>
+          <button class="help" title="Datasets found in the workspace">?</button>
+        </div>
+        <div class="field" id="srcFile" hidden>
+          <span class="flabel">Select file</span>
+          <input class="filebox" id="fileName" value="" placeholder="No file chosen" readonly>
+          <button class="dbtn" id="btnBrowse">Browse…</button>
+        </div>
+        <h3>Select signal</h3>
+        <div id="signalList"></div>
+        <button class="dbtn wide" id="btnAddList">Add to list</button>
+      </div>
+      <div class="dright">
+        <h3>Dataset list</h3>
+        <div class="dtable">
+          <div class="dhead"><span>Name</span><span>Anomaly Label Variable</span><span class="rm">Remove</span></div>
+          <div class="drows" id="dsRows"></div>
+        </div>
+      </div>
+    </div>
+    <div class="dfoot">
+      <button class="dbtn" id="btnHelp">Help</button>
+      <span class="spacer"></span>
+      <button class="dbtn primary" id="btnDlgImport">Import</button><button class="dbtn" data-close>Cancel</button>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

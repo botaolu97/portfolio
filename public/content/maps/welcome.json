@@ -27,7 +27,8 @@
         "shape": "rounded",
         "fill": "#e8f0fe",
         "stroke": "#4f6bed",
-        "label": "Click the demo to try it →"
+        "label": "Click the demo to try it →",
+        "rotation": 0
       },
       "width": 240,
       "height": 104
@@ -56,7 +57,7 @@
         "y": 560
       },
       "data": {
-        "html": "<p>🪇 is so cute!</p><p></p><p>npm start</p>",
+        "html": "<p>🪇 is so cute!</p><p></p><p>npm start</p><p></p><p>npm run encode-videos</p>",
         "color": "yellow",
         "size": "md",
         "rotation": 0

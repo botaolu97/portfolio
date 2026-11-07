@@ -24,7 +24,7 @@ import { nodeTypes } from '../nodes/nodeTypes';
 import type { AddableNodeType } from '../store/defaults';
 import { type FlowEdge, type FlowNode, useMapStore } from '../store/mapStore';
 import { useUiStore } from '../store/uiStore';
-import { useTheme } from '../ui/theme';
+import { type Theme, useTheme } from '../ui/theme';
 import { tokenValues } from '../ui/tokens';
 import styles from './Canvas.module.css';
 import { addNodesFromFiles } from './fileDrop';
@@ -42,25 +42,36 @@ export const PALETTE_MIME = 'application/x-mubu-node';
 const defaultEdgeOptions = { type: 'smoothstep' };
 
 const DEFAULT_CONNECTOR_WIDTH = Number.parseFloat(tokenValues['component.connector.width']);
+const DEFAULT_LABEL_SIZE = Number.parseFloat(tokenValues['component.connector.label-size']);
 
 /**
  * Gives each connector its own color and thickness (or the --connector-* defaults). The arrow is
  * sized in screen units, growing gently with the line, so thick lines don't get giant arrows.
  */
-function styleEdge(edge: FlowEdge): FlowEdge {
-  const stroke = edge.color ?? 'var(--connector-color)';
+function styleEdge(edge: FlowEdge, theme: Theme): FlowEdge {
+  // Each theme has its own color; a connector with only a light color keeps it in dark too.
+  const stroke =
+    (theme === 'dark' ? (edge.colorDark ?? edge.color) : edge.color) ?? 'var(--connector-color)';
   const width = edge.width ?? DEFAULT_CONNECTOR_WIDTH;
-  const arrow = 12 + width * 4;
+  const size = 12 + width * 4;
+  const marker = {
+    type: MarkerType.ArrowClosed,
+    color: stroke,
+    width: size,
+    height: size,
+    markerUnits: 'userSpaceOnUse',
+  };
+  const arrow = edge.arrow ?? 'end';
   return {
     ...edge,
     style: { ...edge.style, stroke, strokeWidth: width },
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      color: stroke,
-      width: arrow,
-      height: arrow,
-      markerUnits: 'userSpaceOnUse',
-    },
+    labelStyle: { ...edge.labelStyle, fontSize: edge.labelSize ?? DEFAULT_LABEL_SIZE },
+    // React Flow sizes the label's background box only when the text changes, not the font size;
+    // the label gets a canvas-colored outline instead (Canvas.module.css), which always fits.
+    labelShowBg: false,
+    // React Flow orients markers "auto-start-reverse", so a start arrow points at the source.
+    markerEnd: arrow === 'end' || arrow === 'both' ? marker : undefined,
+    markerStart: arrow === 'start' || arrow === 'both' ? marker : undefined,
   };
 }
 
@@ -85,8 +96,8 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
     })),
   );
   const { screenToFlowPosition } = useReactFlow<FlowNode, FlowEdge>();
-  const styledEdges = useMemo(() => edges.map(styleEdge), [edges]);
   const theme = useTheme((s) => s.theme);
+  const styledEdges = useMemo(() => edges.map((e) => styleEdge(e, theme)), [edges, theme]);
   usePageZoomGuard();
   const handleNodesChange = useCallback(
     (changes: Parameters<typeof onNodesChange>[0]) =>

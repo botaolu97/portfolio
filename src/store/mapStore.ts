@@ -13,6 +13,8 @@ import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { type AddableNodeType, NODE_DEFAULTS } from './defaults';
 import {
+  CONNECTOR_STYLE_KEYS,
+  type ConnectorStyle,
   MAP_VERSION,
   type MapDoc,
   type MapEdge,
@@ -22,13 +24,15 @@ import {
 } from './schema';
 
 export type FlowNode = { [T in NodeType]: Node<NodeDataOf<T>, T> }[NodeType];
-export type FlowEdge = Edge & Pick<MapEdge, 'type' | 'color' | 'width'>;
+export type FlowEdge = Edge & Omit<MapEdge, keyof Edge | 'label'> & Pick<MapEdge, 'type'>;
 
 export interface MapState {
   slug: string | null;
   title: string;
   nodes: FlowNode[];
   edges: FlowEdge[];
+  /** The look new connectors get on this canvas. */
+  connector: ConnectorStyle;
   load: (slug: string, doc: MapDoc) => void;
   setTitle: (title: string) => void;
   onNodesChange: (changes: NodeChange<FlowNode>[]) => void;
@@ -40,10 +44,9 @@ export interface MapState {
     overrides?: { data?: Partial<NodeDataOf<T>>; width?: number; height?: number },
   ) => string;
   updateNodeData: <T extends NodeType>(id: string, patch: Partial<NodeDataOf<T>>) => void;
-  updateEdge: (
-    id: string,
-    patch: Partial<Pick<FlowEdge, 'label' | 'type' | 'animated' | 'color' | 'width'>>,
-  ) => void;
+  updateEdge: (id: string, patch: Partial<Pick<FlowEdge, 'label'> & ConnectorStyle>) => void;
+  /** Gives every connector, and every new one from now on, the look of connector `id`. */
+  applyConnectorStyleToAll: (id: string) => void;
   insertClones: (nodes: FlowNode[], edges: FlowEdge[], offset: number) => void;
   /** Turns two or more image nodes into one stack node; returns its id. */
   stackImages: (ids: string[]) => string | null;
@@ -79,18 +82,33 @@ function toMapEdge(edge: FlowEdge): MapEdge {
   if (edge.type) out.type = edge.type;
   if (typeof edge.label === 'string' && edge.label) out.label = edge.label;
   if (edge.animated) out.animated = true;
+  if (edge.arrow && edge.arrow !== 'end') out.arrow = edge.arrow;
   if (edge.color) out.color = edge.color;
+  if (edge.colorDark) out.colorDark = edge.colorDark;
   if (edge.width) out.width = edge.width;
+  if (edge.labelSize) out.labelSize = edge.labelSize;
   return out;
 }
 
-export function toDoc(state: Pick<MapState, 'title' | 'nodes' | 'edges'>): MapDoc {
-  return {
+/** The look of a connector: only the fields that are set. */
+export function connectorStyleOf(edge: ConnectorStyle): ConnectorStyle {
+  const out: Record<string, unknown> = {};
+  for (const key of CONNECTOR_STYLE_KEYS) if (edge[key] !== undefined) out[key] = edge[key];
+  return out as ConnectorStyle;
+}
+
+export function toDoc(
+  state: Pick<MapState, 'title' | 'nodes' | 'edges'> & Partial<Pick<MapState, 'connector'>>,
+): MapDoc {
+  const doc: MapDoc = {
     version: MAP_VERSION,
     title: state.title,
     nodes: state.nodes.map(toMapNode),
     edges: state.edges.map(toMapEdge),
   };
+  const connector = connectorStyleOf(state.connector ?? {});
+  if (Object.keys(connector).length) doc.connector = connector;
+  return doc;
 }
 
 /** Copies nodes with fresh ids, keeping only edges whose both ends were copied. */
@@ -151,12 +169,19 @@ export const useMapStore = create<MapState>()(
       title: '',
       nodes: [],
       edges: [],
+      connector: {},
 
       load: (slug, doc) => {
         // Paused so loading neither records a step nor swallows the first real edit in the debounce.
         const history = useMapStore.temporal.getState();
         history.pause();
-        set({ slug, title: doc.title, nodes: doc.nodes as FlowNode[], edges: doc.edges });
+        set({
+          slug,
+          title: doc.title,
+          nodes: doc.nodes as FlowNode[],
+          edges: doc.edges,
+          connector: doc.connector ?? {},
+        });
         history.resume();
         history.clear();
       },
@@ -168,7 +193,12 @@ export const useMapStore = create<MapState>()(
       onEdgesChange: (changes) => set({ edges: applyEdgeChanges(changes, get().edges) }),
 
       onConnect: (connection) =>
-        set({ edges: addEdge({ ...connection, id: newId(), type: 'smoothstep' }, get().edges) }),
+        set({
+          edges: addEdge(
+            { type: 'smoothstep', ...get().connector, ...connection, id: newId() },
+            get().edges,
+          ),
+        }),
 
       addNode: (type, position, overrides = {}) => {
         const defaults = NODE_DEFAULTS[type];
@@ -199,6 +229,18 @@ export const useMapStore = create<MapState>()(
 
       updateEdge: (id, patch) =>
         set({ edges: get().edges.map((e) => (e.id === id ? { ...e, ...patch } : e)) }),
+
+      applyConnectorStyleToAll: (id) => {
+        const source = get().edges.find((e) => e.id === id);
+        if (!source) return;
+        const connector = connectorStyleOf(source);
+        // Unset fields are cleared too, so every connector ends up looking exactly the same.
+        const reset = Object.fromEntries(CONNECTOR_STYLE_KEYS.map((k) => [k, undefined]));
+        set({
+          connector,
+          edges: get().edges.map((e) => ({ ...e, ...reset, ...connector })),
+        });
+      },
 
       stackImages: (ids) => {
         const { nodes, edges } = get();
@@ -308,13 +350,18 @@ export const useMapStore = create<MapState>()(
     {
       // History tracks only what gets saved, so selection and measuring never create undo steps.
       partialize: (state) => {
-        const { title, nodes, edges } = toDoc(state);
+        const { title, nodes, edges, connector } = toDoc(state);
         // A code block's highlighted HTML is derived from its code, so it never makes its own
         // undo step; after undo the node highlights itself again.
         const tracked = nodes.map((n) =>
           n.type === 'code' ? { ...n, data: { ...n.data, html: '' } } : n,
         );
-        return { title, nodes: tracked as FlowNode[], edges: edges as FlowEdge[] };
+        return {
+          title,
+          nodes: tracked as FlowNode[],
+          edges: edges as FlowEdge[],
+          connector: connector ?? {},
+        };
       },
       equality: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       // A drag or a burst of typing becomes one undo step.

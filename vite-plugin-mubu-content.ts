@@ -352,7 +352,12 @@ async function screenshot(url: string): Promise<Buffer | null> {
   }
 }
 
-export async function fetchLinkPreview(assetsDir: string, input: string): Promise<LinkPreview> {
+export async function fetchLinkPreview(
+  assetsDir: string,
+  input: string,
+  /** Only the title and icon (links inside text): skips the preview image and screenshot. */
+  iconOnly = false,
+): Promise<LinkPreview> {
   const url = normalizeUrl(input);
   if (!url) throw new HttpError(400, 'Enter a web address (http or https)');
   const page = await fetchLimited(
@@ -368,10 +373,11 @@ export async function fetchLinkPreview(assetsDir: string, input: string): Promis
     favicon = (await downloadImage(assetsDir, icon, 1024 * 1024)) ?? undefined;
     if (favicon) break;
   }
-  let image = meta.imageUrl
-    ? ((await downloadImage(assetsDir, meta.imageUrl, 10 * 1024 * 1024)) ?? undefined)
-    : undefined;
-  if (!image) {
+  let image =
+    meta.imageUrl && !iconOnly
+      ? ((await downloadImage(assetsDir, meta.imageUrl, 10 * 1024 * 1024)) ?? undefined)
+      : undefined;
+  if (!image && !iconOnly) {
     const shot = await screenshot(url);
     if (shot) image = await saveAsset(assetsDir, shot, '.jpg');
   }
@@ -591,11 +597,15 @@ export function mubuContent(): Plugin {
               return sendJson(res, 200, await saveDemo(dirs.demos, files));
             }
             case '/__mubu/link': {
-              const { url: link } = JSON.parse((await readBody(req)).toString('utf8')) as {
-                url?: unknown;
-              };
+              const { url: link, iconOnly } = JSON.parse(
+                (await readBody(req)).toString('utf8'),
+              ) as { url?: unknown; iconOnly?: unknown };
               if (typeof link !== 'string') throw new HttpError(400, 'Expected { url }');
-              return sendJson(res, 200, await fetchLinkPreview(dirs.assets, link));
+              return sendJson(
+                res,
+                200,
+                await fetchLinkPreview(dirs.assets, link, iconOnly === true),
+              );
             }
             default:
               return sendJson(res, 404, { error: 'Unknown endpoint' });

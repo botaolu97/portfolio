@@ -10,6 +10,11 @@
 
 .canvas :global(.react-flow__edge-text) {
   fill: var(--color-text);
+  /* A halo in the canvas color keeps the label readable over the line, at any font size. */
+  stroke: var(--color-canvas);
+  stroke-width: 0.4em;
+  stroke-linejoin: round;
+  paint-order: stroke;
 }
 
 .dropping::after {

@@ -4,6 +4,7 @@ import type { TextSize } from '../store/schema';
 import { hideNativeScrollbar, OverlayScrollbar } from '../ui/OverlayScrollbar';
 import { tokenValues } from '../ui/tokens';
 import nodeStyles from './nodes.module.css';
+import { withLinkIcons } from './richLinks';
 import styles from './TextReader.module.css';
 import { textSizeStyle } from './textSize';
 
@@ -282,7 +283,7 @@ export function TextReader({
                   className={cloneClass}
                   style={{ minHeight: height }}
                   // Authored by the site owner in edit mode, never by visitors.
-                  dangerouslySetInnerHTML={{ __html: html }}
+                  dangerouslySetInnerHTML={{ __html: withLinkIcons(html) }}
                 />
               )}
             </div>
