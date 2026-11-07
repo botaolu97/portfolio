@@ -6,58 +6,58 @@
       "id": "f92bb232",
       "type": "text",
       "position": {
-        "x": -904,
-        "y": -320
+        "x": -736,
+        "y": -104
       },
       "data": {
         "html": "<h1>Summary</h1><p></p><p>Our team wanted to <mark>accommodate increasing customer's needs in time series data anomaly detection (tsAD)</mark>. I helped the team to define the product scope, establish project lifecycle, and design and test the UI from scratch.</p><p></p><p>The MVP was adopted by <mark>600+ customers</mark>, quickly validating our initial direction. This may not be a big number in consumer section, but for a specialized domain, it was a strong signal that we were solving a real customer need.</p>",
-        "size": "xl"
+        "size": "sm"
       },
-      "width": 600,
-      "height": 592
+      "width": 336,
+      "height": 336
     },
     {
       "id": "8c694f61",
       "type": "note",
       "position": {
-        "x": -1112,
-        "y": -440
+        "x": -800,
+        "y": -176
       },
       "data": {
         "html": "<p>🫘 this is team work! I worked with 1 researcher and 5 engineers to build this app</p>",
         "color": "yellow",
-        "size": "xl",
+        "size": "sm",
         "rotation": -10.2
       },
-      "width": 240,
-      "height": 216,
+      "width": 128,
+      "height": 112,
       "zIndex": 2
     },
     {
       "id": "cc8f16e3",
       "type": "text",
       "position": {
-        "x": -912,
-        "y": 536
+        "x": -728,
+        "y": 400
       },
       "data": {
         "html": "<h1>Background</h1><p></p><p>Industrial engineers need to identify anomalous patterns in physical-system data early to prevent equipment failures and reduce operational costs.</p><p></p><p>This need is growing: <mark>the global anomaly detection market is estimated at $7–8B in 2026</mark>, and our team had also received direct requests from our top customers.</p>",
-        "size": "xl"
+        "size": "sm"
       },
-      "width": 600,
-      "height": 576
+      "width": 320,
+      "height": 320
     },
     {
       "id": "6e9ce31b",
       "type": "label",
       "position": {
-        "x": -168,
-        "y": -1072
+        "x": 160,
+        "y": -432
       },
       "data": {
         "text": "🫶 From code to AI workflow: \nReduce technical complexcity for industrial enginners",
         "font": "handjet",
-        "size": 167,
+        "size": 61,
         "weight": 400
       }
     },
@@ -65,8 +65,8 @@
       "id": "43aa77d9",
       "type": "stack",
       "position": {
-        "x": 4296,
-        "y": 2520
+        "x": 2016,
+        "y": 1352
       },
       "data": {
         "items": [
@@ -89,15 +89,15 @@
         ],
         "edges": []
       },
-      "width": 840,
-      "height": 621
+      "width": 288,
+      "height": 309
     },
     {
       "id": "5639f36b",
       "type": "stack",
       "position": {
-        "x": 4336,
-        "y": 3208
+        "x": 2024,
+        "y": 1632
       },
       "data": {
         "items": [
@@ -128,59 +128,59 @@
         ],
         "edges": []
       },
-      "width": 744,
-      "height": 837
+      "width": 264,
+      "height": 413
     },
     {
       "id": "474d7971",
       "type": "image",
       "position": {
-        "x": 1480,
-        "y": 1192
+        "x": 1184,
+        "y": 840
       },
       "data": {
         "src": "content/assets/44e0c0dade8f8cde.png",
         "alt": "image",
         "fit": "contain"
       },
-      "width": 1352,
-      "height": 1052
+      "width": 536,
+      "height": 417
     },
     {
       "id": "6aaa6d1e",
       "type": "image",
       "position": {
-        "x": -1856,
-        "y": 2352
+        "x": -1160,
+        "y": 1456
       },
       "data": {
         "src": "content/assets/02cb390ffa0020ea.png",
         "alt": "image",
         "fit": "contain"
       },
-      "width": 384,
-      "height": 555
+      "width": 168,
+      "height": 243
     },
     {
       "id": "e0c7d3b1",
       "type": "text",
       "position": {
-        "x": -904,
-        "y": 1360
+        "x": -720,
+        "y": 888
       },
       "data": {
-        "html": "<h1>User Pain Points</h1><p></p><p>Previously, users rely on fragmented technical documentation to identify the right model, then learn and write MATLAB code to configure and run it. Much of their time is spent debugging, while comparing results requires manually generating plots with limited interactivity.</p><p></p><ul><li><p>Scattered documentations: previously, an engineer needs to read all these documents to understand what to do</p></li></ul><ul><li><p>Endless Debugging</p></li><li><p>Static outcomes</p></li></ul><p></p>",
-        "size": "xl"
+        "html": "<h1>User Pain Points</h1><p></p><p>Previously, users rely on fragmented technical documentation to identify the right model, then learn and write MATLAB code to configure and run it. Much of their time is spent debugging, while comparing results requires manually generating plots with limited interactivity.</p><p></p>",
+        "size": "sm"
       },
-      "width": 736,
-      "height": 680
+      "width": 272,
+      "height": 264
     },
     {
       "id": "a78d2ed8",
       "type": "link",
       "position": {
-        "x": 400,
-        "y": -312
+        "x": 208,
+        "y": -224
       },
       "data": {
         "url": "https://www.mathworks.com/products/time-series-anomaly-detection.html",
@@ -190,78 +190,78 @@
         "image": "content/assets/de4fb705b062a37c.gif",
         "favicon": "content/assets/ef0eca8b5b903f64.ico"
       },
-      "width": 600,
-      "height": 596
+      "width": 632,
+      "height": 572
     },
     {
       "id": "011d8974",
       "type": "image",
       "position": {
-        "x": 1472,
-        "y": 576
+        "x": 1184,
+        "y": 408
       },
       "data": {
         "src": "content/assets/a541ae9a87460ff0.png",
         "alt": "image",
         "fit": "contain"
       },
-      "width": 1887,
-      "height": 397
+      "width": 719,
+      "height": 151
     },
     {
       "id": "792aa628",
       "type": "note",
       "position": {
-        "x": 1160,
-        "y": 368
+        "x": 1008,
+        "y": 304
       },
       "data": {
-        "html": "<p>Our tech lead created a slide deck to align the basic understanding of this app's purpose. </p><p></p><p>It's technical architecture, not a user flow.</p>",
+        "html": "<p>Our tech lead created a slide deck to align the basic understanding of this app's purpose.</p><p></p><p>It's a technical architecture, not a user flow.</p>",
         "color": "yellow",
-        "size": "xl",
+        "size": "sm",
         "rotation": -10.2
       },
-      "width": 360,
-      "height": 368,
+      "width": 176,
+      "height": 176,
       "zIndex": 2
     },
     {
       "id": "33ee15c5",
       "type": "note",
       "position": {
-        "x": 1280,
-        "y": 1128
+        "x": 1032,
+        "y": 784
       },
       "data": {
         "html": "<p>I worked with developers and reseacher to draft the basic happy paths.</p>",
         "color": "yellow",
-        "size": "xl",
+        "size": "sm",
         "rotation": -10.2
       },
-      "width": 240,
-      "height": 216,
+      "width": 184,
+      "height": 160,
       "zIndex": 2
     },
     {
       "id": "329ea05c",
       "type": "text",
       "position": {
-        "x": 1504,
-        "y": -312
+        "x": 1184,
+        "y": -136
       },
       "data": {
         "html": "<h1>Design Challenges</h1><p></p><p>Fundamentally, there're three:</p><p></p><ul><li><p>Mapping out the user workflow behind the technical languages</p></li><li><p>Bringing the team to a shared understanding</p></li><li><p>Designing for amateur and advanced user at the same time</p></li></ul><p></p>",
-        "size": "xl"
+        "size": "sm"
       },
-      "width": 720,
-      "height": 520
+      "width": 280,
+      "height": 272
     },
     {
       "id": "e752dff2",
       "type": "shape",
       "position": {
-        "x": 1552,
-        "y": 1040
+        "x": 1288,
+        "y": 656
       },
       "data": {
         "shape": "arrow",
@@ -277,8 +277,8 @@
       "id": "55a80d0a",
       "type": "shape",
       "position": {
-        "x": 2872,
-        "y": 1688
+        "x": 1800,
+        "y": 960
       },
       "data": {
         "shape": "arrow",
@@ -294,8 +294,8 @@
       "id": "4a2085fa",
       "type": "code",
       "position": {
-        "x": -2096,
-        "y": 1704
+        "x": -1664,
+        "y": 1240
       },
       "data": {
         "code": "url = 'https://ssd.mathworks.com/supportfiles/predmaint/anomalyDetection3axisVibration/v1/vibrationData.zip';\nwebsave('vibrationData.zip',url);\nunzip('vibrationData.zip');\nload(\"MachineData.mat\")\nhead(trainData,3)\n\nensMember = 4;\n\ntrainFeatures = generateFeatures(trainData);\nhead(trainFeatures(:,1:6))\nhelperPlotVibrationData(trainData, ensMember)\n\n",
@@ -305,85 +305,85 @@
         "wrap": true,
         "html": "<pre class=\"shiki shiki-themes github-light github-dark\" style=\"--shiki-light:#24292e;--shiki-dark:#e1e4e8;--shiki-light-bg:#fff;--shiki-dark-bg:#24292e\" tabindex=\"0\"><code><span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">url = </span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\">'https://ssd.mathworks.com/supportfiles/predmaint/anomalyDetection3axisVibration/v1/vibrationData.zip'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">;</span></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">websave(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\">'vibrationData.zip'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">,url);</span></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">unzip(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\">'vibrationData.zip'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">);</span></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">load(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECBFF\">\"MachineData.mat\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">)</span></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">head(trainData,</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#79B8FF\">3</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">)</span></span>\n<span class=\"line\"></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">ensMember = </span><span style=\"--shiki-light:#005CC5;--shiki-dark:#79B8FF\">4</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">;</span></span>\n<span class=\"line\"></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">trainFeatures = generateFeatures(trainData);</span></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">head(trainFeatures(:,</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#79B8FF\">1</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">:</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#79B8FF\">6</span><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">))</span></span>\n<span class=\"line\"><span style=\"--shiki-light:#24292E;--shiki-dark:#E1E4E8\">helperPlotVibrationData(trainData, ensMember)</span></span>\n<span class=\"line\"></span>\n<span class=\"line\"></span></code></pre>"
       },
-      "width": 588,
-      "height": 416
+      "width": 388,
+      "height": 216
     },
     {
       "id": "4769015b",
       "type": "note",
       "position": {
-        "x": -2288,
-        "y": 1072
+        "x": -1608,
+        "y": 568
       },
       "data": {
-        "html": "<ul><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/predmaint/ug/anomaly-detection-using-3-axis-vibration-data.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Industrial Machinery Using Three-Axis Vibration Data - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/predmaint/ug/industrial-cooling-fan-anomaly-detection-with-docker-deployment.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Industrial Cooling Fan Anomaly Detection Algorithm Development for Deployment to a Microservice Docker Image - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/anomaly-detection-using-convolutional-autoencoder-with-wavelet-scattering-sequences.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Anomaly Detection Using Convolutional Autoencoder with Wavelet Scattering Sequences - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/detect-anomalies-in-signals-using-deep-learning.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Signals Using deepSignalAnomalyDetector - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/detect-anomalies-in-machinery-using-lstm-autoencoder.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Signals Using deepSignalAnomalyDetector - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/detect-anomalies-in-ecg-data-using-wavelet-scattering-and-lstm-autoencoder-in-simulink.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">https://www.mathworks.com/help/signal/ug/detect-anomalies-in-ecg-data-using-wavelet-scattering-and-lstm-autoencoder-in-simulink.html</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/dsp/ug/fault-detection-and-localization-in-three-phase-power-transmission.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Fault Detection and Localization in Three-Phase Power Transmission Using Deep Signal Anomaly Detector in Simulink - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/audio/ug/audio-based-anomaly-detection-for-machine-health-monitoring.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Audio-Based Anomaly Detection for Machine Health Monitoring - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/wavelet/ug/detect-anomalies-using-wavelet-scattering-with-autoencoders.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies Using Wavelet Scattering with Autoencoders - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/deeplearning/ug/time-series-anomaly-detection-using-deep-learning.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Time Series Anomaly Detection Using Deep Learning - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/deeplearning/ug/multivariate-time-series-anomaly-detection-using-graph-neural-network.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Multivariate Time Series Anomaly Detection Using Graph Neural Network - MATLAB &amp; Simulink</a></p></li></ul><p></p>",
+        "html": "<p>Related documentations:</p><ul><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/predmaint/ug/anomaly-detection-using-3-axis-vibration-data.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Industrial Machinery Using Three-Axis Vibration Data - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/predmaint/ug/industrial-cooling-fan-anomaly-detection-with-docker-deployment.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Industrial Cooling Fan Anomaly Detection Algorithm Development for Deployment to a Microservice Docker Image - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/anomaly-detection-using-convolutional-autoencoder-with-wavelet-scattering-sequences.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Anomaly Detection Using Convolutional Autoencoder with Wavelet Scattering Sequences - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/detect-anomalies-in-signals-using-deep-learning.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Signals Using deepSignalAnomalyDetector - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/detect-anomalies-in-machinery-using-lstm-autoencoder.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Signals Using deepSignalAnomalyDetector - MATLAB &amp; Simulink</a></p></li></ul><ul><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/dsp/ug/fault-detection-and-localization-in-three-phase-power-transmission.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Fault Detection and Localization in Three-Phase Power Transmission Using Deep Signal Anomaly Detector in Simulink - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/audio/ug/audio-based-anomaly-detection-for-machine-health-monitoring.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Audio-Based Anomaly Detection for Machine Health Monitoring - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/wavelet/ug/detect-anomalies-using-wavelet-scattering-with-autoencoders.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies Using Wavelet Scattering with Autoencoders - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/deeplearning/ug/time-series-anomaly-detection-using-deep-learning.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Time Series Anomaly Detection Using Deep Learning - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/deeplearning/ug/multivariate-time-series-anomaly-detection-using-graph-neural-network.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Multivariate Time Series Anomaly Detection Using Graph Neural Network - MATLAB &amp; Simulink</a></p></li></ul><p></p>",
         "color": "blue",
-        "size": "md",
+        "size": "sm",
         "rotation": 0
       },
-      "width": 760,
-      "height": 360
+      "width": 336,
+      "height": 584
     },
     {
       "id": "576b9fec",
       "type": "image",
       "position": {
-        "x": 3104,
-        "y": 1200
+        "x": 2016,
+        "y": 848
       },
       "data": {
         "src": "content/assets/f0db764d5543cb77.png",
         "alt": "image",
         "fit": "contain"
       },
-      "width": 5517,
-      "height": 1069
+      "width": 2069,
+      "height": 401
     },
     {
       "id": "bc1508b9",
       "type": "note",
       "position": {
-        "x": 3064,
-        "y": 1120
+        "x": 2024,
+        "y": 776
       },
       "data": {
-        "html": "<p>Expanded the happy paths into highly diverged workflow</p>",
+        "html": "<p>Expanded the happy paths into highly diverged workflow. This enable us to think from blue sky to MVP</p>",
         "color": "yellow",
-        "size": "xl",
+        "size": "sm",
         "rotation": -10.2
       },
-      "width": 240,
-      "height": 216,
+      "width": 144,
+      "height": 144,
       "zIndex": 2
     },
     {
       "id": "ffb06085",
       "type": "image",
       "position": {
-        "x": 1864,
-        "y": 2624
+        "x": 1192,
+        "y": 1488
       },
       "data": {
         "src": "content/assets/2f013ecb473e224d.png",
         "alt": "image",
         "fit": "contain"
       },
-      "width": 1936,
-      "height": 1271
+      "width": 522,
+      "height": 343
     },
     {
       "id": "1c9de049",
       "type": "shape",
       "position": {
-        "x": 3296,
-        "y": 2392
+        "x": 1744,
+        "y": 1296
       },
       "data": {
         "shape": "arrow",
         "fill": "#e8f0fe",
         "stroke": "#4f6bed",
         "label": "",
-        "rotation": 109.7
+        "rotation": 144.6
       },
       "width": 160,
       "height": 100
@@ -392,25 +392,25 @@
       "id": "bdd1d7e5",
       "type": "note",
       "position": {
-        "x": 1704,
-        "y": 2784
+        "x": 1096,
+        "y": 1400
       },
       "data": {
         "html": "<p>Brought the team into a two half days' design workshop to unveil hidden requirements and align UI framework</p>",
         "color": "yellow",
-        "size": "xl",
+        "size": "sm",
         "rotation": -10.2
       },
-      "width": 376,
-      "height": 272,
+      "width": 152,
+      "height": 152,
       "zIndex": 2
     },
     {
       "id": "c42d5b9a",
       "type": "shape",
       "position": {
-        "x": 1888,
-        "y": 232
+        "x": 1208,
+        "y": 192
       },
       "data": {
         "shape": "arrow",
@@ -423,33 +423,81 @@
       "height": 100
     },
     {
-      "id": "fe503bc6",
-      "type": "demo",
-      "position": {
-        "x": 1240,
-        "y": 4152
-      },
-      "data": {
-        "demoId": "d-93df289c",
-        "entry": "index.html",
-        "title": "Demo",
-        "device": "desktop"
-      },
-      "width": 1616,
-      "height": 968
-    },
-    {
       "id": "02ef7c10",
       "type": "video",
       "position": {
-        "x": -1016,
-        "y": 3440
+        "x": 88,
+        "y": 584
       },
       "data": {
         "src": "content/assets/e7ac100a8e911832.mp4"
       },
-      "width": 2032,
-      "height": 1262
+      "width": 864,
+      "height": 518
+    },
+    {
+      "id": "68000a31",
+      "type": "note",
+      "position": {
+        "x": 2192,
+        "y": 1840
+      },
+      "data": {
+        "html": "<p>Everyone on the team contribute to the workflow and UI framework and in the first time, try to think in the user's shoe and critique each other 🔥</p>",
+        "color": "yellow",
+        "size": "sm",
+        "rotation": -10.2
+      },
+      "width": 176,
+      "height": 152,
+      "zIndex": 2
+    },
+    {
+      "id": "30cbd39a",
+      "type": "note",
+      "position": {
+        "x": 1968,
+        "y": 1320
+      },
+      "data": {
+        "html": "<p>I paired everyone into small groups, draw, discuss, critique, and then do it again..</p>",
+        "color": "yellow",
+        "size": "sm",
+        "rotation": -10.2
+      },
+      "width": 152,
+      "height": 136,
+      "zIndex": 2
+    },
+    {
+      "id": "1a7554a6",
+      "type": "image",
+      "position": {
+        "x": 1088,
+        "y": 1992
+      },
+      "data": {
+        "src": "content/assets/6ad4e71c64a4ce91.svg",
+        "alt": "pasted",
+        "fit": "contain"
+      },
+      "width": 106,
+      "height": 480
+    },
+    {
+      "id": "21fbc540",
+      "type": "image",
+      "position": {
+        "x": 1216,
+        "y": 1992
+      },
+      "data": {
+        "src": "content/assets/28f06ce21d814302.svg",
+        "alt": "pasted",
+        "fit": "contain"
+      },
+      "width": 44,
+      "height": 146
     }
   ],
   "edges": [
@@ -460,6 +508,7 @@
       "sourceHandle": "r",
       "targetHandle": "l",
       "type": "default",
+      "arrow": "start",
       "color": "#ef2415",
       "colorDark": "#ef2415",
       "width": 6,
@@ -472,6 +521,7 @@
       "sourceHandle": "r",
       "targetHandle": "l",
       "type": "default",
+      "arrow": "start",
       "color": "#ef2415",
       "colorDark": "#ef2415",
       "width": 6,
@@ -484,6 +534,7 @@
       "sourceHandle": "r",
       "targetHandle": "l",
       "type": "default",
+      "arrow": "start",
       "color": "#ef2415",
       "colorDark": "#ef2415",
       "width": 6,
@@ -561,6 +612,19 @@
       "targetHandle": "l",
       "type": "default",
       "label": "Design artifacts",
+      "color": "#ef2415",
+      "colorDark": "#ef2415",
+      "width": 6,
+      "labelSize": 24
+    },
+    {
+      "id": "7e234e17",
+      "source": "a78d2ed8",
+      "target": "02ef7c10",
+      "sourceHandle": "b",
+      "targetHandle": "t",
+      "type": "default",
+      "label": "Demo",
       "color": "#ef2415",
       "colorDark": "#ef2415",
       "width": 6,

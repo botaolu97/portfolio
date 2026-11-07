@@ -37,11 +37,40 @@ export function imagesFromClipboard(data: Pick<DataTransfer, 'files' | 'getData'
         : new File([f], `pasted.${IMAGE_TYPES[f.type]}`, { type: f.type }),
     );
   if (files.length > 0) return files;
-  const text = data.getData('text/plain').trim();
-  if (/^(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*<svg[\s>]/i.test(text) && text.endsWith('</svg>')) {
-    return [new File([text], 'pasted.svg', { type: 'image/svg+xml' })];
+  const svg =
+    svgMarkup(data.getData('image/svg+xml'), true) ??
+    svgMarkup(data.getData('text/plain'), false) ??
+    svgMarkup(data.getData('text/html'), true);
+  return svg ? [new File([svg], 'pasted.svg', { type: 'image/svg+xml' })] : [];
+}
+
+/** What may come before the <svg> in an SVG file: an XML declaration, a doctype, comments. */
+const PROLOG =
+  /^\s*(<\?xml[^>]*\?>\s*)?(<!--[\s\S]*?-->\s*|<!DOCTYPE[^>[]*(\[[\s\S]*?\])?\s*>\s*)*$/i;
+
+/**
+ * The SVG in copied text, as a standalone file. Plain text must be just an SVG file's contents (so
+ * pasting a sentence that mentions <svg> does nothing); in HTML, the first <svg>…</svg> is used.
+ * Markup copied from a web page often has no xmlns, without which it can't be shown as an image.
+ */
+export function svgMarkup(text: string, embedded: boolean): string | null {
+  const start = text.search(/<svg[\s>]/i);
+  const end = text.toLowerCase().lastIndexOf('</svg>');
+  if (start < 0 || end < start) return null;
+  if (
+    !embedded &&
+    (!PROLOG.test(text.slice(0, start)) || !/^\s*(<!--[\s\S]*?-->\s*)*$/.test(text.slice(end + 6)))
+  ) {
+    return null;
   }
-  return [];
+  let svg = text.slice(start, end + 6);
+  if (!/^<svg[^>]*\sxmlns=/i.test(svg)) {
+    svg = svg.replace(/^<svg/i, '<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+  if (/\sxlink:/i.test(svg) && !/^<svg[^>]*\sxmlns:xlink=/i.test(svg)) {
+    svg = svg.replace(/^<svg/i, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+  }
+  return svg;
 }
 
 /** Scales natural dimensions down so the longer side is at most `max`. */

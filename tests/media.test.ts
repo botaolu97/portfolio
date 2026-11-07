@@ -60,6 +60,27 @@ describe('imagesFromClipboard', () => {
     ]);
   });
 
+  it('accepts SVG with a doctype, a trailing comment, from HTML, and adds a missing xmlns', async () => {
+    const body = '<svg width="10" height="10"><use xlink:href="#a"/></svg>';
+    const named = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>';
+    const read = async (text: string, type = 'text/plain') => {
+      const files = imagesFromClipboard({
+        files: [] as unknown as FileList,
+        getData: (t: string) => (t === type ? text : ''),
+      });
+      return files.length ? await files[0].text() : null;
+    };
+    const doctype =
+      '<?xml version="1.0"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "x.dtd">\n' + named;
+    expect(await read(doctype)).toBe(named);
+    expect(await read(`${named}\n<!-- end -->`)).toBe(named);
+    expect(await read(`<meta charset="utf-8"><div>${named}</div>`, 'text/html')).toBe(named);
+    const fixed = await read(body);
+    expect(fixed).toContain('xmlns="http://www.w3.org/2000/svg"');
+    expect(fixed).toContain('xmlns:xlink="http://www.w3.org/1999/xlink"');
+    expect(await read('I like <svg> icons')).toBeNull();
+  });
+
   it('turns copied SVG markup into an SVG file', () => {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>';
     const [file] = imagesFromClipboard(clip([], `\n${svg}\n`));
