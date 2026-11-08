@@ -15,15 +15,14 @@ test.afterAll(async ({ request }) => {
 });
 
 test('create a map, add nodes, undo, and run an uploaded demo', async ({ page }) => {
-  // Start from a missing canvas (so no real canvas is opened) and create one from the switcher.
+  // Start from a missing canvas (so no real canvas is opened) and create one from the panel.
   await page.goto('/#/m/__missing__');
-  const switcher = page.getByRole('button', { name: /Switch canvas/ });
-  await switcher.click();
-  await page.getByRole('menuitem', { name: 'New canvas' }).click();
+  const panel = page.getByRole('navigation', { name: 'Canvases' });
+  await panel.getByRole('button', { name: /New canvas/ }).click();
   await page.getByLabel('New canvas name').fill(slug);
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(new RegExp(`#/m/${slug}$`));
-  await expect(switcher).toContainText(slug);
+  await expect(panel.getByRole('link', { name: slug })).toHaveAttribute('aria-current', 'page');
 
   // Add a shape from the palette; ⌘Z undoes it and there is no redo.
   const shapes = page.locator('.react-flow__node-shape');
@@ -138,7 +137,6 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   ).toBe('none');
   await textNode.dblclick();
   const reader = page.getByRole('dialog', { name: 'Full text' });
-  await expect(page.getByRole('button', { name: /Switch canvas/ })).toHaveCount(0);
   const editor = reader.locator('.ProseMirror');
   await expect(editor).toBeFocused();
   await page.keyboard.press('ControlOrMeta+a');
@@ -369,7 +367,14 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
           '<link rel="stylesheet" href="counter.css"><button id="b">Clicked 0</button><script src="counter.js"></script>',
         ),
       },
-      { name: 'counter.css', mimeType: 'text/css', buffer: Buffer.from('button{font-size:40px}') },
+      {
+        name: 'counter.css',
+        mimeType: 'text/css',
+        buffer: Buffer.from(
+          // Centered, clear of the palette that overlaps the canvas's top-left corner.
+          'body{margin:0;height:100vh;display:grid;place-items:center}button{font-size:40px}',
+        ),
+      },
       {
         name: 'counter.js',
         mimeType: 'text/javascript',
@@ -474,13 +479,11 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await page.mouse.up();
   expect(await demo.evaluate((el) => el.style.transform)).not.toBe(before);
 
-  // The switcher lists this canvas, checked, and offers New canvas in edit mode.
-  await switcher.click();
-  await expect(page.getByRole('menuitemradio', { name: slug })).toHaveAttribute(
-    'aria-checked',
-    'true',
-  );
-  await expect(page.getByRole('menuitem', { name: 'New canvas' })).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('menu')).toHaveCount(0);
+  // The panel lists this canvas as the open one, and offers New canvas in edit mode. After the
+  // edits are saved, the dev server takes the canvas's snapshot and the panel shows it.
+  await expect(panel.getByRole('link', { name: slug })).toHaveAttribute('aria-current', 'page');
+  await expect(panel.getByRole('button', { name: /New canvas/ })).toBeVisible();
+  await expect(panel.getByRole('link', { name: slug }).locator('img')).toBeVisible({
+    timeout: 20_000,
+  });
 });

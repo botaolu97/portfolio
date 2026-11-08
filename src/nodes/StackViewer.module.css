@@ -1,7 +1,9 @@
-/* Sandwich: the canvas, this blurred gray layer, then the spread-out images on top. */
+/* Sandwich: the canvas, this blurred gray layer, then the spread-out images on top. It covers the
+   canvas area only (never the canvas panel), and sizes the images to it (a size container). */
 .backdrop {
-  position: fixed;
+  position: absolute;
   inset: 0;
+  container-type: size;
   z-index: var(--z-viewer);
   display: grid;
   place-items: center;
@@ -33,7 +35,7 @@
 }
 
 .hint {
-  position: fixed;
+  position: absolute;
   left: 50%;
   bottom: var(--space-24);
   transform: translateX(-50%);

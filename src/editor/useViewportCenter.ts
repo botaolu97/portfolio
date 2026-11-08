@@ -1,7 +1,11 @@
 import { useReactFlow } from '@xyflow/react';
+import { overlayRect } from '../app/overlayRoot';
 
-/** The canvas point at the middle of the window, for placing new nodes in view. */
+/** The canvas point at the middle of the canvas area, for placing new nodes in view. */
 export function useViewportCenter() {
   const { screenToFlowPosition } = useReactFlow();
-  return () => screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  return () => {
+    const area = overlayRect();
+    return screenToFlowPosition({ x: area.left + area.width / 2, y: area.top + area.height / 2 });
+  };
 }

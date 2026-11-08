@@ -1,0 +1,298 @@
+/* Left panel: every canvas as a snapshot of its last view plus its title (see CanvasPanel.tsx).
+   The dock takes the panel's width in the page; tucked away it narrows to a sliver
+   (--canvas-panel-collapsed-ratio of the window) and the panel slides left behind its clip, so
+   the canvas area grows and the two never overlap. */
+.dock {
+  --_full: max(calc(var(--canvas-panel-width-ratio) * 100vw), var(--canvas-panel-min-width));
+  --_sliver: calc(var(--canvas-panel-collapsed-ratio) * 100vw);
+  position: relative;
+  flex: none;
+  width: var(--_full);
+  height: 100%;
+  transition: width var(--canvas-panel-slide) var(--motion-easing-standard);
+}
+
+.dock.collapsed {
+  width: var(--_sliver);
+}
+
+.clip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--canvas-panel-border);
+}
+
+.panel {
+  width: var(--_full);
+  transform: translateX(0);
+  transition: transform var(--canvas-panel-slide) var(--motion-easing-standard);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas-panel-bg);
+  /* Scrolls on its own; touch pans it (the canvas page blocks touch panning). */
+  touch-action: pan-y;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--canvas-panel-padding) var(--canvas-panel-padding) var(--space-8);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.status {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.status[data-status="error"] {
+  color: var(--color-danger);
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: var(--space-4) var(--canvas-panel-padding) var(--canvas-panel-padding);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--canvas-panel-gap);
+}
+
+/* Reordering (edit mode): the dragged canvas dims; a line in the accent color shows where it lands. */
+.list li {
+  position: relative;
+}
+
+.dragging {
+  opacity: 0.4;
+}
+
+.dropBefore::before,
+.dropAfter::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--canvas-panel-current-width);
+  border-radius: var(--radius-full);
+  background: var(--canvas-panel-current);
+}
+
+.dropBefore::before {
+  top: calc(-0.5 * var(--canvas-panel-gap) - 1px);
+}
+
+.dropAfter::after {
+  bottom: calc(-0.5 * var(--canvas-panel-gap) - 1px);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  color: var(--color-text);
+  text-decoration: none;
+  border-radius: var(--canvas-panel-thumb-radius);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.thumb {
+  display: block;
+  aspect-ratio: var(--canvas-panel-thumb-ratio);
+  overflow: hidden;
+  border-radius: var(--canvas-panel-thumb-radius);
+  border: 1px solid var(--canvas-panel-thumb-border);
+  background: var(--color-canvas);
+  transition: box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.thumbEmpty {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+/* Hover: a lighter ring than the open canvas's, so the two never look alike. */
+.item:hover .thumb {
+  box-shadow: 0 0 0 var(--canvas-panel-current-width) var(--color-canvas-dot);
+}
+
+.item[aria-current="page"] .thumb {
+  box-shadow: 0 0 0 var(--canvas-panel-current-width) var(--canvas-panel-current);
+}
+
+.title {
+  font-size: var(--font-size-md);
+  line-height: var(--font-line-height-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titleInput {
+  width: 100%;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-6);
+  margin: calc(-1 * var(--space-4)) 0;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-field);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-md);
+}
+
+.titleInput:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.item[aria-current="page"] .title {
+  font-weight: var(--font-weight-semibold);
+}
+
+.footer {
+  padding: var(--space-8) var(--canvas-panel-padding) var(--canvas-panel-padding);
+  border-top: 1px solid var(--canvas-panel-border);
+}
+
+.newForm {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.newForm input {
+  flex: 1;
+  min-width: 0;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-field);
+  color: var(--color-text);
+}
+
+.newButton {
+  width: 100%;
+  height: var(--size-control-sm);
+  padding: 0 var(--space-10);
+  border: 1px solid var(--button-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.newForm .newButton {
+  width: auto;
+}
+
+.newButton:hover {
+  background: var(--color-surface-muted);
+}
+
+.error {
+  margin: var(--space-6) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.collapsed .panel {
+  transform: translateX(calc(var(--_sliver) - var(--_full)));
+}
+
+/* Tucked away: the sliver shows the panel's right edge under a dark shade, and a click anywhere on it brings
+   the panel back. */
+.sliver {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  padding: 0;
+  background: var(--canvas-panel-shade);
+  cursor: pointer;
+  transition: background var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+.sliver:hover {
+  background: var(--canvas-panel-shade-hover);
+}
+
+/* The tab on the panel's edge, at its middle, just outside the panel (over the canvas's edge). */
+.handle {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  z-index: var(--z-controls);
+  display: grid;
+  place-items: center;
+  width: var(--canvas-panel-handle-width);
+  height: var(--canvas-panel-handle-height);
+  margin-top: calc(-0.5 * var(--canvas-panel-handle-height));
+  padding: 0;
+  border: 1px solid var(--canvas-panel-border);
+  border-left: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--canvas-panel-bg);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.handle:hover {
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.handle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .panel {
+    transition: none;
+  }
+}

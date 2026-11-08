@@ -19,6 +19,7 @@ import {
   useState,
 } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { SNAPSHOT } from '../app/snapshot';
 import { EDITABLE } from '../content/api';
 import { nodeTypes } from '../nodes/nodeTypes';
 import type { AddableNodeType } from '../store/defaults';
@@ -85,6 +86,8 @@ function ShortcutsHost({ onPasteImages }: { onPasteImages: (files: File[]) => vo
 }
 
 export function Canvas({ onError }: { onError?: (message: string) => void }) {
+  // The canvas opens where it was last left in the editor (read once); otherwise it fits everything.
+  const [initialViewport] = useState(() => useMapStore.getState().viewport);
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } = useMapStore(
     useShallow((s) => ({
       nodes: s.nodes,
@@ -225,8 +228,15 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
         onlyRenderVisibleElements
-        fitView
+        defaultViewport={initialViewport}
+        fitView={!initialViewport}
         fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
+        // The editor remembers the view, so the canvas (and its snapshot) open where you left off.
+        onMoveEnd={
+          EDITABLE && !SNAPSHOT
+            ? (_, viewport) => useMapStore.getState().setViewport(viewport)
+            : undefined
+        }
         colorMode={theme}
         attributionPosition="bottom-center"
       >
@@ -238,8 +248,11 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         <Background
           variant={BackgroundVariant.Dots}
           gap={24}
-          size={1.5}
+          // Dot diameter in px at 100% zoom.
+          size={3}
           color="var(--color-canvas-dot)"
+          // React Flow's dark mode paints its own near-black; the canvas color wins in both themes.
+          bgColor="var(--color-canvas)"
         />
       </ReactFlow>
     </div>

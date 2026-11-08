@@ -1,17 +1,20 @@
 [
   {
+    "slug": "untitled-map",
+    "title": "About Me",
+    "updatedAt": "2026-11-08T03:00:00.554Z",
+    "thumbAt": 1794106805369
+  },
+  {
     "slug": "from-code-to-ai-workflow",
     "title": "From Code to AI Workflow",
-    "updatedAt": "2026-11-07T21:19:19.032Z"
+    "updatedAt": "2026-11-08T03:00:05.385Z",
+    "thumbAt": 1794106843447
   },
   {
     "slug": "welcome",
-    "title": "Welcome to Mubu",
-    "updatedAt": "2026-11-07T19:56:28.495Z"
-  },
-  {
-    "slug": "untitled-map",
-    "title": "Untitled map",
-    "updatedAt": "2026-11-05T22:35:16.315Z"
+    "title": "Parking Lot",
+    "updatedAt": "2026-11-08T03:00:38.977Z",
+    "thumbAt": 1794106841995
   }
 ]

@@ -81,5 +81,17 @@ export interface LinkPreview {
 }
 
 /** Edit mode: the dev server reads the page and saves its image and icon as assets. */
+/** Edit mode: puts the canvases in this order (the first is where visitors start). */
+export const reorderMaps = (slugs: string[]) =>
+  post<MapIndexEntry[]>('order', JSON.stringify({ slugs }));
+
+/** Edit mode: the dev server pictures the canvas at its saved view (for the canvas panel). */
+export const captureSnapshot = (slug: string, size: { width: number; height: number }) =>
+  post<MapIndexEntry[]>('thumb', JSON.stringify(size), { slug });
+
+/** A canvas's snapshot for a theme, cache-busted by when it was taken; undefined if it has none. */
+export const snapshotUrl = (entry: MapIndexEntry, theme: 'light' | 'dark') =>
+  entry.thumbAt ? asset(`content/thumbs/${entry.slug}-${theme}.jpg?v=${entry.thumbAt}`) : undefined;
+
 export const fetchLinkPreview = (url: string, options: { iconOnly?: boolean } = {}) =>
   post<LinkPreview>('link', JSON.stringify({ url, ...options }));

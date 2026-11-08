@@ -5,15 +5,15 @@
  *   npm run delete-canvas -- exact-slug
  *
  * The name must match exactly (case and spaces included). Uploaded images, videos and demos stay
- * in public/content, since other canvases may use them. Commit and push to remove the canvas from
+ * in public/content, since other canvases may use them; the canvas's snapshots are removed. Commit and push to remove the canvas from
  * the published site.
  */
 import { rm } from 'node:fs/promises';
 import path from 'node:path';
-import { contentPaths, writeMapIndex } from '../vite-plugin-mubu-content.ts';
+import { contentPaths, removeThumbs, writeMapIndex } from '../vite-plugin-mubu-content.ts';
 
 export async function deleteCanvas(root: string, name: string) {
-  const { maps } = contentPaths(root);
+  const { maps, thumbs } = contentPaths(root);
   const index = await writeMapIndex(maps);
   const matches = index.filter((m) => m.title === name || m.slug === name);
   if (matches.length === 0) {
@@ -26,6 +26,7 @@ export async function deleteCanvas(root: string, name: string) {
   }
   const [canvas] = matches;
   await rm(path.join(maps, `${canvas.slug}.json`));
+  await removeThumbs(thumbs, canvas.slug);
   const remaining = await writeMapIndex(maps);
   return { deleted: canvas, remaining };
 }

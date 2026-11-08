@@ -1,0 +1,32 @@
+.spinner {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: auto;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border-radius: var(--radius-full);
+  border: var(--spinner-stroke) solid var(--spinner-track);
+  border-top-color: var(--spinner-color);
+  animation: spin var(--spinner-duration) linear infinite;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Reduced motion: a gentle pulse instead of turning. */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: pulse calc(var(--spinner-duration) * 2) ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse {
+    from {
+      opacity: 0.35;
+    }
+  }
+}

@@ -32,6 +32,7 @@ export function contentPaths(root: string) {
     maps: path.join(content, 'maps'),
     assets: path.join(content, 'assets'),
     demos: path.join(content, 'demos'),
+    thumbs: path.join(content, 'thumbs'),
   };
 }
 
@@ -71,7 +72,11 @@ export function resolveDemoEntry(paths: string[]): { entry: string; generated?: 
   return { entry: 'index.html', generated };
 }
 
-export async function writeMapIndex(mapsDir: string) {
+/**
+ * Rebuilds content/maps/index.json from the map files. Canvases keep their order unless `order`
+ * (slugs, from dragging them in the canvas panel) gives a new one.
+ */
+export async function writeMapIndex(mapsDir: string, order?: string[]) {
   await mkdir(mapsDir, { recursive: true });
   const files = (await readdir(mapsDir)).filter((f) => f.endsWith('.json') && f !== 'index.json');
   const entries = await Promise.all(
@@ -84,14 +89,25 @@ export async function writeMapIndex(mapsDir: string) {
       } catch {
         // Keep the filename as the title for a malformed file.
       }
-      return { slug: file.replace(/\.json$/, ''), title, updatedAt: info.mtime.toISOString() };
+      const slug = file.replace(/\.json$/, '');
+      const thumb = await stat(path.join(mapsDir, '..', 'thumbs', `${slug}-light.jpg`)).catch(
+        () => null,
+      );
+      return {
+        slug,
+        title,
+        updatedAt: info.mtime.toISOString(),
+        ...(thumb ? { thumbAt: Math.round(thumb.mtimeMs) } : {}),
+      };
     }),
   );
   // Canvases keep a stable order (1..n, top to bottom): existing ones keep their place, new ones go
   // to the bottom (oldest first). Editing a canvas never reorders it.
-  const previous: string[] = await readFile(path.join(mapsDir, 'index.json'), 'utf8')
-    .then((raw) => (JSON.parse(raw) as { slug: string }[]).map((e) => e.slug))
-    .catch(() => []);
+  const previous: string[] =
+    order ??
+    (await readFile(path.join(mapsDir, 'index.json'), 'utf8')
+      .then((raw) => (JSON.parse(raw) as { slug: string }[]).map((e) => e.slug))
+      .catch(() => []));
   const rank = (slug: string) => {
     const i = previous.indexOf(slug);
     return i === -1 ? Number.POSITIVE_INFINITY : i;
@@ -534,6 +550,98 @@ function requireSlug(url: URL) {
   return slug;
 }
 
+/** Width of canvas snapshots in px (the panel shows them at most this wide). */
+export const THUMB_WIDTH = 480;
+export const THUMB_THEMES = ['light', 'dark'] as const;
+
+export async function removeThumbs(thumbsDir: string, slug: string) {
+  await Promise.all(
+    THUMB_THEMES.map((t) => rm(path.join(thumbsDir, `${slug}-${t}.jpg`), { force: true })),
+  );
+}
+
+type SnapshotBrowser = import('@playwright/test').Browser;
+let snapshotBrowser: Promise<SnapshotBrowser> | null = null;
+/** One headless Chromium (Playwright's, as for link previews), kept open between snapshots. */
+function browserForSnapshots(): Promise<SnapshotBrowser> {
+  snapshotBrowser ??= import('@playwright/test')
+    .then(({ chromium }) => chromium.launch())
+    .catch((err) => {
+      snapshotBrowser = null;
+      throw err;
+    });
+  return snapshotBrowser;
+}
+
+// One snapshot per canvas at a time; a request while one runs is folded into a single rerun.
+const running = new Map<string, Promise<void>>();
+const rerun = new Map<string, () => Promise<void>>();
+
+/**
+ * Pictures a canvas as it was last left in the editor: the app opened in snapshot mode (only the
+ * canvas, at its saved view) at the size of the editor's canvas area, once per theme, scaled to
+ * THUMB_WIDTH. Written to thumbs/<slug>-light.jpg and -dark.jpg.
+ */
+export function captureThumbs(
+  origin: string,
+  thumbsDir: string,
+  slug: string,
+  width: number,
+  height: number,
+  /** False once the canvas is deleted: a snapshot finishing after that is removed again. */
+  canvasExists: () => boolean,
+): Promise<void> {
+  const job = async () => {
+    if (!canvasExists()) return;
+    const browser = await browserForSnapshots();
+    await mkdir(thumbsDir, { recursive: true });
+    for (const theme of THUMB_THEMES) {
+      const context = await browser.newContext({
+        viewport: { width, height },
+        deviceScaleFactor: THUMB_WIDTH / width,
+        colorScheme: theme,
+      });
+      try {
+        const page = await context.newPage();
+        await page.goto(`${origin}?snapshot#/m/${slug}`, { waitUntil: 'load', timeout: 20_000 });
+        await page.waitForSelector('.react-flow__node, .react-flow__pane', { timeout: 10_000 });
+        // Let images, fonts and demos settle.
+        await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => undefined);
+        await page.waitForTimeout(500);
+        const shot = await page.screenshot({ type: 'jpeg', quality: 80 });
+        await writeFile(path.join(thumbsDir, `${slug}-${theme}.jpg`), shot);
+      } finally {
+        // The browser may already be gone (dev server restarting): never let that throw.
+        await context.close().catch(() => undefined);
+      }
+    }
+    if (!canvasExists()) await removeThumbs(thumbsDir, slug);
+  };
+  const current = running.get(slug);
+  if (current) {
+    if (!rerun.has(slug)) {
+      rerun.set(slug, job);
+      const next = current.then(() => {
+        rerun.delete(slug);
+        return job();
+      });
+      running.set(slug, next);
+      // Failures reach the caller; these bookkeeping chains must never become unhandled rejections
+      // (one would take down the whole dev server).
+      void next
+        .catch(() => undefined)
+        .finally(() => running.get(slug) === next && running.delete(slug));
+    }
+    return running.get(slug) as Promise<void>;
+  }
+  const first = job();
+  running.set(slug, first);
+  void first
+    .catch(() => undefined)
+    .finally(() => running.get(slug) === first && running.delete(slug));
+  return first;
+}
+
 export function mubuContent(): Plugin {
   let dirs: ReturnType<typeof contentPaths>;
   let outDir: string;
@@ -552,6 +660,11 @@ export function mubuContent(): Plugin {
       await writeMapIndex(dirs.maps);
     },
     configureServer(server) {
+      // The snapshot browser goes away with the dev server (including restarts).
+      server.httpServer?.once('close', () => {
+        void snapshotBrowser?.then((b) => b.close()).catch(() => undefined);
+        snapshotBrowser = null;
+      });
       server.middlewares.use(async (req, res, next) => {
         const url = new URL(req.url ?? '/', 'http://localhost');
         const base = server.config.base.replace(/\/$/, '');
@@ -580,6 +693,38 @@ export function mubuContent(): Plugin {
             case '/__mubu/delete': {
               const slug = requireSlug(url);
               await rm(path.join(dirs.maps, `${slug}.json`), { force: true });
+              await removeThumbs(dirs.thumbs, slug);
+              return sendJson(res, 200, await writeMapIndex(dirs.maps));
+            }
+            case '/__mubu/order': {
+              const { slugs } = JSON.parse((await readBody(req)).toString('utf8')) as {
+                slugs?: unknown;
+              };
+              if (
+                !Array.isArray(slugs) ||
+                !slugs.every((s) => typeof s === 'string' && SLUG_RE.test(s))
+              ) {
+                throw new HttpError(400, 'Expected { slugs: [...] }');
+              }
+              return sendJson(res, 200, await writeMapIndex(dirs.maps, slugs));
+            }
+            case '/__mubu/thumb': {
+              const slug = requireSlug(url);
+              const { width, height } = JSON.parse((await readBody(req)).toString('utf8')) as {
+                width?: unknown;
+                height?: unknown;
+              };
+              const size = (n: unknown) =>
+                typeof n === 'number' && n >= 200 && n <= 5000 ? Math.round(n) : null;
+              const w = size(width);
+              const h = size(height);
+              if (!w || !h) throw new HttpError(400, 'Expected { width, height } in px');
+              if (!existsSync(path.join(dirs.maps, `${slug}.json`))) {
+                throw new HttpError(404, 'No such canvas');
+              }
+              const origin = `http://127.0.0.1:${server.config.server.port ?? 5173}${server.config.base}`;
+              const mapFile = path.join(dirs.maps, `${slug}.json`);
+              await captureThumbs(origin, dirs.thumbs, slug, w, h, () => existsSync(mapFile));
               return sendJson(res, 200, await writeMapIndex(dirs.maps));
             }
             case '/__mubu/upload': {

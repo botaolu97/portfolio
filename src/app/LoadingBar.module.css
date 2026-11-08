@@ -1,0 +1,19 @@
+/* Along the top edge of the canvas area, above the canvas and the outgoing canvas's snapshot. */
+.track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-controls);
+  height: var(--loading-bar-height);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bar {
+  height: 100%;
+  background: var(--loading-bar-color);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  opacity: 0;
+}

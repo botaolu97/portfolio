@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "title": "Welcome to Mubu",
+  "title": "Parking Lot",
   "nodes": [
     {
       "id": "intro",
@@ -163,5 +163,10 @@
       "type": "smoothstep",
       "animated": true
     }
-  ]
+  ],
+  "viewport": {
+    "x": -404.5,
+    "y": -194.3,
+    "zoom": 0.8727
+  }
 }

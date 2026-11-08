@@ -1,7 +1,8 @@
 /* Layers: the frame (the box's background with the scrolling text, clipped as one), the back button.
    The frame zooms with a transform (not a clip) so it runs on the GPU in step with the text. */
+/* Fills the canvas area only (never the canvas panel); see src/app/overlayRoot.ts. */
 .root {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: var(--z-viewer);
 }
@@ -44,7 +45,7 @@
 }
 
 .back {
-  position: fixed;
+  position: absolute;
   top: var(--reader-inset);
   left: var(--reader-inset);
   display: flex;

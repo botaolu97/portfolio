@@ -48,14 +48,21 @@ Tokens come in three tiers:
 
 ## Color
 
-- Backgrounds: `--color-canvas` behind everything (a detective-board tan, `#D9C9B8`, in light mode;
-  the dot grid is a darker tan), `--color-surface` for anything that sits on it
+- Backgrounds: `--color-canvas` behind everything (a warm light gray, `#E8E7E1`, in light mode and
+  a soft charcoal, `#252525`, in dark mode; the dot grid, `--color-canvas-dot`, sits about 1.75:1
+  against it), `--color-surface` for anything that sits on it
   (cards, panels, inputs), `--color-surface-muted` for hover fills, title bars and placeholders.
 - Text: `--color-text` for content, `--color-text-muted` for labels, captions and hints. Use
   `--color-text-on-accent` on accent and danger fills.
 - Lines: `--color-border` for every 1px border and divider.
+- **High contrast.** Mubu is high contrast in both modes: every box and control has a visible
+  edge (`--color-border`, at least 3:1 against surfaces and the canvas; boxes on the canvas use
+  `--node-border` as an inset outline, so they keep their size), text and muted text reach at
+  least 4.5:1 on surfaces and on the canvas, and connectors at least 3:1 on the canvas. Check new
+  colors against both the light canvas and the dark surfaces.
 - Status: `--color-danger` only for destructive actions and errors.
-- Note colors (`--color-note-*`) are paper colors: they don't change in dark mode, and note text stays dark.
+- Note colors (`--color-note-*`) are pastels in light mode and deep tints of the same hues in dark
+  mode, with `--note-text` dark on the pastels and light on the tints (at least 10:1).
 
 ## Typography
 
@@ -109,15 +116,48 @@ label fonts (Fasthand, Caveat, Handjet, Instrument Serif).
 Height `--button-height`, horizontal padding `--button-padding-x`, radius `--button-radius`.
 Disabled buttons drop to 45% opacity. In panels, buttons use `--size-control-sm`.
 
-### Canvas switcher (`src/app/CanvasSwitcher.tsx`)
+### Canvas panel (`src/app/CanvasPanel.tsx`)
 
-A `--panel-*` pill fixed `--switcher-inset` from the bottom-left corner, on every page and in both
-modes. Closed, it shows the open canvas's name (truncated at `--switcher-max-width`) and a
-chevron; in edit mode a small dot before the name shows autosave (muted while saving, danger on
-failure, hidden when saved). Open, a `--switcher-menu-width` menu rises above it: a "Canvases"
-heading, every canvas with a check on the current one, and, in edit mode only, "New canvas"
-(name it inline, Enter to create). Arrow keys move through the menu, Esc or a click outside closes
-it. Canvases aren't deleted from the UI; use `npm run delete-canvas -- "Exact name"`.
+A panel down the left side, `--canvas-panel-width-ratio` of the window wide (a fifth; at least
+`--canvas-panel-min-width`), in both modes; the canvas fills the rest. The panel and the canvas
+area never share space: everything that takes over the screen (the text reader, the stack viewer,
+the video viewer) fills the canvas area only (`src/app/overlayRoot.ts`), and videos never use the
+browser's own fullscreen (it's hidden, or left straight away where a browser still offers it);
+the video's enlarge button opens it in the canvas area instead. Under a "Botao's canvas" heading it
+lists every canvas in order as a snapshot of its last view (`--canvas-panel-thumb-ratio` frame,
+cropped to fill) with its title below. The open canvas gets a `--canvas-panel-current` ring (dark gray in light mode, white in dark
+mode) and a bold title; hover rings the frame in the lighter dot-grid color. Each item is a link (⌘-click opens a new
+tab). In edit mode a double-click on a canvas's name renames it (Enter or clicking away saves, Esc
+cancels), dragging a canvas up or down the list reorders it (an accent line shows where it lands;
+Alt+↑/↓ does the same from the keyboard), the header shows autosave status while something is
+unsaved, and the footer has
+"+ New canvas" (name it inline, Enter to create). Canvases aren't deleted from the UI; use
+`npm run delete-canvas -- "Exact name"`.
+
+**Tucking it away.** A `--canvas-panel-handle-*` tab sits on the panel's edge at its middle,
+just outside the panel. Clicking it slides the panel left (`--canvas-panel-slide`) until only
+`--canvas-panel-collapsed-ratio` of the window (a fifteenth) still shows under a dark
+`--canvas-panel-shade`; the canvas area
+grows into the space (the two still never overlap). The tab or a click on the sliver brings the
+panel back. The choice is remembered in the browser (`mubu.panelCollapsed`).
+
+**Order and start page.** The panel's order is the canvases' order (`content/maps/index.json`);
+the first canvas is where the site root opens, for visitors and in the editor.
+
+**Loading.** While a canvas loads after a switch, a `--loading-bar-*` bar along the top of the
+canvas area creeps toward the end (`--loading-bar-creep`), then finishes and fades once the map and
+the images inside the visible canvas area have loaded (at most 2.5 s; boxes React Flow draws just off-screen are ignored, since their lazy images never load until scrolled to). Images, videos and embedded players show a
+`--spinner-*` ring, circling over them until they've loaded (a gentle pulse with reduced motion).
+
+**Last view and snapshots.** The editor saves where each canvas was last panned and zoomed
+(`viewport` in the map file), and the canvas opens there, for visitors too; a canvas without one
+fits everything. After each save (once things are quiet for a moment, and when you leave a canvas)
+the dev server pictures the canvas: it opens the app in snapshot mode (`?snapshot`: only the
+canvas, nothing editable) in headless Chromium at the size of the editor's canvas area, once per
+theme, and saves `public/content/thumbs/<slug>-light.jpg` and `-dark.jpg` (480px wide). The panel
+shows the one for the current theme, cache-busted by `thumbAt` in the canvas index. A canvas
+without a snapshot yet shows its initial. The old bottom-left switcher
+(`src/app/CanvasSwitcher.tsx`) now appears only on the empty start page.
 
 The site root opens the "welcome" canvas (or the first one); there is no separate list page.
 
@@ -229,7 +269,7 @@ with the canvas (`connector` in the map file) as the look for connectors drawn f
   yellow. It comes in five `--color-note-*` fills (yellow, pink, green, blue, purple), stored by
   name in the map so the palette can change later. Rich text (see below) in `--note-text` at
   `--note-font-size`, `--note-padding` inside, `--note-radius` corners and `--note-shadow` like
-  paper. Notes stay light in dark mode. In the inspector the colors are round
+  paper, and a `--node-border` edge. In dark mode the fills turn to deep tints with light text. In the inspector the colors are round
   `--note-swatch-size` swatches (native radio buttons); the chosen one gets the accent focus ring.
   Notes can be rotated (`rotation`, -180° to 180°): only the paper turns, while the resize and
   connection handles stay on the unrotated box. In the editor a selected note shows a
@@ -409,23 +449,23 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--color-canvas` | `#d9c9b8` | `#161615` | Page and canvas background (a detective-board tan in light mode). |
-| `--color-canvas-dot` | `#bfa98f` | `#3a3a37` | Dot grid on the canvas. |
+| `--color-canvas` | `#e8e7e1` | `#252525` | Page and canvas background: a warm light gray (#E8E7E1) in light mode, a soft charcoal (#252525) in dark mode rather than near-black. |
+| `--color-canvas-dot` | `#b3b2aa` | `#4a4a46` | Dot grid on the canvas: about 1.75:1 against the canvas in both modes, visible but quieter than any content. |
 | `--color-surface` | `#ffffff` | `#1f1f1e` | Cards, panels, inputs on the canvas. |
 | `--color-surface-muted` | `#f0f0ed` | `#2a2a28` | Hover fills, title bars, placeholders. |
 | `--color-field` | `#f6f6f4` | `#161615` | Inside text inputs, selects and segmented controls. |
-| `--color-border` | `#e2e2dd` | `#353532` | Default 1px borders and dividers. |
+| `--color-border` | `#4a4a45` | `#8a8a84` | Default 1px borders and dividers. High contrast: at least 3:1 against surfaces and the canvas in both modes, so every box and control has a visible edge. |
 | `--color-text` | `#1c1c1a` | `#ececea` | Primary text. |
-| `--color-text-muted` | `#6b6b66` | `#9a9a94` | Secondary text, labels, hints. |
+| `--color-text-muted` | `#4a4a45` | `#b8b8b2` | Secondary text, labels, hints. High contrast: at least 4.5:1 on surfaces and on the canvas. |
 | `--color-text-on-accent` | `#ffffff` | — | Text on accent or danger fills. |
 | `--color-accent` | `#4f6bed` | `#7d93f5` | Primary actions, selection, focus. |
 | `--color-accent-soft` | `#e8ecfd` | `#2a3156` | Tinted backgrounds behind accent content. |
 | `--color-danger` | `#d4483b` | `#ef6a5d` | Destructive actions and errors. |
-| `--color-note-yellow` | `#ffef9f` | — | Default note color. |
-| `--color-note-pink` | `#ffd6e2` | — |  |
-| `--color-note-green` | `#c8f0d0` | — |  |
-| `--color-note-blue` | `#cfe4ff` | — |  |
-| `--color-note-purple` | `#e2d8ff` | — |  |
+| `--color-note-yellow` | `#ffef9f` | `#3b3412` | Default note color. |
+| `--color-note-pink` | `#ffd6e2` | `#4a1f2e` |  |
+| `--color-note-green` | `#c8f0d0` | `#1c3a26` |  |
+| `--color-note-blue` | `#cfe4ff` | `#1b2d4d` |  |
+| `--color-note-purple` | `#e2d8ff` | `#31254e` |  |
 
 #### `font`
 
@@ -534,7 +574,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--button-radius` | `var(--radius-sm) → 5px` | follows alias |  |
 | `--button-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
 | `--button-bg-hover` | `var(--color-surface-muted) → #f0f0ed` | follows alias |  |
-| `--button-border` | `var(--color-border) → #e2e2dd` | follows alias |  |
+| `--button-border` | `var(--color-border) → #4a4a45` | follows alias |  |
 | `--button-primary-bg` | `var(--color-accent) → #4f6bed` | follows alias |  |
 | `--button-primary-text` | `var(--color-text-on-accent) → #ffffff` | follows alias |  |
 
@@ -543,7 +583,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--panel-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
-| `--panel-border` | `var(--color-border) → #e2e2dd` | follows alias |  |
+| `--panel-border` | `var(--color-border) → #4a4a45` | follows alias |  |
 | `--panel-radius` | `var(--radius-md) → 8px` | follows alias |  |
 | `--panel-shadow` | `var(--shadow-raised) → 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 4px 16px 0 rgb(0 0 0 / 0.06)` | follows alias |  |
 
@@ -598,8 +638,8 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--note-text` | `#1c1c1a` | — | Note text; dark in both modes because note fills are light. |
-| `--note-placeholder` | `#6b6b66` | — |  |
+| `--note-text` | `#1c1c1a` | `#ececea` | Note text: dark on the light fills, light on the dark-mode fills. |
+| `--note-placeholder` | `#4a4a45` | `#b8b8b2` |  |
 | `--note-padding` | `var(--space-8) → 8px` | follows alias | Space inside a note on every side. |
 | `--note-radius` | `var(--radius-xs) → 2px` | follows alias |  |
 | `--note-font-size` | `var(--font-size-lg) → 15px` | follows alias |  |
@@ -632,7 +672,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--theme-switch-inset` | `var(--space-16) → 16px` | follows alias | Distance from the window's bottom and right edges. |
 | `--theme-switch-track` | `var(--color-surface-muted) → #f0f0ed` | follows alias |  |
 | `--theme-switch-knob-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
-| `--theme-switch-icon` | `var(--color-text-muted) → #6b6b66` | follows alias |  |
+| `--theme-switch-icon` | `var(--color-text-muted) → #4a4a45` | follows alias |  |
 | `--theme-switch-icon-active` | `var(--color-text) → #1c1c1a` | follows alias |  |
 
 #### `component.code`
@@ -642,12 +682,12 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--code-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
 | `--code-bar-bg` | `var(--color-surface-muted) → #f0f0ed` | follows alias |  |
 | `--code-bar-height` | `32px` | — |  |
-| `--code-border` | `var(--color-border) → #e2e2dd` | follows alias |  |
+| `--code-border` | `var(--color-border) → #4a4a45` | follows alias |  |
 | `--code-radius` | `var(--radius-md) → 8px` | follows alias |  |
 | `--code-font-size` | `var(--font-size-md) → 13px` | follows alias |  |
 | `--code-line-height` | `1.6` | — |  |
 | `--code-padding` | `var(--space-12) → 12px` | follows alias |  |
-| `--code-line-number` | `var(--color-text-muted) → #6b6b66` | follows alias | Line numbers in the gutter. |
+| `--code-line-number` | `var(--color-text-muted) → #4a4a45` | follows alias | Line numbers in the gutter. |
 
 #### `component.switcher`
 
@@ -728,6 +768,8 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--node-shadow` | `var(--shadow-subtle) → 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 8px 0 rgb(0 0 0 / 0.05)` | follows alias | Text boxes, code blocks, images, videos and demos (notes and stack prints have their own). |
+| `--node-border` | `var(--color-border) → #4a4a45` | follows alias | Edge of every box on the canvas (high contrast): text, notes, code, images, videos, demos, web pages and stack prints. |
+| `--node-border-width` | `1px` | — |  |
 | `--node-shape-shadow` | `rgb(0 0 0 / 0.08)` | `rgb(0 0 0 / 0.35)` | Shapes use a drop-shadow filter in this color so the shadow follows their outline. |
 
 #### `component.label`
@@ -743,6 +785,47 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | --- | --- | --- | --- |
 | `--canvas-slide-shadow` | `0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12)` | `0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45)` |  |
 
+#### `component.spinner`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--spinner-size` | `28px` | — |  |
+| `--spinner-stroke` | `3px` | — |  |
+| `--spinner-color` | `var(--color-accent) → #4f6bed` | follows alias |  |
+| `--spinner-track` | `var(--color-border) → #4a4a45` | follows alias | The faint full ring the arc runs along. |
+| `--spinner-duration` | `800ms` | — | One turn. |
+
+#### `component.loading-bar`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--loading-bar-height` | `3px` | — |  |
+| `--loading-bar-color` | `var(--color-accent) → #4f6bed` | follows alias |  |
+| `--loading-bar-creep` | `4000ms` | — | Time to creep to 90% while waiting; it never reaches the end until loading is done. |
+| `--loading-bar-finish` | `240ms` | — | Running to the end and fading out once the canvas is ready. |
+
+#### `component.canvas-panel`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--canvas-panel-width-ratio` | `0.2` | — | Share of the window width (a fifth). |
+| `--canvas-panel-min-width` | `168px` | — | Floor on narrow windows, so snapshots and titles stay legible. |
+| `--canvas-panel-collapsed-ratio` | `0.0667` | — | Share of the window width still showing when the panel is tucked away (a fifteenth). |
+| `--canvas-panel-slide` | `280ms` | — | Tucking the panel away or bringing it back. |
+| `--canvas-panel-shade` | `rgb(0 0 0 / 0.32)` | `rgb(0 0 0 / 0.5)` | Darkens the sliver of a tucked-away panel, so it reads as set aside. |
+| `--canvas-panel-shade-hover` | `rgb(0 0 0 / 0.2)` | `rgb(0 0 0 / 0.35)` | Lighter on hover: clicking brings the panel back. |
+| `--canvas-panel-handle-width` | `16px` | — | The tab on the panel's edge that tucks it away and brings it back. |
+| `--canvas-panel-handle-height` | `48px` | — |  |
+| `--canvas-panel-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
+| `--canvas-panel-border` | `var(--color-border) → #4a4a45` | follows alias | Edge between the panel and the canvas. |
+| `--canvas-panel-padding` | `var(--space-16) → 16px` | follows alias |  |
+| `--canvas-panel-gap` | `var(--space-16) → 16px` | follows alias | Space between canvases in the list. |
+| `--canvas-panel-thumb-ratio` | `1.6` | — | Snapshot frame, width / height (16:10). |
+| `--canvas-panel-thumb-radius` | `var(--radius-md) → 8px` | follows alias |  |
+| `--canvas-panel-thumb-border` | `var(--color-border) → #4a4a45` | follows alias |  |
+| `--canvas-panel-current` | `#2a2a28` | `#ffffff` | Ring around the open canvas's snapshot (and the drop line when reordering): a dark gray in light mode, white in dark mode. |
+| `--canvas-panel-current-width` | `2px` | — |  |
+
 #### `component.rich-text-indent`
 
 | CSS variable | Value | Dark | Use |
@@ -754,13 +837,13 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--rich-link-color` | `var(--color-text) → #1c1c1a` | follows alias | Link text: the text color, so a link reads as part of the sentence. |
-| `--rich-link-underline` | `var(--color-text-muted) → #6b6b66` | follows alias | Underline under a link; it darkens to the text color on hover. |
+| `--rich-link-underline` | `var(--color-text-muted) → #4a4a45` | follows alias | Underline under a link; it darkens to the text color on hover. |
 
 #### `component.connector`
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--connector-color` | `#9a9a94` | `#6b6b66` | Default line and arrow color. |
+| `--connector-color` | `#4a4a45` | `#9a9a94` | Default line and arrow color. |
 | `--connector-width` | `1.5` | — | Default thickness in px. |
 | `--connector-label-size` | `12` | — | Default connector label font size in px. |
 
@@ -769,7 +852,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--link-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
-| `--link-border` | `var(--color-border) → #e2e2dd` | follows alias |  |
+| `--link-border` | `var(--color-border) → #4a4a45` | follows alias |  |
 | `--link-radius` | `var(--radius-md) → 8px` | follows alias |  |
 | `--link-image-bg` | `var(--color-surface-muted) → #f0f0ed` | follows alias | Behind the preview image, and the fallback panel when there is none. |
 | `--link-padding` | `var(--space-12) → 12px` | follows alias | Inside the text area below the image. |

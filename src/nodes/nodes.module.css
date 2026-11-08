@@ -164,6 +164,9 @@
   user-select: none;
   -webkit-user-drag: none;
   box-shadow: var(--node-shadow);
+  /* High contrast: every box has a visible edge (an inset outline, so the box keeps its size). */
+  outline: var(--node-border-width) solid var(--node-border);
+  outline-offset: calc(-1 * var(--node-border-width));
 }
 
 /* Shape */
@@ -227,6 +230,18 @@
   box-shadow: var(--node-shadow);
 }
 
+/* High contrast edge. A <video> or iframe paints over its parent's outline, so the edge is a layer
+   on top (clicks pass through to the player). */
+.video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: var(--node-border-width) solid var(--node-border);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
 .video video,
 .video iframe,
 .video img {
@@ -252,6 +267,33 @@
 
 .play:hover {
   background: var(--video-play-bg-hover);
+}
+
+/* Enlarges the video in the canvas area (instead of the browser's fullscreen). Top-right, above
+   the edit-mode drag strip and clear of the player's controls at the bottom. */
+.expand {
+  position: absolute;
+  top: var(--space-6);
+  right: var(--space-6);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--video-play-bg);
+  color: var(--video-play-icon);
+  cursor: pointer;
+}
+
+.expand:hover {
+  background: var(--video-play-bg-hover);
+}
+
+.expand:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* Demo */
@@ -385,6 +427,9 @@
   border-radius: var(--note-radius);
   box-shadow: var(--note-shadow);
   color: var(--note-text);
+  /* High contrast: every box has a visible edge (an inset outline, so the box keeps its size). */
+  outline: var(--node-border-width) solid var(--node-border);
+  outline-offset: calc(-1 * var(--node-border-width));
 }
 
 .noteText {
@@ -580,6 +625,8 @@
   border-radius: var(--stack-radius);
   background: var(--stack-frame);
   box-shadow: var(--stack-shadow);
+  /* High contrast: an edge around the white frame. */
+  outline: var(--node-border-width) solid var(--node-border);
   user-select: none;
   -webkit-user-drag: none;
 }

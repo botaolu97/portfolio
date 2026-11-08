@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { overlayRect, overlayRoot } from '../app/overlayRoot';
 import type { TextSize } from '../store/schema';
 import { hideNativeScrollbar, OverlayScrollbar } from '../ui/OverlayScrollbar';
 import { tokenValues } from '../ui/tokens';
@@ -51,16 +52,18 @@ const along = (a: number, b: number, v: number, t: number) =>
 const ZOOM_STEPS = 24;
 
 /**
- * The box's rectangle on screen at its normal size: if the reader opens while the box is lifted
- * by its hover scale, the zoom still starts from (and lands back on) the box's real size.
+ * The box's rectangle at its normal size, relative to the canvas area the reader fills: if the
+ * reader opens while the box is lifted by its hover scale, the zoom still starts from (and lands
+ * back on) the box's real size.
  */
 function unscaledRect(el: HTMLElement, zoom: number) {
   const r = el.getBoundingClientRect();
+  const area = overlayRect();
   const width = el.offsetWidth * zoom;
   const height = el.offsetHeight * zoom;
   return new DOMRect(
-    r.left + (r.width - width) / 2,
-    r.top + (r.height - height) / 2,
+    r.left - area.left + (r.width - width) / 2,
+    r.top - area.top + (r.height - height) / 2,
     width,
     height,
   );
@@ -305,6 +308,6 @@ export function TextReader({
         Back
       </button>
     </div>,
-    document.body,
+    overlayRoot(),
   );
 }

@@ -221,12 +221,16 @@ export const mapDoc = z.object({
   edges: z.array(mapEdge),
   /** The look new connectors get on this canvas (set by "Apply to all connectors"). */
   connector: connectorStyle.optional(),
+  /** Where the canvas was last panned and zoomed to in the editor; it opens there. */
+  viewport: z.object({ x: z.number(), y: z.number(), zoom: z.number().positive() }).optional(),
 });
 
 export const mapIndexEntry = z.object({
   slug: z.string(),
   title: z.string(),
   updatedAt: z.string(),
+  /** When the canvas's snapshot (content/thumbs/<slug>-light|dark.jpg) was last taken, in ms. */
+  thumbAt: z.number().optional(),
 });
 
 export type MapDoc = z.infer<typeof mapDoc>;

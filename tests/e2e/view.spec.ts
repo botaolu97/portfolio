@@ -42,19 +42,19 @@ test('published site is read-only and demos still run', async ({ page }) => {
   });
   await useFixtures(page);
 
-  // The root opens the first canvas; the switcher lists canvases but can't create one.
+  // The root opens the first canvas; the left panel lists canvases (a fifth of the window wide)
+  // but can't create one.
   await page.goto('/');
   await expect(page).toHaveURL(/#\/m\/e2e-fixture$/);
-  const switcher = page.getByRole('button', { name: /Switch canvas/ });
-  await expect(switcher).toContainText('E2E fixture');
-  await switcher.click();
-  await expect(page.getByRole('menuitemradio', { name: 'E2E fixture' })).toHaveAttribute(
-    'aria-checked',
-    'true',
-  );
-  await expect(page.getByRole('menuitemradio', { name: 'Other canvas' })).toBeVisible();
-  await expect(page.getByRole('menuitem', { name: 'New canvas' })).toHaveCount(0);
-  await page.keyboard.press('Escape');
+  const panel = page.getByRole('navigation', { name: 'Canvases' });
+  const canvasLink = (name: string) => panel.getByRole('link', { name });
+  await expect(canvasLink('E2E fixture')).toHaveAttribute('aria-current', 'page');
+  await expect(canvasLink('Other canvas')).toBeVisible();
+  await expect(canvasLink('Other canvas')).not.toHaveAttribute('aria-current');
+  await expect(panel.getByRole('button', { name: /New canvas/ })).toHaveCount(0);
+  const panelBox = await panel.boundingBox();
+  const windowWidth = page.viewportSize()?.width ?? 0;
+  expect(panelBox?.width).toBeCloseTo(Math.max(windowWidth * 0.2, 168), 0);
   await expect(page.getByRole('banner')).toHaveCount(0);
 
   await expect(page.locator('.react-flow__node')).toHaveCount(7);
@@ -96,7 +96,8 @@ test('published site is read-only and demos still run', async ({ page }) => {
   expect(await scaleOf(page.locator('.react-flow__node-shape > div').first())).toBe(1);
   await page.mouse.move(8, 8);
 
-  // In the reader the text is a third of the window wide, selection is a subtle gray, and the
+  // In the reader (which fills the canvas area, right of the panel) the text is a third of the
+  // area wide, selection is a subtle gray, and the
   // custom scrollbar (thumb only, 24px from the edge) fades in on scroll and out 2s later.
   await page.locator('.react-flow__node[data-id="longread"] [class*="_text_"]').click();
   const longReader = page.getByRole('dialog', { name: 'Full text' });
@@ -104,8 +105,10 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await page.waitForTimeout(500);
   const readerText = longReader.locator('[class*="_block_"]');
   const textWidth = (await readerText.boundingBox())?.width ?? 0;
-  expect(textWidth).toBeGreaterThan(1280 / 3 - 4);
-  expect(textWidth).toBeLessThan(1280 / 3 + 4);
+  const areaWidth = (await longReader.boundingBox())?.width ?? 0;
+  expect(areaWidth).toBeCloseTo(1280 - (panelBox?.width ?? 0), 0);
+  expect(textWidth).toBeGreaterThan(areaWidth / 3 - 4);
+  expect(textWidth).toBeLessThan(areaWidth / 3 + 4);
   expect(
     await longReader
       .locator('p')
@@ -147,7 +150,8 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await expect(spread).toHaveCount(0);
   await pile.click();
   await expect(spread).toBeVisible();
-  await page.mouse.click(8, 8);
+  // An empty spot of the viewer (it covers the canvas area, right of the panel).
+  await page.mouse.click((panelBox?.width ?? 0) + 8, 8);
   await expect(spread).toHaveCount(0);
 
   const snippet = page.locator('.react-flow__node-code');
@@ -163,8 +167,10 @@ test('published site is read-only and demos still run', async ({ page }) => {
   const transform = () => shape.evaluate((el) => el.style.transform);
   const before = await transform();
   await shape.hover();
+  const shapeBox = await shape.boundingBox();
+  if (!shapeBox) throw new Error('shape not visible');
   await page.mouse.down();
-  await page.mouse.move(100, 700, { steps: 5 });
+  await page.mouse.move(shapeBox.x + 60, shapeBox.y + shapeBox.height + 40, { steps: 5 });
   await page.mouse.up();
   expect(await transform()).toBe(before);
 
@@ -200,11 +206,9 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await textBox.click();
   await expect(reader).toBeVisible();
   await expect(reader).toContainText('Fixture note');
-  await expect(switcher).toHaveCount(0);
   await expect(page.getByRole('switch', { name: 'Dark theme' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(reader).toHaveCount(0);
-  await expect(switcher).toBeVisible();
   // Right after landing, the box under the pointer doesn't lift until the pointer leaves and returns.
   await expect(textBox).toHaveAttribute('data-landing', 'true');
   expect(await scaleOf(textBox)).toBe(1);
@@ -217,7 +221,7 @@ test('published site is read-only and demos still run', async ({ page }) => {
 
   // Zoom gestures over the interface zoom the canvas, never the page.
   const viewport = () => page.locator('.react-flow__viewport').evaluate((el) => el.style.transform);
-  const header = switcher;
+  const header = panel;
   const headerBox = await header.boundingBox();
   const beforeZoom = await viewport();
   const pinchPrevented = await header.evaluate((el) => {
@@ -247,7 +251,7 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await expect(html).toHaveAttribute('data-theme', 'dark');
   const canvasColor = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
   // The switch animates (a view transition), so the new colors land a moment after the click.
-  await expect.poll(canvasColor).toBe('rgb(22, 22, 21)');
+  await expect.poll(canvasColor).toBe('rgb(37, 37, 37)');
   await page.reload();
   await expect(html).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByRole('switch', { name: 'Dark theme' })).toHaveAttribute(
@@ -255,13 +259,12 @@ test('published site is read-only and demos still run', async ({ page }) => {
     'true',
   );
   await page.getByRole('switch', { name: 'Dark theme' }).click();
-  await expect.poll(canvasColor).toBe('rgb(217, 201, 184)');
+  await expect.poll(canvasColor).toBe('rgb(232, 231, 225)');
 
   expect(editorRequests).toEqual([]);
 
-  // Switch to another canvas from the menu.
-  await switcher.click();
-  await page.getByRole('menuitemradio', { name: 'Other canvas' }).click();
+  // Switch to another canvas from the panel.
+  await canvasLink('Other canvas').click();
   await expect(page).toHaveURL(/#\/m\/e2e-other$/);
   // Canvas 1 → 2 slides up: the new canvas comes in from below while a snapshot of the old one
   // leaves upward; the snapshot is gone afterwards.
@@ -278,12 +281,11 @@ test('published site is read-only and demos still run', async ({ page }) => {
   await expect.poll(() => firstFrame('in')).toBe('translateY(100%)');
   expect(await firstFrame('out')).toBe('translateY(-100%)');
   await expect.poll(() => page.locator('.react-flow').count()).toBe(1);
-  await expect(switcher).toContainText('Other canvas');
+  await expect(canvasLink('Other canvas')).toHaveAttribute('aria-current', 'page');
   await expect(page.getByText('Other note')).toBeVisible();
 
   // And back (2 → 1) slides down.
-  await switcher.click();
-  await page.getByRole('menuitemradio', { name: 'E2E fixture' }).click();
+  await canvasLink('E2E fixture').click();
   await expect.poll(() => firstFrame('in')).toBe('translateY(-100%)');
   await expect.poll(() => page.locator('.react-flow').count()).toBe(1);
 });

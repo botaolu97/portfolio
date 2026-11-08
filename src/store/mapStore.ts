@@ -33,6 +33,9 @@ export interface MapState {
   edges: FlowEdge[];
   /** The look new connectors get on this canvas. */
   connector: ConnectorStyle;
+  /** Where the canvas was last panned and zoomed to (saved; not an undo step). */
+  viewport: MapDoc['viewport'];
+  setViewport: (viewport: NonNullable<MapDoc['viewport']>) => void;
   load: (slug: string, doc: MapDoc) => void;
   setTitle: (title: string) => void;
   onNodesChange: (changes: NodeChange<FlowNode>[]) => void;
@@ -98,7 +101,8 @@ export function connectorStyleOf(edge: ConnectorStyle): ConnectorStyle {
 }
 
 export function toDoc(
-  state: Pick<MapState, 'title' | 'nodes' | 'edges'> & Partial<Pick<MapState, 'connector'>>,
+  state: Pick<MapState, 'title' | 'nodes' | 'edges'> &
+    Partial<Pick<MapState, 'connector' | 'viewport'>>,
 ): MapDoc {
   const doc: MapDoc = {
     version: MAP_VERSION,
@@ -108,6 +112,7 @@ export function toDoc(
   };
   const connector = connectorStyleOf(state.connector ?? {});
   if (Object.keys(connector).length) doc.connector = connector;
+  if (state.viewport) doc.viewport = state.viewport;
   return doc;
 }
 
@@ -170,6 +175,7 @@ export const useMapStore = create<MapState>()(
       nodes: [],
       edges: [],
       connector: {},
+      viewport: undefined,
 
       load: (slug, doc) => {
         // Paused so loading neither records a step nor swallows the first real edit in the debounce.
@@ -181,12 +187,29 @@ export const useMapStore = create<MapState>()(
           nodes: doc.nodes as FlowNode[],
           edges: doc.edges,
           connector: doc.connector ?? {},
+          viewport: doc.viewport,
         });
         history.resume();
         history.clear();
       },
 
       setTitle: (title) => set({ title }),
+
+      setViewport: (viewport) => {
+        const round = (n: number, places: number) => Number(n.toFixed(places));
+        const next = {
+          x: round(viewport.x, 1),
+          y: round(viewport.y, 1),
+          zoom: round(viewport.zoom, 4),
+        };
+        const prev = get().viewport;
+        if (prev && prev.x === next.x && prev.y === next.y && prev.zoom === next.zoom) return;
+        // Panning is not an edit: it never becomes an undo step.
+        const history = useMapStore.temporal.getState();
+        history.pause();
+        set({ viewport: next });
+        history.resume();
+      },
 
       onNodesChange: (changes) => set({ nodes: applyNodeChanges(changes, get().nodes) }),
 

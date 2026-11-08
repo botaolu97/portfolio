@@ -3,12 +3,13 @@ import { useHashLocation } from 'wouter/use-hash-location';
 import { ThemeSwitch } from '../ui/ThemeSwitch';
 import { Home } from './Home';
 import { MapPage } from './MapPage';
+import { SNAPSHOT } from './snapshot';
 
 // Hash routes (#/m/slug) work on any static host without server rewrites.
 export function App() {
   return (
     <>
-      <ThemeSwitch />
+      {!SNAPSHOT && <ThemeSwitch />}
       <Router hook={useHashLocation}>
         <Switch>
           <Route path="/">

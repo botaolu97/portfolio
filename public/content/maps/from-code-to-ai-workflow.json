@@ -51,13 +51,13 @@
       "id": "6e9ce31b",
       "type": "label",
       "position": {
-        "x": 160,
-        "y": -432
+        "x": 216,
+        "y": -384
       },
       "data": {
         "text": "🫶 From code to AI workflow: \nReduce technical complexcity for industrial enginners",
         "font": "handjet",
-        "size": 61,
+        "size": 44,
         "weight": 400
       }
     },
@@ -343,7 +343,7 @@
       "id": "bc1508b9",
       "type": "note",
       "position": {
-        "x": 2024,
+        "x": 1944,
         "y": 776
       },
       "data": {
@@ -409,8 +409,8 @@
       "id": "c42d5b9a",
       "type": "shape",
       "position": {
-        "x": 1208,
-        "y": 192
+        "x": 1264,
+        "y": 208
       },
       "data": {
         "shape": "arrow",
@@ -426,8 +426,8 @@
       "id": "02ef7c10",
       "type": "video",
       "position": {
-        "x": 88,
-        "y": 584
+        "x": 128,
+        "y": 536
       },
       "data": {
         "src": "content/assets/e7ac100a8e911832.mp4"
@@ -624,7 +624,7 @@
       "sourceHandle": "b",
       "targetHandle": "t",
       "type": "default",
-      "label": "Demo",
+      "label": "Product demo",
       "color": "#ef2415",
       "colorDark": "#ef2415",
       "width": 6,
@@ -637,5 +637,10 @@
     "colorDark": "#ef2415",
     "width": 6,
     "labelSize": 24
+  },
+  "viewport": {
+    "x": -63.2,
+    "y": 38.6,
+    "zoom": 0.7081
   }
 }

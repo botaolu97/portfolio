@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "title": "Untitled map",
+  "title": "About Me",
   "nodes": [
     {
       "id": "c99d300e",
@@ -38,8 +38,8 @@
       "id": "c711e2e8",
       "type": "stack",
       "position": {
-        "x": 1680,
-        "y": 584
+        "x": 1720,
+        "y": 648
       },
       "data": {
         "items": [
@@ -80,7 +80,26 @@
       },
       "width": 480,
       "height": 480
+    },
+    {
+      "id": "0bf30f46",
+      "type": "text",
+      "position": {
+        "x": 1728,
+        "y": 288
+      },
+      "data": {
+        "html": "<h1>About this website</h1><p></p><p>Q: Why I want to create a canvas website?</p><p>A: I can think better in a spatial structure and I think I need more flexibility to put my work in..</p><p></p>",
+        "size": "md"
+      },
+      "width": 456,
+      "height": 248
     }
   ],
-  "edges": []
+  "edges": [],
+  "viewport": {
+    "x": -641.5,
+    "y": -30.2,
+    "zoom": 0.6682
+  }
 }

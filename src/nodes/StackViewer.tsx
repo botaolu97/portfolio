@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { overlayRoot } from '../app/overlayRoot';
 import { asset } from '../content/api';
 import type { StackItem } from '../store/schema';
 import styles from './StackViewer.module.css';
@@ -33,10 +34,10 @@ export function StackViewer({ items, onClose }: { items: StackItem[]; onClose: (
     };
   }, [onClose]);
 
-  // Each cell's share of the window, so the whole spread always fits.
+  // Each cell's share of the viewer (the canvas area, a size container), so the spread always fits.
   const cell = {
-    maxWidth: `calc((100vw - 2 * var(--stack-viewer-padding) - ${columns - 1} * var(--stack-viewer-gap)) / ${columns})`,
-    maxHeight: `calc((100vh - 2 * var(--stack-viewer-padding) - ${rows - 1} * var(--stack-viewer-gap)) / ${rows})`,
+    maxWidth: `calc((100cqw - ${columns - 1} * var(--stack-viewer-gap)) / ${columns})`,
+    maxHeight: `calc((100cqh - ${rows - 1} * var(--stack-viewer-gap)) / ${rows})`,
   };
 
   return createPortal(
@@ -80,6 +81,6 @@ export function StackViewer({ items, onClose }: { items: StackItem[]; onClose: (
       </div>
       <p className={styles.hint}>Click outside or press Esc to stack again</p>
     </div>,
-    document.body,
+    overlayRoot(),
   );
 }

@@ -1,14 +1,14 @@
 /* Generated from design/tokens.json by `npm run tokens`. Do not edit. */
 
 :root {
-  --color-canvas: #d9c9b8;
-  --color-canvas-dot: #bfa98f;
+  --color-canvas: #e8e7e1;
+  --color-canvas-dot: #b3b2aa;
   --color-surface: #ffffff;
   --color-surface-muted: #f0f0ed;
   --color-field: #f6f6f4;
-  --color-border: #e2e2dd;
+  --color-border: #4a4a45;
   --color-text: #1c1c1a;
-  --color-text-muted: #6b6b66;
+  --color-text-muted: #4a4a45;
   --color-text-on-accent: #ffffff;
   --color-accent: #4f6bed;
   --color-accent-soft: #e8ecfd;
@@ -111,7 +111,7 @@
   --toast-bg: var(--color-danger);
   --toast-text: var(--color-text-on-accent);
   --note-text: #1c1c1a;
-  --note-placeholder: #6b6b66;
+  --note-placeholder: #4a4a45;
   --note-padding: var(--space-8);
   --note-radius: var(--radius-xs);
   --note-font-size: var(--font-size-lg);
@@ -180,14 +180,42 @@
   --rotate-handle-fill: var(--color-surface);
   --hover-lift-scale: 1.02;
   --node-shadow: var(--shadow-subtle);
+  --node-border: var(--color-border);
+  --node-border-width: 1px;
   --node-shape-shadow: rgb(0 0 0 / 0.08);
   --label-color: var(--color-text);
   --label-padding: var(--space-4);
   --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.14), 0 0 64px 0 rgb(0 0 0 / 0.12);
+  --spinner-size: 28px;
+  --spinner-stroke: 3px;
+  --spinner-color: var(--color-accent);
+  --spinner-track: var(--color-border);
+  --spinner-duration: 800ms;
+  --loading-bar-height: 3px;
+  --loading-bar-color: var(--color-accent);
+  --loading-bar-creep: 4000ms;
+  --loading-bar-finish: 240ms;
+  --canvas-panel-width-ratio: 0.2;
+  --canvas-panel-min-width: 168px;
+  --canvas-panel-collapsed-ratio: 0.0667;
+  --canvas-panel-slide: 280ms;
+  --canvas-panel-shade: rgb(0 0 0 / 0.32);
+  --canvas-panel-shade-hover: rgb(0 0 0 / 0.2);
+  --canvas-panel-handle-width: 16px;
+  --canvas-panel-handle-height: 48px;
+  --canvas-panel-bg: var(--color-surface);
+  --canvas-panel-border: var(--color-border);
+  --canvas-panel-padding: var(--space-16);
+  --canvas-panel-gap: var(--space-16);
+  --canvas-panel-thumb-ratio: 1.6;
+  --canvas-panel-thumb-radius: var(--radius-md);
+  --canvas-panel-thumb-border: var(--color-border);
+  --canvas-panel-current: #2a2a28;
+  --canvas-panel-current-width: 2px;
   --rich-text-indent: 1.5em;
   --rich-link-color: var(--color-text);
   --rich-link-underline: var(--color-text-muted);
-  --connector-color: #9a9a94;
+  --connector-color: #4a4a45;
   --connector-width: 1.5;
   --connector-label-size: 12;
   --link-bg: var(--color-surface);
@@ -206,46 +234,66 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --color-canvas: #161615;
-    --color-canvas-dot: #3a3a37;
+    --color-canvas: #252525;
+    --color-canvas-dot: #4a4a46;
     --color-surface: #1f1f1e;
     --color-surface-muted: #2a2a28;
     --color-field: #161615;
-    --color-border: #353532;
+    --color-border: #8a8a84;
     --color-text: #ececea;
-    --color-text-muted: #9a9a94;
+    --color-text-muted: #b8b8b2;
     --color-accent: #7d93f5;
     --color-accent-soft: #2a3156;
     --color-danger: #ef6a5d;
+    --color-note-yellow: #3b3412;
+    --color-note-pink: #4a1f2e;
+    --color-note-green: #1c3a26;
+    --color-note-blue: #1b2d4d;
+    --color-note-purple: #31254e;
     --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 4px 16px 0 rgb(0 0 0 / 0.3);
     --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.25), 0 2px 8px 0 rgb(0 0 0 / 0.22);
+    --note-text: #ececea;
+    --note-placeholder: #b8b8b2;
     --reader-selection: rgb(236 236 234 / 0.2);
     --scrollbar-thumb: rgb(236 236 234 / 0.32);
     --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
     --node-shape-shadow: rgb(0 0 0 / 0.35);
     --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45);
-    --connector-color: #6b6b66;
+    --canvas-panel-shade: rgb(0 0 0 / 0.5);
+    --canvas-panel-shade-hover: rgb(0 0 0 / 0.35);
+    --canvas-panel-current: #ffffff;
+    --connector-color: #9a9a94;
   }
 }
 
 :root[data-theme='dark'] {
-  --color-canvas: #161615;
-  --color-canvas-dot: #3a3a37;
+  --color-canvas: #252525;
+  --color-canvas-dot: #4a4a46;
   --color-surface: #1f1f1e;
   --color-surface-muted: #2a2a28;
   --color-field: #161615;
-  --color-border: #353532;
+  --color-border: #8a8a84;
   --color-text: #ececea;
-  --color-text-muted: #9a9a94;
+  --color-text-muted: #b8b8b2;
   --color-accent: #7d93f5;
   --color-accent-soft: #2a3156;
   --color-danger: #ef6a5d;
+  --color-note-yellow: #3b3412;
+  --color-note-pink: #4a1f2e;
+  --color-note-green: #1c3a26;
+  --color-note-blue: #1b2d4d;
+  --color-note-purple: #31254e;
   --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 4px 16px 0 rgb(0 0 0 / 0.3);
   --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.25), 0 2px 8px 0 rgb(0 0 0 / 0.22);
+  --note-text: #ececea;
+  --note-placeholder: #b8b8b2;
   --reader-selection: rgb(236 236 234 / 0.2);
   --scrollbar-thumb: rgb(236 236 234 / 0.32);
   --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
   --node-shape-shadow: rgb(0 0 0 / 0.35);
   --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45);
-  --connector-color: #6b6b66;
+  --canvas-panel-shade: rgb(0 0 0 / 0.5);
+  --canvas-panel-shade-hover: rgb(0 0 0 / 0.35);
+  --canvas-panel-current: #ffffff;
+  --connector-color: #9a9a94;
 }
