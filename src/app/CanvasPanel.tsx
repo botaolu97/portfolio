@@ -8,6 +8,7 @@ import { useTheme } from '../ui/theme';
 import styles from './CanvasPanel.module.css';
 import { useCanvasIndex } from './canvasIndex';
 import { beginCanvasSlide } from './canvasTransition';
+import { CONTACT_LINKS } from './contactLinks';
 
 const STATUS_LABEL: Record<SaveStatus, string> = {
   saved: 'All changes saved',
@@ -42,7 +43,9 @@ function writeCollapsed(collapsed: boolean) {
 }
 
 /** The panel's heading. */
-export const PANEL_TITLE = "Botao's canvas";
+export const PANEL_TITLE = 'Botao';
+/** One line about the owner, under the name. */
+export const PANEL_INTRO = 'Senior product designer at MathWorks';
 
 /**
  * Renames a canvas. The open one changes in the store (autosave writes it, live everywhere);
@@ -160,18 +163,21 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
     <div className={`${styles.dock} ${collapsed ? styles.collapsed : ''}`}>
       <div className={styles.clip}>
         {/* Tucked away, the sliver is one big "show the panel" target; its contents rest. */}
-        {collapsed && (
-          <button
-            type="button"
-            className={styles.sliver}
-            aria-label="Show canvases"
-            tabIndex={-1}
-            onClick={toggle}
-          />
-        )}
+        {/* Always there, so the shade fades in and out with the slide instead of popping. */}
+        <button
+          type="button"
+          className={styles.sliver}
+          aria-label="Show canvases"
+          aria-hidden={!collapsed}
+          tabIndex={-1}
+          onClick={toggle}
+        />
         <nav className={styles.panel} aria-label="Canvases" id="canvas-panel" inert={collapsed}>
           <div className={styles.header}>
-            <h2 className={styles.heading}>{PANEL_TITLE}</h2>
+            <div>
+              <h2 className={styles.heading}>{PANEL_TITLE}</h2>
+              <p className={styles.intro}>{PANEL_INTRO}</p>
+            </div>
             {EDITABLE && saveStatus && (
               // Shown while there's something unsaved; "All changes saved" is for screen readers only.
               <span
@@ -322,38 +328,59 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
                 </li>
               );
             })}
-          </ol>
-          {EDITABLE && (
-            <div className={styles.footer}>
-              {creating ? (
-                <form className={styles.newForm} onSubmit={create}>
-                  <input
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    placeholder="Canvas name"
-                    aria-label="New canvas name"
-                    // biome-ignore lint/a11y/noAutofocus: the field appears because the user asked for it
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (e.key === 'Escape') setCreating(false);
-                    }}
-                  />
-                  <button type="submit" className={styles.newButton}>
-                    Create
+            {EDITABLE && (
+              // Right under the last canvas (not part of the reorderable list's order).
+              <li className={styles.newItem}>
+                {creating ? (
+                  <form className={styles.newForm} onSubmit={create}>
+                    <input
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      placeholder="Canvas name"
+                      aria-label="New canvas name"
+                      // biome-ignore lint/a11y/noAutofocus: the field appears because the user asked for it
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') setCreating(false);
+                      }}
+                    />
+                    <button type="submit" className={styles.newButton}>
+                      Create
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    className={styles.newButton}
+                    onClick={() => setCreating(true)}
+                  >
+                    + New canvas
                   </button>
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  className={styles.newButton}
-                  onClick={() => setCreating(true)}
-                >
-                  + New canvas
-                </button>
-              )}
-              {error && <p className={styles.error}>{error}</p>}
-            </div>
-          )}
+                )}
+                {error && <p className={styles.error}>{error}</p>}
+              </li>
+            )}
+          </ol>
+          {/* The very bottom is for the owner's links, in edit and view mode alike. */}
+          <footer className={styles.footer}>
+            <ul className={styles.links}>
+              {CONTACT_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    className={styles.link}
+                    href={link.href}
+                    aria-label={link.label}
+                    title={link.label}
+                    {...(link.href.startsWith('http')
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                  >
+                    {link.icon}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </footer>
         </nav>
       </div>
       <button

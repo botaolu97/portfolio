@@ -1,4 +1,5 @@
 import { tokenValues } from '../ui/tokens';
+import { overlayRect, overlayRoot } from './overlayRoot';
 
 /**
  * Slide between canvases. Only one canvas can be live (they share the map store), so the canvas
@@ -31,16 +32,19 @@ export function beginCanvasSlide(direction: SlideDirection) {
       media.tagName === 'VIDEO' ? 'var(--video-backdrop)' : 'var(--demo-page-bg)';
     media.replaceWith(block);
   }
+  // Inside the canvas area, which clips: the sliding canvases and their shadows never reach the
+  // canvas panel.
+  const area = overlayRect();
   Object.assign(ghost.style, {
-    position: 'fixed',
-    left: `${rect.left}px`,
-    top: `${rect.top}px`,
+    position: 'absolute',
+    left: `${rect.left - area.left}px`,
+    top: `${rect.top - area.top}px`,
     width: `${rect.width}px`,
     height: `${rect.height}px`,
     zIndex: '1',
     pointerEvents: 'none',
   });
-  document.body.appendChild(ghost);
+  overlayRoot().appendChild(ghost);
   pending = { ghost, direction };
 }
 

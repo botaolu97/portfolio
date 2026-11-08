@@ -206,7 +206,7 @@
   --canvas-panel-bg: var(--color-surface);
   --canvas-panel-border: var(--color-border);
   --canvas-panel-padding: var(--space-16);
-  --canvas-panel-gap: var(--space-16);
+  --canvas-panel-gap: var(--space-24);
   --canvas-panel-thumb-ratio: 1.6;
   --canvas-panel-thumb-radius: var(--radius-md);
   --canvas-panel-thumb-border: var(--color-border);

@@ -123,21 +123,23 @@ A panel down the left side, `--canvas-panel-width-ratio` of the window wide (a f
 area never share space: everything that takes over the screen (the text reader, the stack viewer,
 the video viewer) fills the canvas area only (`src/app/overlayRoot.ts`), and videos never use the
 browser's own fullscreen (it's hidden, or left straight away where a browser still offers it);
-the video's enlarge button opens it in the canvas area instead. Under a "Botao's canvas" heading it
+the video's enlarge button opens it in the canvas area instead. Under a header (the owner's name, "Botao", bold, and a one-line intro in muted text, both in
+`src/app/CanvasPanel.tsx`) it
 lists every canvas in order as a snapshot of its last view (`--canvas-panel-thumb-ratio` frame,
 cropped to fill) with its title below. The open canvas gets a `--canvas-panel-current` ring (dark gray in light mode, white in dark
 mode) and a bold title; hover rings the frame in the lighter dot-grid color. Each item is a link (⌘-click opens a new
 tab). In edit mode a double-click on a canvas's name renames it (Enter or clicking away saves, Esc
 cancels), dragging a canvas up or down the list reorders it (an accent line shows where it lands;
 Alt+↑/↓ does the same from the keyboard), the header shows autosave status while something is
-unsaved, and the footer has
-"+ New canvas" (name it inline, Enter to create). Canvases aren't deleted from the UI; use
+unsaved, and "+ New canvas" sits right under the last canvas (name it inline, Enter to create).
+The very bottom of the panel, in both modes, holds the owner's links as monochrome icons in the
+text color (`src/app/contactLinks.tsx`): LinkedIn (opens in a new tab) and email (mailto). Canvases aren't deleted from the UI; use
 `npm run delete-canvas -- "Exact name"`.
 
 **Tucking it away.** A `--canvas-panel-handle-*` tab sits on the panel's edge at its middle,
 just outside the panel. Clicking it slides the panel left (`--canvas-panel-slide`) until only
 `--canvas-panel-collapsed-ratio` of the window (a fifteenth) still shows under a dark
-`--canvas-panel-shade`; the canvas area
+`--canvas-panel-shade` (which fades in and out with the slide, same time and curve); the canvas area
 grows into the space (the two still never overlap). The tab or a click on the sliver brings the
 panel back. The choice is remembered in the browser (`mubu.panelCollapsed`).
 
@@ -819,7 +821,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--canvas-panel-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
 | `--canvas-panel-border` | `var(--color-border) → #4a4a45` | follows alias | Edge between the panel and the canvas. |
 | `--canvas-panel-padding` | `var(--space-16) → 16px` | follows alias |  |
-| `--canvas-panel-gap` | `var(--space-16) → 16px` | follows alias | Space between canvases in the list. |
+| `--canvas-panel-gap` | `var(--space-24) → 24px` | follows alias | Space between canvases in the list. |
 | `--canvas-panel-thumb-ratio` | `1.6` | — | Snapshot frame, width / height (16:10). |
 | `--canvas-panel-thumb-radius` | `var(--radius-md) → 8px` | follows alias |  |
 | `--canvas-panel-thumb-border` | `var(--color-border) → #4a4a45` | follows alias |  |

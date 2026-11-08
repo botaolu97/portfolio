@@ -36,19 +36,29 @@
   touch-action: pan-y;
 }
 
+/* The owner's name and a one-line intro, then some room before the canvases. */
 .header {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-8);
-  padding: var(--canvas-panel-padding) var(--canvas-panel-padding) var(--space-8);
+  padding: var(--space-20) var(--canvas-panel-padding) var(--space-20);
 }
 
 .heading {
   margin: 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--font-line-height-tight);
   color: var(--color-text);
+}
+
+.intro {
+  margin: var(--space-6) 0 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--font-line-height-snug);
+  color: var(--color-text-muted);
 }
 
 .status {
@@ -66,7 +76,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   margin: 0;
-  padding: var(--space-4) var(--canvas-panel-padding) var(--canvas-panel-padding);
+  padding: var(--space-6) var(--canvas-panel-padding) var(--canvas-panel-padding);
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -183,9 +193,43 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* "+ New canvas" sits right after the last canvas, inside the scrolling list. */
+.newItem {
+  list-style: none;
+}
+
+/* The very bottom: the owner's links (LinkedIn, email) as monochrome icons. */
 .footer {
-  padding: var(--space-8) var(--canvas-panel-padding) var(--canvas-panel-padding);
+  flex: none;
+  padding: var(--space-10) var(--canvas-panel-padding);
   border-top: 1px solid var(--canvas-panel-border);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: grid;
+  place-items: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+}
+
+.link:hover {
+  background: var(--color-surface-muted);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .newForm {
@@ -253,10 +297,20 @@
   padding: 0;
   background: var(--canvas-panel-shade);
   cursor: pointer;
-  transition: background var(--motion-duration-fast) var(--motion-easing-standard);
+  /* Hidden while the panel is out; it fades in along the same curve and time as the slide. */
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--canvas-panel-slide) var(--motion-easing-standard),
+    background var(--motion-duration-fast) var(--motion-easing-standard);
 }
 
-.sliver:hover {
+.collapsed .sliver {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.collapsed .sliver:hover {
   background: var(--canvas-panel-shade-hover);
 }
 
@@ -292,7 +346,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dock,
-  .panel {
+  .panel,
+  .sliver {
     transition: none;
   }
 }

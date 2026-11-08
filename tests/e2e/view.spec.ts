@@ -271,8 +271,10 @@ test('published site is read-only and demos still run', async ({ page }) => {
   const firstFrame = (dir: 'in' | 'out') =>
     page.evaluate((d) => {
       const layer = document.querySelector('[data-canvas-layer]');
-      const ghost = [...document.body.children].find(
-        (el) => el.querySelector('.react-flow') && !el.contains(layer),
+      // The snapshot slides inside the canvas area (which clips it), never over the panel.
+      const area = document.querySelector('[data-overlay-root]');
+      const ghost = [...(area?.children ?? [])].find(
+        (el) => el !== layer && el.querySelector('.react-flow'),
       );
       const el = d === 'in' ? layer : ghost;
       const keyframes = el?.getAnimations()[0]?.effect as KeyframeEffect | undefined;

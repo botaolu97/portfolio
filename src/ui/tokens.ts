@@ -207,7 +207,7 @@ export const tokenValues = {
   'component.canvas-panel.bg': "#ffffff",
   'component.canvas-panel.border': "#4a4a45",
   'component.canvas-panel.padding': "16px",
-  'component.canvas-panel.gap': "16px",
+  'component.canvas-panel.gap': "24px",
   'component.canvas-panel.thumb-ratio': "1.6",
   'component.canvas-panel.thumb-radius': "8px",
   'component.canvas-panel.thumb-border': "#4a4a45",
