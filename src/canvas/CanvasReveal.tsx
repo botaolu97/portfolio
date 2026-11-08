@@ -10,9 +10,12 @@ const num = (token: keyof typeof tokenValues) => Number.parseFloat(tokenValues[t
 /** The reveal's look and feel; the editor gets a smaller, quieter version (see design tokens). */
 const SETTINGS = {
   radius: num(EDITABLE ? 'component.canvas-reveal.radius-edit' : 'component.canvas-reveal.radius'),
+  // Symbol width and line thickness as multiples of the dot's diameter: they grow and shrink
+  // with the dots, so they keep the same weight at every zoom.
   symbol: num(
     EDITABLE ? 'component.canvas-reveal.symbol-size-edit' : 'component.canvas-reveal.symbol-size',
   ),
+  stroke: num('component.canvas-reveal.stroke'),
   fadeIn: num('component.canvas-reveal.fade-in'),
   fadeOut: num('component.canvas-reveal.fade-out'),
   follow: num('component.canvas-reveal.follow'),
@@ -124,8 +127,8 @@ export function CanvasReveal({ gap, dotSize }: { gap: number; dotSize: number })
       const step = gap * zoom;
       const offset = dotSize / 2 - gap / 2;
       const dotRadius = (dotSize * zoom) / 2;
-      const symbolSize = SETTINGS.symbol * Math.min(Math.max(zoom, 0.75), 1.5);
-      const stroke = Math.max(1.1, symbolSize * 0.16);
+      const symbolSize = dotRadius * 2 * SETTINGS.symbol;
+      const stroke = Math.max(1, dotRadius * 2 * SETTINGS.stroke);
       // Grid points (in canvas units) whose screen position is within reach of the pointer.
       const iFrom = Math.ceil((pos.x - radius - tx) / step - offset / gap);
       const iTo = Math.floor((pos.x + radius - tx) / step - offset / gap);

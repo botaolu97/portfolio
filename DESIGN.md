@@ -254,7 +254,9 @@ with the canvas (`connector` in the map file) as the look for connectors drawn f
 
 Around the mouse pointer, the canvas's dots morph into + − × ÷ and back into dots as it moves
 away: at the edge of the reach (`--canvas-reveal-radius`) a dot only stretches a little, at the
-pointer it's a full symbol (`--canvas-reveal-symbol-size`, × turning into place from +). Each grid
+pointer it's a full symbol (`--canvas-reveal-symbol-size` and `--canvas-reveal-stroke`, both
+multiples of the dot's diameter, so the symbols scale with zoom and keep the dots' weight; ×
+turns into place from +). Each grid
 point always shows the same symbol, so it reads as a hidden layer being uncovered. The reveal
 trails the pointer softly (`--canvas-reveal-follow`), fades in (`--canvas-reveal-fade-in`) and
 settles back to dots (`--canvas-reveal-fade-out`) when the pointer leaves, rests for a moment or
@@ -820,8 +822,9 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--canvas-reveal-color` | `#8a8a84` | `#6b6b66` | Symbols at full strength (visitors). |
 | `--canvas-reveal-radius` | `140px` | — | Reach around the pointer, on screen (visitors). |
 | `--canvas-reveal-radius-edit` | `84px` | — | Smaller reach in the editor. |
-| `--canvas-reveal-symbol-size` | `9px` | — | A symbol's width at the pointer, at 100% zoom (visitors). |
-| `--canvas-reveal-symbol-size-edit` | `6px` | — | Smaller symbols in the editor, drawn in the dot color rather than the stronger reveal color. |
+| `--canvas-reveal-symbol-size` | `3.6` | — | A symbol's width at the pointer, as a multiple of the dot's diameter (visitors): about 11px at 100% zoom, and it scales with zoom exactly like the dots. |
+| `--canvas-reveal-symbol-size-edit` | `3` | — | Smaller symbols in the editor (about 9px at 100%), drawn in the dot color rather than the stronger reveal color. |
+| `--canvas-reveal-stroke` | `0.75` | — | Symbol line thickness as a multiple of the dot's diameter, so symbols carry about the same visual weight as the dots at every zoom. |
 | `--canvas-reveal-fade-in` | `220ms` | — |  |
 | `--canvas-reveal-fade-out` | `420ms` | — | Settling back to dots after the pointer stops, leaves, or a drag starts. |
 | `--canvas-reveal-follow` | `0.22` | — | How much of the way to the pointer the reveal moves each frame (lower trails more softly). |

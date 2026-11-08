@@ -194,8 +194,9 @@
   --canvas-reveal-color: #8a8a84;
   --canvas-reveal-radius: 140px;
   --canvas-reveal-radius-edit: 84px;
-  --canvas-reveal-symbol-size: 9px;
-  --canvas-reveal-symbol-size-edit: 6px;
+  --canvas-reveal-symbol-size: 3.6;
+  --canvas-reveal-symbol-size-edit: 3;
+  --canvas-reveal-stroke: 0.75;
   --canvas-reveal-fade-in: 220ms;
   --canvas-reveal-fade-out: 420ms;
   --canvas-reveal-follow: 0.22;
