@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "title": "MATLAB Agentic Desktop",
+  "nodes": [
+    {
+      "id": "ae9ec989",
+      "type": "note",
+      "position": {
+        "x": 1028,
+        "y": 260
+      },
+      "data": {
+        "html": "<p>NDA!!!</p><p></p>",
+        "color": "yellow",
+        "size": "md",
+        "rotation": 0
+      },
+      "width": 200,
+      "height": 200
+    }
+  ],
+  "edges": [],
+  "viewport": {
+    "x": -601,
+    "y": 26,
+    "zoom": 1
+  }
+}

@@ -164,7 +164,7 @@ export const tokenValues = {
   'component.stack-viewer.gap': "24px",
   'component.text-box.padding': "0.1",
   'component.reader.top': "72px",
-  'component.reader.width-ratio': "0.3333",
+  'component.reader.width-ratio': "0.5",
   'component.reader.min-width': "320px",
   'component.reader.gutter': "24px",
   'component.reader.inset': "16px",

@@ -122,7 +122,7 @@ export function TextReader({
   /**
    * Keyframes from the reader (first) to the box (last). Sizes change on a log scale — equal ratios
    * per step — about a fixed point, for the text and the background alike. The background shrinks
-   * far more than the text (window to box, vs. a third of the window to box); interpolated linearly
+   * far more than the text (window to box, vs. half the window to box); interpolated linearly
    * in pixels, most of its visible shrink would land in the last frames, after the text has
    * settled, and read as a second shrink.
    *
@@ -176,7 +176,7 @@ export function TextReader({
     const ratio = px(vars.getPropertyValue('--reader-width-ratio'));
     const minWidth = px(vars.getPropertyValue('--reader-min-width'));
     const top = px(vars.getPropertyValue('--reader-top'));
-    // A third of the window wide; on narrow windows at least --reader-min-width, never wider than
+    // Half the canvas area wide; on narrow windows at least --reader-min-width, never wider than
     // the window minus the gutters.
     const textWidth = Math.min(vw - 2 * gutter, Math.max(vw * ratio, minWidth));
     const scale = textWidth / width;

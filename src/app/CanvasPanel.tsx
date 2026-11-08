@@ -1,9 +1,10 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import { EDITABLE, fetchMap, reorderMaps, saveMap, snapshotUrl } from '../content/api';
 import { useMapStore } from '../store/mapStore';
 import { MAP_VERSION, slugify } from '../store/schema';
 import { type SaveStatus, useUiStore } from '../store/uiStore';
+import { hideNativeScrollbar, OverlayScrollbar } from '../ui/OverlayScrollbar';
 import { useTheme } from '../ui/theme';
 import styles from './CanvasPanel.module.css';
 import { useCanvasIndex } from './canvasIndex';
@@ -79,6 +80,8 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // The canvas list scrolls under the header, with the reader's thumb-only scrollbar.
+  const list = useRef<HTMLOListElement>(null);
   // Tucked away to the left, with a sliver still showing; the handle on its edge toggles it.
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const toggle = () => {
@@ -189,178 +192,182 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
               </span>
             )}
           </div>
-          <ol className={styles.list}>
-            {maps.map((map) => {
-              const current = map.slug === slug;
-              const src = snapshotUrl(map, theme);
-              const title = (current && liveTitle) || map.title;
-              if (renaming?.slug === map.slug) {
-                // Editing the name: the snapshot stays, the title becomes a field.
+          <div className={styles.listArea}>
+            <ol ref={list} className={`${styles.list} ${hideNativeScrollbar}`}>
+              {maps.map((map) => {
+                const current = map.slug === slug;
+                const src = snapshotUrl(map, theme);
+                const title = (current && liveTitle) || map.title;
+                if (renaming?.slug === map.slug) {
+                  // Editing the name: the snapshot stays, the title becomes a field.
+                  return (
+                    <li key={map.slug}>
+                      <div className={styles.item} aria-current={current ? 'page' : undefined}>
+                        <span className={styles.thumb}>
+                          {src ? <img src={src} alt="" draggable={false} /> : null}
+                        </span>
+                        <input
+                          className={styles.titleInput}
+                          value={renaming.title}
+                          aria-label="Canvas name"
+                          // biome-ignore lint/a11y/noAutofocus: the field appears because the user asked for it
+                          autoFocus
+                          onFocus={(e) => e.currentTarget.select()}
+                          onChange={(e) => setRenaming({ slug: map.slug, title: e.target.value })}
+                          onBlur={commitRename}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') commitRename();
+                            if (e.key === 'Escape') {
+                              e.stopPropagation();
+                              setRenaming(null);
+                            }
+                          }}
+                        />
+                      </div>
+                    </li>
+                  );
+                }
+                const index = maps.indexOf(map);
+                const dropClass =
+                  drop?.slug === map.slug && dragging !== map.slug
+                    ? drop.after
+                      ? styles.dropAfter
+                      : styles.dropBefore
+                    : '';
                 return (
-                  <li key={map.slug}>
-                    <div className={styles.item} aria-current={current ? 'page' : undefined}>
-                      <span className={styles.thumb}>
-                        {src ? <img src={src} alt="" draggable={false} /> : null}
-                      </span>
-                      <input
-                        className={styles.titleInput}
-                        value={renaming.title}
-                        aria-label="Canvas name"
-                        // biome-ignore lint/a11y/noAutofocus: the field appears because the user asked for it
-                        autoFocus
-                        onFocus={(e) => e.currentTarget.select()}
-                        onChange={(e) => setRenaming({ slug: map.slug, title: e.target.value })}
-                        onBlur={commitRename}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') commitRename();
-                          if (e.key === 'Escape') {
-                            e.stopPropagation();
-                            setRenaming(null);
-                          }
-                        }}
-                      />
-                    </div>
-                  </li>
-                );
-              }
-              const index = maps.indexOf(map);
-              const dropClass =
-                drop?.slug === map.slug && dragging !== map.slug
-                  ? drop.after
-                    ? styles.dropAfter
-                    : styles.dropBefore
-                  : '';
-              return (
-                <li
-                  key={map.slug}
-                  className={`${dropClass} ${dragging === map.slug ? styles.dragging : ''}`}
-                  draggable={EDITABLE}
-                  onDragStart={
-                    EDITABLE
-                      ? (e) => {
-                          e.dataTransfer.effectAllowed = 'move';
-                          e.dataTransfer.setData('text/plain', map.slug);
-                          setDragging(map.slug);
-                        }
-                      : undefined
-                  }
-                  onDragOver={
-                    EDITABLE && dragging
-                      ? (e) => {
-                          e.preventDefault();
-                          e.dataTransfer.dropEffect = 'move';
-                          const box = e.currentTarget.getBoundingClientRect();
-                          const after = e.clientY > box.top + box.height / 2;
-                          if (drop?.slug !== map.slug || drop.after !== after) {
-                            setDrop({ slug: map.slug, after });
-                          }
-                        }
-                      : undefined
-                  }
-                  onDrop={
-                    EDITABLE && dragging
-                      ? (e) => {
-                          e.preventDefault();
-                          if (drop) moveTo(dragging, drop.slug, drop.after);
-                          setDragging(null);
-                          setDrop(null);
-                        }
-                      : undefined
-                  }
-                  onDragEnd={
-                    EDITABLE
-                      ? () => {
-                          setDragging(null);
-                          setDrop(null);
-                        }
-                      : undefined
-                  }
-                >
-                  <a
-                    // The whole item is dragged (to reorder), not the link itself.
-                    draggable={false}
-                    aria-keyshortcuts={EDITABLE ? 'Alt+ArrowUp Alt+ArrowDown' : undefined}
-                    onKeyDown={
+                  <li
+                    key={map.slug}
+                    className={`${dropClass} ${dragging === map.slug ? styles.dragging : ''}`}
+                    draggable={EDITABLE}
+                    onDragStart={
                       EDITABLE
                         ? (e) => {
-                            // Alt+↑/↓ moves the canvas up or down the list, for keyboard users.
-                            if (!e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
-                            e.preventDefault();
-                            const neighbor = maps[index + (e.key === 'ArrowUp' ? -1 : 1)];
-                            if (neighbor) moveTo(map.slug, neighbor.slug, e.key === 'ArrowDown');
+                            e.dataTransfer.effectAllowed = 'move';
+                            e.dataTransfer.setData('text/plain', map.slug);
+                            setDragging(map.slug);
                           }
                         : undefined
                     }
-                    href={`#/m/${map.slug}`}
-                    className={styles.item}
-                    aria-current={current ? 'page' : undefined}
-                    onClick={(e) => {
-                      // Plain clicks switch in place (with the slide); ⌘/Ctrl-click opens a new tab.
-                      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-                      e.preventDefault();
-                      go(map.slug);
-                    }}
+                    onDragOver={
+                      EDITABLE && dragging
+                        ? (e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                            const box = e.currentTarget.getBoundingClientRect();
+                            const after = e.clientY > box.top + box.height / 2;
+                            if (drop?.slug !== map.slug || drop.after !== after) {
+                              setDrop({ slug: map.slug, after });
+                            }
+                          }
+                        : undefined
+                    }
+                    onDrop={
+                      EDITABLE && dragging
+                        ? (e) => {
+                            e.preventDefault();
+                            if (drop) moveTo(dragging, drop.slug, drop.after);
+                            setDragging(null);
+                            setDrop(null);
+                          }
+                        : undefined
+                    }
+                    onDragEnd={
+                      EDITABLE
+                        ? () => {
+                            setDragging(null);
+                            setDrop(null);
+                          }
+                        : undefined
+                    }
                   >
-                    <span className={styles.thumb}>
-                      {src ? (
-                        <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />
-                      ) : (
-                        <span className={styles.thumbEmpty} aria-hidden="true">
-                          {title.slice(0, 1).toUpperCase()}
-                        </span>
-                      )}
-                    </span>
-                    <span
-                      className={styles.title}
-                      title={EDITABLE ? 'Double-click to rename' : undefined}
-                      onDoubleClick={
+                    <a
+                      // The whole item is dragged (to reorder), not the link itself.
+                      draggable={false}
+                      aria-keyshortcuts={EDITABLE ? 'Alt+ArrowUp Alt+ArrowDown' : undefined}
+                      onKeyDown={
                         EDITABLE
                           ? (e) => {
+                              // Alt+↑/↓ moves the canvas up or down the list, for keyboard users.
+                              if (!e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown'))
+                                return;
                               e.preventDefault();
-                              setRenaming({ slug: map.slug, title });
+                              const neighbor = maps[index + (e.key === 'ArrowUp' ? -1 : 1)];
+                              if (neighbor) moveTo(map.slug, neighbor.slug, e.key === 'ArrowDown');
                             }
                           : undefined
                       }
-                    >
-                      {title}
-                    </span>
-                  </a>
-                </li>
-              );
-            })}
-            {EDITABLE && (
-              // Right under the last canvas (not part of the reorderable list's order).
-              <li className={styles.newItem}>
-                {creating ? (
-                  <form className={styles.newForm} onSubmit={create}>
-                    <input
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      placeholder="Canvas name"
-                      aria-label="New canvas name"
-                      // biome-ignore lint/a11y/noAutofocus: the field appears because the user asked for it
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') setCreating(false);
+                      href={`#/m/${map.slug}`}
+                      className={styles.item}
+                      aria-current={current ? 'page' : undefined}
+                      onClick={(e) => {
+                        // Plain clicks switch in place (with the slide); ⌘/Ctrl-click opens a new tab.
+                        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                        e.preventDefault();
+                        go(map.slug);
                       }}
-                    />
-                    <button type="submit" className={styles.newButton}>
-                      Create
+                    >
+                      <span className={styles.thumb}>
+                        {src ? (
+                          <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />
+                        ) : (
+                          <span className={styles.thumbEmpty} aria-hidden="true">
+                            {title.slice(0, 1).toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+                      <span
+                        className={styles.title}
+                        title={EDITABLE ? 'Double-click to rename' : undefined}
+                        onDoubleClick={
+                          EDITABLE
+                            ? (e) => {
+                                e.preventDefault();
+                                setRenaming({ slug: map.slug, title });
+                              }
+                            : undefined
+                        }
+                      >
+                        {title}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+              {EDITABLE && (
+                // Right under the last canvas (not part of the reorderable list's order).
+                <li className={styles.newItem}>
+                  {creating ? (
+                    <form className={styles.newForm} onSubmit={create}>
+                      <input
+                        value={newTitle}
+                        onChange={(e) => setNewTitle(e.target.value)}
+                        placeholder="Canvas name"
+                        aria-label="New canvas name"
+                        // biome-ignore lint/a11y/noAutofocus: the field appears because the user asked for it
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') setCreating(false);
+                        }}
+                      />
+                      <button type="submit" className={styles.newButton}>
+                        Create
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.newButton}
+                      onClick={() => setCreating(true)}
+                    >
+                      + New canvas
                     </button>
-                  </form>
-                ) : (
-                  <button
-                    type="button"
-                    className={styles.newButton}
-                    onClick={() => setCreating(true)}
-                  >
-                    + New canvas
-                  </button>
-                )}
-                {error && <p className={styles.error}>{error}</p>}
-              </li>
-            )}
-          </ol>
+                  )}
+                  {error && <p className={styles.error}>{error}</p>}
+                </li>
+              )}
+            </ol>
+            <OverlayScrollbar target={list} />
+          </div>
           {/* The very bottom is for the owner's links, in edit and view mode alike. */}
           <footer className={styles.footer}>
             <ul className={styles.links}>

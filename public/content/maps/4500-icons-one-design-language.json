@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "title": "Largest Technical Icon Systems",
+  "nodes": [
+    {
+      "id": "036c1581",
+      "type": "image",
+      "position": {
+        "x": 296,
+        "y": 144
+      },
+      "data": {
+        "src": "content/assets/00c39f22b4ebc76a.svg",
+        "alt": "pasted",
+        "fit": "contain"
+      },
+      "width": 480,
+      "height": 256
+    },
+    {
+      "id": "3ce35415",
+      "type": "image",
+      "position": {
+        "x": 296,
+        "y": 432
+      },
+      "data": {
+        "src": "content/assets/4525f53bf28d5639.svg",
+        "alt": "pasted",
+        "fit": "contain"
+      },
+      "width": 480,
+      "height": 256
+    },
+    {
+      "id": "08ad5fcb",
+      "type": "image",
+      "position": {
+        "x": 880,
+        "y": 192
+      },
+      "data": {
+        "src": "content/assets/bf0df821c6c3b3f0.svg",
+        "alt": "pasted",
+        "fit": "contain"
+      },
+      "width": 424,
+      "height": 480
+    }
+  ],
+  "edges": [],
+  "viewport": {
+    "x": 188.3,
+    "y": 293.3,
+    "zoom": 0.4428
+  }
+}

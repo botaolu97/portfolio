@@ -123,8 +123,9 @@ A panel down the left side, `--canvas-panel-width-ratio` of the window wide (a f
 area never share space: everything that takes over the screen (the text reader, the stack viewer,
 the video viewer) fills the canvas area only (`src/app/overlayRoot.ts`), and videos never use the
 browser's own fullscreen (it's hidden, or left straight away where a browser still offers it);
-the video's enlarge button opens it in the canvas area instead. Under a header (the owner's name, "Botao", bold, and a one-line intro in muted text, both in
-`src/app/CanvasPanel.tsx`) it
+the video's enlarge button opens it in the canvas area instead. Under a header with a bottom border, which the list scrolls beneath (the owner's name, "Botao", bold, and a one-line intro in muted text, both in
+`src/app/CanvasPanel.tsx`; the list's scrollbar is the reader's thumb-only one, in
+`--scrollbar-thumb` gray) it
 lists every canvas in order as a snapshot of its last view (`--canvas-panel-thumb-ratio` frame,
 cropped to fill) with its title below. The open canvas gets a `--canvas-panel-current` ring (dark gray in light mode, white in dark
 mode) and a bold title; hover rings the frame in the lighter dot-grid color. Each item is a link (⌘-click opens a new
@@ -338,7 +339,7 @@ no highlighter and the colors follow the theme switch.
 Clicking a text node (view mode; in the editor, double-click or "Edit full screen" in the inspector)
 zooms the box
 up to fill the window in `--motion-duration-zoom`. The text keeps exactly the box's layout and is
-scaled to `--reader-width-ratio` (a third) of the window's width (at least `--reader-min-width` on
+scaled to `--reader-width-ratio` (half) of the canvas area's width (at least `--reader-min-width` on
 narrow windows, never wider than the window minus `--reader-gutter`), starting `--reader-top` from
 the top. Long text scrolls with the overlay scrollbar (`src/ui/OverlayScrollbar.tsx`): a
 `--scrollbar-*` thumb with no track, `--scrollbar-inset` from the right, top and bottom edges, that
@@ -352,7 +353,7 @@ the theme switch stays (`--z-theme-switch`). A Back pill sits `--reader-inset` f
 Back or Esc zooms back out, landing the visible top of the text back in the box, in
 `--motion-duration-zoom-out` with `--motion-easing-zoom-out`. Both directions scale on a log
 scale (equal ratios per frame) about a fixed point, for the text and the background alike: the
-background changes size far more than the text (window to box vs. a third of the window to box),
+background changes size far more than the text (window to box vs. half the window to box),
 and interpolating pixels linearly would cram its visible shrink into the last frames, after the
 text has settled, which reads as a second shrink. Both move by transform only (the background
 frame scales to the box; the text's transform undoes that scale), so they run on the GPU in the
@@ -733,7 +734,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
 | `--reader-top` | `72px` | — | Space above the text, below the back button. |
-| `--reader-width-ratio` | `0.3333` | — | Text width as a share of the window (a third). |
+| `--reader-width-ratio` | `0.5` | — | Text width as a share of the canvas area the reader fills (half). |
 | `--reader-min-width` | `320px` | — | On narrow windows the text never gets narrower than this (or the window minus the gutters). |
 | `--reader-gutter` | `var(--space-24) → 24px` | follows alias | Minimum space beside the text. |
 | `--reader-inset` | `var(--space-16) → 16px` | follows alias | Back button distance from the top-left corner. |

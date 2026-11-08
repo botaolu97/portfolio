@@ -57,7 +57,7 @@
         "y": 560
       },
       "data": {
-        "html": "<p>🪇 is so cute!</p><p></p><p>npm start</p><p></p><p>npm run encode-videos</p>",
+        "html": "<p>🪇 is so cute!</p><p></p><p>npm start</p><p></p><p>npm run encode-videos</p><p></p><p>editor: <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"http://127.0.0.1:5173/\" data-previewed=\"\">Mubu</a> viewer: <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"http://127.0.0.1:4173/\" data-previewed=\"\">Mubu</a></p>",
         "color": "yellow",
         "size": "md",
         "rotation": 0
@@ -165,8 +165,8 @@
     }
   ],
   "viewport": {
-    "x": -404.5,
-    "y": -194.3,
-    "zoom": 0.8727
+    "x": 449.6,
+    "y": -402.6,
+    "zoom": 0.9772
   }
 }

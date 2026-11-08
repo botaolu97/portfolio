@@ -163,7 +163,7 @@
   --stack-viewer-gap: var(--space-24);
   --text-box-padding: 0.1;
   --reader-top: 72px;
-  --reader-width-ratio: 0.3333;
+  --reader-width-ratio: 0.5;
   --reader-min-width: 320px;
   --reader-gutter: var(--space-24);
   --reader-inset: var(--space-16);

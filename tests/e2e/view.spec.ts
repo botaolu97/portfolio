@@ -96,7 +96,7 @@ test('published site is read-only and demos still run', async ({ page }) => {
   expect(await scaleOf(page.locator('.react-flow__node-shape > div').first())).toBe(1);
   await page.mouse.move(8, 8);
 
-  // In the reader (which fills the canvas area, right of the panel) the text is a third of the
+  // In the reader (which fills the canvas area, right of the panel) the text is half the
   // area wide, selection is a subtle gray, and the
   // custom scrollbar (thumb only, 24px from the edge) fades in on scroll and out 2s later.
   await page.locator('.react-flow__node[data-id="longread"] [class*="_text_"]').click();
@@ -107,8 +107,8 @@ test('published site is read-only and demos still run', async ({ page }) => {
   const textWidth = (await readerText.boundingBox())?.width ?? 0;
   const areaWidth = (await longReader.boundingBox())?.width ?? 0;
   expect(areaWidth).toBeCloseTo(1280 - (panelBox?.width ?? 0), 0);
-  expect(textWidth).toBeGreaterThan(areaWidth / 3 - 4);
-  expect(textWidth).toBeLessThan(areaWidth / 3 + 4);
+  expect(textWidth).toBeGreaterThan(areaWidth / 2 - 4);
+  expect(textWidth).toBeLessThan(areaWidth / 2 + 4);
   expect(
     await longReader
       .locator('p')

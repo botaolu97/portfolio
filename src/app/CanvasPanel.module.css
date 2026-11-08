@@ -43,6 +43,8 @@
   justify-content: space-between;
   gap: var(--space-8);
   padding: var(--space-20) var(--canvas-panel-padding) var(--space-20);
+  /* The canvas list scrolls under this edge. */
+  border-bottom: 1px solid var(--canvas-panel-border);
 }
 
 .heading {
@@ -70,13 +72,21 @@
   color: var(--color-danger);
 }
 
-.list {
+/* Holds the scrolling list and its overlay scrollbar (the same thumb-only one as the reader's, in
+   --scrollbar-thumb gray), set closer to the edge than in the reader. */
+.listArea {
+  --scrollbar-inset: var(--space-4);
+  position: relative;
   flex: 1;
   min-height: 0;
+}
+
+.list {
+  height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
   margin: 0;
-  padding: var(--space-6) var(--canvas-panel-padding) var(--canvas-panel-padding);
+  padding: var(--canvas-panel-gap) var(--canvas-panel-padding) var(--canvas-panel-padding);
   list-style: none;
   display: flex;
   flex-direction: column;
