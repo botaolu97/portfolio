@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "title": "About Me",
+  "title": "README",
   "nodes": [
     {
       "id": "c99d300e",
@@ -10,76 +10,11 @@
         "y": 296
       },
       "data": {
-        "html": "<h1>Senior product designer at <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"framer-1mbagem framer-lux5qc\" href=\"https://mathworks.com/\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\"><u>MathWorks</u><mark>↗</mark></a></h1><p></p><p>I have 4 year of experience working on engineering tools &amp; design systems for 5M+ technical users.</p><p>I design beyond the interface — investing in user research, product strategy, and design engineering.</p>",
+        "html": "<h1>Who is Botao?</h1><p></p><p>I have 4 year of experience working on engineering tools &amp; design systems for 5M+ technical users.</p><p>I design beyond the interface — investing in user research, product strategy, and design engineering.</p>",
         "size": "md"
       },
       "width": 456,
       "height": 248
-    },
-    {
-      "id": "d4bdd765",
-      "type": "link",
-      "position": {
-        "x": 1224,
-        "y": 600
-      },
-      "data": {
-        "url": "https://drive.google.com/file/d/1NS0f4OdL_CIRJ85JGcZZnQnA24D3co9L/view?pli=1",
-        "title": "botao_UX.pdf",
-        "description": "",
-        "siteName": "Google Docs",
-        "image": "content/assets/a96b09a587164849.jpg",
-        "favicon": "content/assets/4559312557d667bf.png"
-      },
-      "width": 360,
-      "height": 300
-    },
-    {
-      "id": "c711e2e8",
-      "type": "stack",
-      "position": {
-        "x": 1720,
-        "y": 648
-      },
-      "data": {
-        "items": [
-          {
-            "id": "3412e710",
-            "src": "content/assets/806ce638c0f2ee1a.png",
-            "alt": "image",
-            "fit": "contain",
-            "width": 480,
-            "height": 480
-          },
-          {
-            "id": "6b25fda3",
-            "src": "content/assets/545f44930c3c596f.png",
-            "alt": "image",
-            "fit": "contain",
-            "width": 480,
-            "height": 480
-          },
-          {
-            "id": "bb33247b",
-            "src": "content/assets/348030d4f9d36d4b.png",
-            "alt": "image",
-            "fit": "contain",
-            "width": 480,
-            "height": 480
-          },
-          {
-            "id": "4c049018",
-            "src": "content/assets/9b6cc84ae7bfe01a.png",
-            "alt": "image",
-            "fit": "contain",
-            "width": 480,
-            "height": 480
-          }
-        ],
-        "edges": []
-      },
-      "width": 480,
-      "height": 480
     },
     {
       "id": "0bf30f46",
@@ -94,12 +29,40 @@
       },
       "width": 456,
       "height": 248
+    },
+    {
+      "id": "17abd918",
+      "type": "text",
+      "position": {
+        "x": 1224,
+        "y": 632
+      },
+      "data": {
+        "html": "<h1>Resume</h1><p></p><h3><strong>MathWorks</strong></h3><h3><strong>Senior UX Designer</strong></h3><p>- Redesigned a foundational MATLAB layout widget, leveraging <strong>agentic prototyping</strong> to gain stakeholder buy-in, resolve key usability issues, and improve layout behavior during window resizing for over <strong>5 million users</strong>.</p><p>- Directed MathWorks’ icon design program, establishing <strong>design standards</strong> for domain-specific icons across <strong>4,300+ assets</strong>; mentored <strong>50+ designers</strong> via weekly office hours; hosted a <strong>2 hour</strong> department training; developed a <strong>Figma plugin</strong> to automate design compliance checks.</p><p>- Drove the design of a MATLAB code performance analysis tool, validating product direction through stakeholder reviews and two rounds of user testing with <strong>5 engineers</strong>.</p><p>- Authored the MATLAB side panel design guidelines, adopted by <strong>15 downstream teams</strong>.</p>",
+        "size": "md"
+      },
+      "width": 456,
+      "height": 248
+    },
+    {
+      "id": "d222e6c2",
+      "type": "text",
+      "position": {
+        "x": 1736,
+        "y": 632
+      },
+      "data": {
+        "html": "<h1>My inspiration</h1><p></p><h3>- <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://hayyoth.org/\" data-favicon=\"content/assets/9f268d61499ea0ec.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/9f268d61499ea0ec.ico&quot;);\">Hayyoth</a></h3><h3>-</h3><p></p><p>tbd..</p><p></p><p></p>",
+        "size": "md"
+      },
+      "width": 456,
+      "height": 248
     }
   ],
   "edges": [],
   "viewport": {
-    "x": -225.3,
-    "y": 5.6,
-    "zoom": 0.5095
+    "x": -687.4,
+    "y": 42.3,
+    "zoom": 0.7043
   }
 }

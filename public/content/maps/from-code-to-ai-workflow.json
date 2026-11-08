@@ -21,7 +21,7 @@
       "type": "note",
       "position": {
         "x": -800,
-        "y": -176
+        "y": -216
       },
       "data": {
         "html": "<p>🫘 this is team work! I worked with 1 researcher and 5 engineers to build this app</p>",
@@ -29,8 +29,8 @@
         "size": "sm",
         "rotation": -10.2
       },
-      "width": 128,
-      "height": 112,
+      "width": 160,
+      "height": 152,
       "zIndex": 2
     },
     {
@@ -150,8 +150,8 @@
       "id": "6aaa6d1e",
       "type": "image",
       "position": {
-        "x": -1160,
-        "y": 1456
+        "x": -1000,
+        "y": 1376
       },
       "data": {
         "src": "content/assets/02cb390ffa0020ea.png",
@@ -165,15 +165,15 @@
       "id": "e0c7d3b1",
       "type": "text",
       "position": {
-        "x": -720,
-        "y": 888
+        "x": -728,
+        "y": 856
       },
       "data": {
         "html": "<h1>User Pain Points</h1><p></p><p>Previously, users rely on fragmented technical documentation to identify the right model, then learn and write MATLAB code to configure and run it. Much of their time is spent debugging, while comparing results requires manually generating plots with limited interactivity.</p><p></p>",
         "size": "sm"
       },
-      "width": 272,
-      "height": 264
+      "width": 304,
+      "height": 312
     },
     {
       "id": "a78d2ed8",
@@ -253,8 +253,8 @@
         "html": "<h1>Design Challenges</h1><p></p><p>Fundamentally, there're three:</p><p></p><ul><li><p>Mapping out the user workflow behind the technical languages</p></li><li><p>Bringing the team to a shared understanding</p></li><li><p>Designing for amateur and advanced user at the same time</p></li></ul><p></p>",
         "size": "sm"
       },
-      "width": 280,
-      "height": 272
+      "width": 312,
+      "height": 304
     },
     {
       "id": "e752dff2",
@@ -294,8 +294,8 @@
       "id": "4a2085fa",
       "type": "code",
       "position": {
-        "x": -1664,
-        "y": 1240
+        "x": -1456,
+        "y": 1152
       },
       "data": {
         "code": "url = 'https://ssd.mathworks.com/supportfiles/predmaint/anomalyDetection3axisVibration/v1/vibrationData.zip';\nwebsave('vibrationData.zip',url);\nunzip('vibrationData.zip');\nload(\"MachineData.mat\")\nhead(trainData,3)\n\nensMember = 4;\n\ntrainFeatures = generateFeatures(trainData);\nhead(trainFeatures(:,1:6))\nhelperPlotVibrationData(trainData, ensMember)\n\n",
@@ -312,8 +312,8 @@
       "id": "4769015b",
       "type": "note",
       "position": {
-        "x": -1608,
-        "y": 568
+        "x": -1488,
+        "y": 416
       },
       "data": {
         "html": "<p>Related documentations:</p><ul><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/predmaint/ug/anomaly-detection-using-3-axis-vibration-data.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Industrial Machinery Using Three-Axis Vibration Data - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/predmaint/ug/industrial-cooling-fan-anomaly-detection-with-docker-deployment.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Industrial Cooling Fan Anomaly Detection Algorithm Development for Deployment to a Microservice Docker Image - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/anomaly-detection-using-convolutional-autoencoder-with-wavelet-scattering-sequences.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Anomaly Detection Using Convolutional Autoencoder with Wavelet Scattering Sequences - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/detect-anomalies-in-signals-using-deep-learning.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Signals Using deepSignalAnomalyDetector - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/signal/ug/detect-anomalies-in-machinery-using-lstm-autoencoder.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies in Signals Using deepSignalAnomalyDetector - MATLAB &amp; Simulink</a></p></li></ul><ul><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/dsp/ug/fault-detection-and-localization-in-three-phase-power-transmission.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Fault Detection and Localization in Three-Phase Power Transmission Using Deep Signal Anomaly Detector in Simulink - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/audio/ug/audio-based-anomaly-detection-for-machine-health-monitoring.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Audio-Based Anomaly Detection for Machine Health Monitoring - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/wavelet/ug/detect-anomalies-using-wavelet-scattering-with-autoencoders.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Detect Anomalies Using Wavelet Scattering with Autoencoders - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/deeplearning/ug/time-series-anomaly-detection-using-deep-learning.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Time Series Anomaly Detection Using Deep Learning - MATLAB &amp; Simulink</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.mathworks.com/help/deeplearning/ug/multivariate-time-series-anomaly-detection-using-graph-neural-network.html\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\">Multivariate Time Series Anomaly Detection Using Graph Neural Network - MATLAB &amp; Simulink</a></p></li></ul><p></p>",
@@ -322,7 +322,7 @@
         "rotation": 0
       },
       "width": 336,
-      "height": 584
+      "height": 648
     },
     {
       "id": "576b9fec",
@@ -426,14 +426,14 @@
       "id": "02ef7c10",
       "type": "video",
       "position": {
-        "x": 128,
+        "x": -48,
         "y": 536
       },
       "data": {
         "src": "content/assets/e7ac100a8e911832.mp4"
       },
-      "width": 864,
-      "height": 518
+      "width": 992,
+      "height": 598
     },
     {
       "id": "68000a31",
@@ -468,36 +468,6 @@
       "width": 152,
       "height": 136,
       "zIndex": 2
-    },
-    {
-      "id": "1a7554a6",
-      "type": "image",
-      "position": {
-        "x": 1088,
-        "y": 1992
-      },
-      "data": {
-        "src": "content/assets/6ad4e71c64a4ce91.svg",
-        "alt": "pasted",
-        "fit": "contain"
-      },
-      "width": 106,
-      "height": 480
-    },
-    {
-      "id": "21fbc540",
-      "type": "image",
-      "position": {
-        "x": 1216,
-        "y": 1992
-      },
-      "data": {
-        "src": "content/assets/28f06ce21d814302.svg",
-        "alt": "pasted",
-        "fit": "contain"
-      },
-      "width": 44,
-      "height": 146
     }
   ],
   "edges": [
@@ -639,8 +609,8 @@
     "labelSize": 24
   },
   "viewport": {
-    "x": 384,
-    "y": 194.7,
-    "zoom": 0.3459
+    "x": -132.8,
+    "y": -120.2,
+    "zoom": 0.4144
   }
 }
