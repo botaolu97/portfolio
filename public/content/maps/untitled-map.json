@@ -10,7 +10,7 @@
         "y": 296
       },
       "data": {
-        "html": "<h1>Senior product designer at <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"framer-1mbagem framer-lux5qc\" href=\"https://mathworks.com/\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\"><u>MathWorks</u><mark>↗</mark></a></h1><p>I have 4 year of experience working on engineering tools &amp; design systems for 5M+ technical users.</p><p>I design beyond the interface — investing in user research, product strategy, and design engineering.</p>",
+        "html": "<h1>Senior product designer at <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"framer-1mbagem framer-lux5qc\" href=\"https://mathworks.com/\" data-favicon=\"content/assets/ef0eca8b5b903f64.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/ef0eca8b5b903f64.ico&quot;);\"><u>MathWorks</u><mark>↗</mark></a></h1><p></p><p>I have 4 year of experience working on engineering tools &amp; design systems for 5M+ technical users.</p><p>I design beyond the interface — investing in user research, product strategy, and design engineering.</p>",
         "size": "md"
       },
       "width": 456,
@@ -98,8 +98,8 @@
   ],
   "edges": [],
   "viewport": {
-    "x": -602,
-    "y": -97.7,
-    "zoom": 0.6682
+    "x": -225.3,
+    "y": 5.6,
+    "zoom": 0.5095
   }
 }
