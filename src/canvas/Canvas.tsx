@@ -28,6 +28,7 @@ import { useUiStore } from '../store/uiStore';
 import { type Theme, useTheme } from '../ui/theme';
 import { tokenValues } from '../ui/tokens';
 import styles from './Canvas.module.css';
+import { CanvasReveal } from './CanvasReveal';
 import { addNodesFromFiles } from './fileDrop';
 import { usePageZoomGuard } from './usePageZoomGuard';
 import { useShortcuts } from './useShortcuts';
@@ -42,6 +43,9 @@ export const PALETTE_MIME = 'application/x-mubu-node';
 
 const defaultEdgeOptions = { type: 'smoothstep' };
 
+/** The canvas dot grid: spacing and dot diameter in px at 100% zoom (CanvasReveal draws on it). */
+const DOT_GAP = 24;
+const DOT_SIZE = 3;
 const DEFAULT_CONNECTOR_WIDTH = Number.parseFloat(tokenValues['component.connector.width']);
 const DEFAULT_LABEL_SIZE = Number.parseFloat(tokenValues['component.connector.label-size']);
 
@@ -245,11 +249,11 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
             <SelectionToolbar />
           </Suspense>
         )}
+        <CanvasReveal gap={DOT_GAP} dotSize={DOT_SIZE} />
         <Background
           variant={BackgroundVariant.Dots}
-          gap={24}
-          // Dot diameter in px at 100% zoom.
-          size={3}
+          gap={DOT_GAP}
+          size={DOT_SIZE}
           color="var(--color-canvas-dot)"
           // React Flow's dark mode paints its own near-black; the canvas color wins in both themes.
           bgColor="var(--color-canvas)"

@@ -250,6 +250,21 @@ none, and "Flip" points it the other way.
 thickness and label size, not its label text — to every connector on the canvas, and saves it
 with the canvas (`connector` in the map file) as the look for connectors drawn from then on.
 
+### Canvas reveal (`src/canvas/CanvasReveal.tsx`)
+
+Around the mouse pointer, the canvas's dots morph into + − × ÷ and back into dots as it moves
+away: at the edge of the reach (`--canvas-reveal-radius`) a dot only stretches a little, at the
+pointer it's a full symbol (`--canvas-reveal-symbol-size`, × turning into place from +). Each grid
+point always shows the same symbol, so it reads as a hidden layer being uncovered. The reveal
+trails the pointer softly (`--canvas-reveal-follow`), fades in (`--canvas-reveal-fade-in`) and
+settles back to dots (`--canvas-reveal-fade-out`) when the pointer leaves, rests for a moment or
+starts a drag. Visitors see the symbols in `--canvas-reveal-color`; the editor gets a smaller
+reach and smaller symbols in the plain dot color, so it barely shows while you work.
+
+It's one canvas between the dot grid and the boxes, redrawn only for the grid points within reach
+and only while something moves or fades, so a still page costs nothing. Off for touch (no hover),
+with reduced motion, below 50% zoom (symbols would be specks) and in canvas snapshots.
+
 ### Canvas node chrome (`src/nodes/NodeChrome.tsx`, `src/canvas/Canvas.module.css`)
 
 | State               | Look                                                                                                                      |
@@ -797,6 +812,19 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--spinner-color` | `var(--color-accent) → #4f6bed` | follows alias |  |
 | `--spinner-track` | `var(--color-border) → #4a4a45` | follows alias | The faint full ring the arc runs along. |
 | `--spinner-duration` | `800ms` | — | One turn. |
+
+#### `component.canvas-reveal`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--canvas-reveal-color` | `#8a8a84` | `#6b6b66` | Symbols at full strength (visitors). |
+| `--canvas-reveal-radius` | `140px` | — | Reach around the pointer, on screen (visitors). |
+| `--canvas-reveal-radius-edit` | `84px` | — | Smaller reach in the editor. |
+| `--canvas-reveal-symbol-size` | `9px` | — | A symbol's width at the pointer, at 100% zoom (visitors). |
+| `--canvas-reveal-symbol-size-edit` | `6px` | — | Smaller symbols in the editor, drawn in the dot color rather than the stronger reveal color. |
+| `--canvas-reveal-fade-in` | `220ms` | — |  |
+| `--canvas-reveal-fade-out` | `420ms` | — | Settling back to dots after the pointer stops, leaves, or a drag starts. |
+| `--canvas-reveal-follow` | `0.22` | — | How much of the way to the pointer the reveal moves each frame (lower trails more softly). |
 
 #### `component.loading-bar`
 

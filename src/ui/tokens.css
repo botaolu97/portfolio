@@ -191,6 +191,14 @@
   --spinner-color: var(--color-accent);
   --spinner-track: var(--color-border);
   --spinner-duration: 800ms;
+  --canvas-reveal-color: #8a8a84;
+  --canvas-reveal-radius: 140px;
+  --canvas-reveal-radius-edit: 84px;
+  --canvas-reveal-symbol-size: 9px;
+  --canvas-reveal-symbol-size-edit: 6px;
+  --canvas-reveal-fade-in: 220ms;
+  --canvas-reveal-fade-out: 420ms;
+  --canvas-reveal-follow: 0.22;
   --loading-bar-height: 3px;
   --loading-bar-color: var(--color-accent);
   --loading-bar-creep: 4000ms;
@@ -259,6 +267,7 @@
     --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
     --node-shape-shadow: rgb(0 0 0 / 0.35);
     --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45);
+    --canvas-reveal-color: #6b6b66;
     --canvas-panel-shade: rgb(0 0 0 / 0.5);
     --canvas-panel-shade-hover: rgb(0 0 0 / 0.35);
     --canvas-panel-current: #ffffff;
@@ -292,6 +301,7 @@
   --scrollbar-thumb-hover: rgb(236 236 234 / 0.5);
   --node-shape-shadow: rgb(0 0 0 / 0.35);
   --canvas-slide-shadow: 0 0 24px 0 rgb(0 0 0 / 0.5), 0 0 64px 0 rgb(0 0 0 / 0.45);
+  --canvas-reveal-color: #6b6b66;
   --canvas-panel-shade: rgb(0 0 0 / 0.5);
   --canvas-panel-shade-hover: rgb(0 0 0 / 0.35);
   --canvas-panel-current: #ffffff;
