@@ -1,5 +1,11 @@
 import { migrateMap } from '../store/migrate';
-import { type MapDoc, type MapIndexEntry, mapIndexEntry } from '../store/schema';
+import {
+  type MapDoc,
+  type MapIndexEntry,
+  mapIndexEntry,
+  type Profile,
+  profile,
+} from '../store/schema';
 
 /** Edit mode exists only on the local dev server; the published build is read-only. */
 export const EDITABLE = import.meta.env.DEV;
@@ -24,6 +30,18 @@ export async function fetchMapIndex(): Promise<MapIndexEntry[]> {
     return [];
   }
 }
+
+/** The panel's name and intro; null if there's none yet (the panel then shows its defaults). */
+export async function fetchProfile(): Promise<Profile | null> {
+  try {
+    return profile.parse(await getJson('content/profile.json'));
+  } catch {
+    return null;
+  }
+}
+
+/** Edit mode: writes content/profile.json. */
+export const saveProfile = (next: Profile) => post<Profile>('profile', JSON.stringify(next));
 
 export async function fetchMap(slug: string): Promise<MapDoc> {
   return migrateMap(await getJson(`content/maps/${slug}.json`));

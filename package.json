@@ -24,6 +24,7 @@
     "@fontsource-variable/caveat": "^5.3.0",
     "@fontsource-variable/handjet": "^5.3.1",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/zalando-sans": "^5.3.0",
     "@fontsource/fasthand": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
     "@shikijs/langs": "^4.6.0",

@@ -124,8 +124,9 @@ area never share space: everything that takes over the screen (the text reader, 
 the video viewer) fills the canvas area only (`src/app/overlayRoot.ts`), and videos never use the
 browser's own fullscreen (it's hidden, or left straight away where a browser still offers it);
 the video's enlarge button opens it in the canvas area instead. Everything in the panel is set in JetBrains Mono (`--canvas-panel-font`) at the interface's
-sizes. Under a header with a bottom border, which the list scrolls beneath (the owner's name, "Botao", bold, and a one-line intro in muted text, both in
-`src/app/CanvasPanel.tsx`; the list's scrollbar is the reader's thumb-only one, in
+sizes. Under a header with a bottom border, which the list scrolls beneath (the owner's name, bold, and a one-line intro in muted text, stored in
+`public/content/profile.json`; in the editor a double-click edits either in place, in the same
+type, Enter or clicking away saves, Esc cancels; the list's scrollbar is the reader's thumb-only one, in
 `--scrollbar-thumb` gray) it
 lists every canvas in order as a snapshot of its last view (`--canvas-panel-thumb-ratio` frame,
 cropped to fill) with its title below. The open canvas gets a `--canvas-panel-current` ring (dark gray in light mode, white in dark
@@ -253,8 +254,10 @@ with the canvas (`connector` in the map file) as the look for connectors drawn f
 
 ### Canvas typeface (experiment: `jetbrains-mono` branch)
 
-All text on the canvas is set in JetBrains Mono (`--canvas-text-font`): text boxes and the reader,
-notes, shape and connector labels, code, link cards and box titles. Labels follow it too, over
+Short text on the canvas is set in JetBrains Mono (`--canvas-text-font`): shape and connector
+labels, code, link cards and box titles. Text that's read in full (text boxes, notes and the
+full-screen reader) is set in Zalando Sans (`--canvas-text-reading-font`), since monospace slows
+reading in paragraphs. Labels follow it too, over
 their own font choice (the choice stays in the map, so dropping the experiment restores it). The
 canvas panel uses the same font (`--canvas-panel-font`).
 
@@ -504,6 +507,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--font-family-serif` | `ui-serif, Georgia, "Times New Roman", serif` | — | Label font option. |
 | `--font-family-fasthand` | `Fasthand, cursive` | — | Label font option (default); bundled with @fontsource/fasthand. |
 | `--font-family-caveat` | `"Caveat Variable", cursive` | — | Label font option; bundled with @fontsource-variable/caveat. |
+| `--font-family-zalando-sans` | `"Zalando Sans Variable", ui-sans-serif, system-ui, sans-serif` | — | Reading text on the canvas (text boxes, notes, the reader); bundled with @fontsource-variable/zalando-sans. |
 | `--font-family-jetbrains-mono` | `"JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace` | — | The canvas panel's font; bundled with @fontsource-variable/jetbrains-mono. |
 | `--font-family-handjet` | `"Handjet Variable", monospace` | — | Label font option: a dot-matrix display face; bundled with @fontsource-variable/handjet (weights 100–900). |
 | `--font-family-instrument-serif` | `"Instrument Serif", ui-serif, Georgia, serif` | — | Label font option: a condensed display serif; bundled with @fontsource/instrument-serif (regular weight only, so heavier weights are synthesized). |
@@ -828,7 +832,8 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--canvas-text-font` | `var(--font-family-jetbrains-mono) → "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace` | follows alias | Every piece of text on the canvas: text boxes and the reader, notes, labels (overriding their own font choice), shape and connector labels, code, link cards and box titles. |
+| `--canvas-text-font` | `var(--font-family-jetbrains-mono) → "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace` | follows alias | Short text on the canvas: labels (overriding their own font choice), shape and connector labels, code, link cards and box titles. |
+| `--canvas-text-reading-font` | `var(--font-family-zalando-sans) → "Zalando Sans Variable", ui-sans-serif, system-ui, sans-serif` | follows alias | Text that's read in full: text boxes, notes and the full-screen reader. A proportional sans reads more easily than mono in paragraphs. |
 
 #### `component.canvas-reveal`
 

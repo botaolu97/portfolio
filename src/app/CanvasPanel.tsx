@@ -10,6 +10,7 @@ import styles from './CanvasPanel.module.css';
 import { useCanvasIndex } from './canvasIndex';
 import { beginCanvasSlide } from './canvasTransition';
 import { CONTACT_LINKS } from './contactLinks';
+import { useProfile } from './profile';
 
 const STATUS_LABEL: Record<SaveStatus, string> = {
   saved: 'All changes saved',
@@ -43,11 +44,6 @@ function writeCollapsed(collapsed: boolean) {
   }
 }
 
-/** The panel's heading. */
-export const PANEL_TITLE = 'Botao';
-/** One line about the owner, under the name. */
-export const PANEL_INTRO = 'Senior product designer at MathWorks';
-
 /**
  * Renames a canvas. The open one changes in the store (autosave writes it, live everywhere);
  * any other is read, retitled and saved straight away.
@@ -80,6 +76,57 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // The owner's name and intro (content/profile.json); in the editor a double-click edits either.
+  const profile = useProfile();
+  const [editingProfile, setEditingProfile] = useState<{
+    field: 'name' | 'intro';
+    value: string;
+  } | null>(null);
+  useEffect(() => {
+    if (!profile.loaded) void profile.load();
+  }, [profile.loaded, profile.load]);
+  const commitProfile = () => {
+    if (!editingProfile) return;
+    const { field, value } = editingProfile;
+    setEditingProfile(null);
+    const next = value.trim();
+    // The name can't be emptied; the intro can.
+    if ((field === 'name' && !next) || next === profile[field]) return;
+    profile.update({ [field]: next }).catch((err: Error) => setError(err.message));
+  };
+  const profileText = (field: 'name' | 'intro', className: string) => {
+    if (EDITABLE && editingProfile?.field === field) {
+      return (
+        <input
+          className={`${className} ${styles.profileInput}`}
+          value={editingProfile.value}
+          aria-label={field === 'name' ? 'Your name' : 'Your intro'}
+          maxLength={field === 'name' ? 80 : 200}
+          // biome-ignore lint/a11y/noAutofocus: the field appears because the user asked for it
+          autoFocus
+          onFocus={(e) => e.currentTarget.select()}
+          onChange={(e) => setEditingProfile({ field, value: e.target.value })}
+          onBlur={commitProfile}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') commitProfile();
+            if (e.key === 'Escape') setEditingProfile(null);
+          }}
+        />
+      );
+    }
+    const Tag = field === 'name' ? 'h2' : 'p';
+    const text = profile[field];
+    if (!text && !EDITABLE) return null;
+    return (
+      <Tag
+        className={`${className} ${EDITABLE ? styles.editableText : ''}`}
+        title={EDITABLE ? 'Double-click to edit' : undefined}
+        onDoubleClick={EDITABLE ? () => setEditingProfile({ field, value: text }) : undefined}
+      >
+        {text || (EDITABLE ? 'Double-click to add an intro' : '')}
+      </Tag>
+    );
+  };
   // The canvas list scrolls under the header, with the reader's thumb-only scrollbar.
   const list = useRef<HTMLOListElement>(null);
   // Tucked away to the left, with a sliver still showing; the handle on its edge toggles it.
@@ -178,8 +225,8 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
         <nav className={styles.panel} aria-label="Canvases" id="canvas-panel" inert={collapsed}>
           <div className={styles.header}>
             <div>
-              <h2 className={styles.heading}>{PANEL_TITLE}</h2>
-              <p className={styles.intro}>{PANEL_INTRO}</p>
+              {profileText('name', styles.heading)}
+              {profileText('intro', styles.intro)}
             </div>
             {EDITABLE && saveStatus && (
               // Shown while there's something unsaved; "All changes saved" is for screen readers only.

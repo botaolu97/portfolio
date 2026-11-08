@@ -23,6 +23,7 @@
   --font-family-serif: ui-serif, Georgia, "Times New Roman", serif;
   --font-family-fasthand: Fasthand, cursive;
   --font-family-caveat: "Caveat Variable", cursive;
+  --font-family-zalando-sans: "Zalando Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --font-family-jetbrains-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
   --font-family-handjet: "Handjet Variable", monospace;
   --font-family-instrument-serif: "Instrument Serif", ui-serif, Georgia, serif;
@@ -193,6 +194,7 @@
   --spinner-track: var(--color-border);
   --spinner-duration: 800ms;
   --canvas-text-font: var(--font-family-jetbrains-mono);
+  --canvas-text-reading-font: var(--font-family-zalando-sans);
   --canvas-reveal-color: #8a8a84;
   --canvas-reveal-radius: 140px;
   --canvas-reveal-radius-edit: 84px;

@@ -696,6 +696,26 @@ export function mubuContent(): Plugin {
               await removeThumbs(dirs.thumbs, slug);
               return sendJson(res, 200, await writeMapIndex(dirs.maps));
             }
+            case '/__mubu/profile': {
+              const { name, intro } = JSON.parse((await readBody(req)).toString('utf8')) as {
+                name?: unknown;
+                intro?: unknown;
+              };
+              if (
+                typeof name !== 'string' ||
+                typeof intro !== 'string' ||
+                name.length > 80 ||
+                intro.length > 200
+              ) {
+                throw new HttpError(400, 'Expected { name, intro }');
+              }
+              const next = { name: name.trim(), intro: intro.trim() };
+              await writeFile(
+                path.join(dirs.content, 'profile.json'),
+                `${JSON.stringify(next, null, 2)}\n`,
+              );
+              return sendJson(res, 200, next);
+            }
             case '/__mubu/order': {
               const { slugs } = JSON.parse((await readBody(req)).toString('utf8')) as {
                 slugs?: unknown;

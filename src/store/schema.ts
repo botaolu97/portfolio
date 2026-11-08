@@ -233,6 +233,13 @@ export const mapIndexEntry = z.object({
   thumbAt: z.number().optional(),
 });
 
+/** The owner's name and one-line intro at the top of the canvas panel (content/profile.json). */
+export const profile = z.object({
+  name: z.string().max(80),
+  intro: z.string().max(200),
+});
+export type Profile = z.infer<typeof profile>;
+
 export type MapDoc = z.infer<typeof mapDoc>;
 export type MapNode = z.infer<typeof mapNode>;
 export type MapEdge = z.infer<typeof mapEdge>;

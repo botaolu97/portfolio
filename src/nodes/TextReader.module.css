@@ -5,7 +5,7 @@
   position: absolute;
   inset: 0;
   z-index: var(--z-viewer);
-  font-family: var(--canvas-text-font);
+  font-family: var(--canvas-text-reading-font);
 }
 
 .frame {

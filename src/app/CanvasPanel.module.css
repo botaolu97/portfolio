@@ -65,6 +65,28 @@
   color: var(--color-text-muted);
 }
 
+/* Editor: the name and intro edit in place, in exactly the same type (a field over the text). */
+.editableText {
+  cursor: text;
+  border-radius: var(--radius-xs);
+}
+
+.editableText:hover {
+  background: var(--color-surface-muted);
+}
+
+.profileInput {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  background: transparent;
+  font-family: inherit;
+}
+
 .status {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
