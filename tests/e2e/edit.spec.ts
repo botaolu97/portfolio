@@ -184,11 +184,14 @@ test('create a map, add nodes, undo, and run an uploaded demo', async ({ page })
   await dragFrom('[class*="_dragStrip_"]', 10);
   expect(await videoAt()).not.toBe(videoBefore);
 
-  // Labels: no box, Fasthand by default; type inline, then change font, size and weight.
+  // Labels: no box, Fasthand as their font choice by default (shown in the canvas typeface,
+  // JetBrains Mono, while that experiment is on); type inline, then change size and weight.
   await page.getByRole('navigation', { name: 'Add to canvas' }).getByText('Label').click();
   const label = page.locator('.react-flow__node-label');
   const labelText = label.locator('[class*="_label_"]');
-  expect(await labelText.evaluate((el) => getComputedStyle(el).fontFamily)).toContain('Fasthand');
+  expect(await labelText.evaluate((el) => getComputedStyle(el).fontFamily)).toContain(
+    'JetBrains Mono',
+  );
   expect(await labelText.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(
     'rgba(0, 0, 0, 0)',
   );
