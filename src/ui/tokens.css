@@ -204,8 +204,8 @@
   --canvas-reveal-fade-in: 220ms;
   --canvas-reveal-fade-out: 420ms;
   --canvas-reveal-follow: 0.22;
-  --loading-bar-height: 3px;
-  --loading-bar-color: var(--color-accent);
+  --loading-bar-height: 12px;
+  --loading-bar-color: #ef2415;
   --loading-bar-creep: 4000ms;
   --loading-bar-finish: 240ms;
   --canvas-panel-width-ratio: 0.2;

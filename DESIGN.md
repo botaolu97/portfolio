@@ -853,8 +853,8 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 
 | CSS variable | Value | Dark | Use |
 | --- | --- | --- | --- |
-| `--loading-bar-height` | `3px` | — |  |
-| `--loading-bar-color` | `var(--color-accent) → #4f6bed` | follows alias |  |
+| `--loading-bar-height` | `12px` | — |  |
+| `--loading-bar-color` | `#ef2415` | — | A bright red, the same in both modes. |
 | `--loading-bar-creep` | `4000ms` | — | Time to creep to 90% while waiting; it never reaches the end until loading is done. |
 | `--loading-bar-finish` | `240ms` | — | Running to the end and fading out once the canvas is ready. |
 
