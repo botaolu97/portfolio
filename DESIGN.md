@@ -67,7 +67,7 @@ Tokens come in three tiers:
 ## Typography
 
 System font stack (`--font-family-sans`) for the interface; the only web fonts are the bundled
-label fonts (Fasthand, Caveat, Handjet, Instrument Serif).
+label fonts (Fasthand, Caveat, Handjet, Instrument Serif) and JetBrains Mono for the canvas panel.
 
 | Role                    | Size               | Weight                                                 |
 | ----------------------- | ------------------ | ------------------------------------------------------ |
@@ -123,7 +123,8 @@ A panel down the left side, `--canvas-panel-width-ratio` of the window wide (a f
 area never share space: everything that takes over the screen (the text reader, the stack viewer,
 the video viewer) fills the canvas area only (`src/app/overlayRoot.ts`), and videos never use the
 browser's own fullscreen (it's hidden, or left straight away where a browser still offers it);
-the video's enlarge button opens it in the canvas area instead. Under a header with a bottom border, which the list scrolls beneath (the owner's name, "Botao", bold, and a one-line intro in muted text, both in
+the video's enlarge button opens it in the canvas area instead. Everything in the panel is set in JetBrains Mono (`--canvas-panel-font`) at the interface's
+sizes. Under a header with a bottom border, which the list scrolls beneath (the owner's name, "Botao", bold, and a one-line intro in muted text, both in
 `src/app/CanvasPanel.tsx`; the list's scrollbar is the reader's thumb-only one, in
 `--scrollbar-thumb` gray) it
 lists every canvas in order as a snapshot of its last view (`--canvas-panel-thumb-ratio` frame,
@@ -249,6 +250,13 @@ none, and "Flip" points it the other way.
 "Apply to all connectors" copies the selected connector's look — style, animation, arrow, both colors,
 thickness and label size, not its label text — to every connector on the canvas, and saves it
 with the canvas (`connector` in the map file) as the look for connectors drawn from then on.
+
+### Canvas typeface (experiment: `jetbrains-mono` branch)
+
+All text on the canvas is set in JetBrains Mono (`--canvas-text-font`): text boxes and the reader,
+notes, shape and connector labels, code, link cards and box titles. Labels follow it too, over
+their own font choice (the choice stays in the map, so dropping the experiment restores it). The
+canvas panel uses the same font (`--canvas-panel-font`).
 
 ### Canvas reveal (`src/canvas/CanvasReveal.tsx`)
 
@@ -496,6 +504,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--font-family-serif` | `ui-serif, Georgia, "Times New Roman", serif` | — | Label font option. |
 | `--font-family-fasthand` | `Fasthand, cursive` | — | Label font option (default); bundled with @fontsource/fasthand. |
 | `--font-family-caveat` | `"Caveat Variable", cursive` | — | Label font option; bundled with @fontsource-variable/caveat. |
+| `--font-family-jetbrains-mono` | `"JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace` | — | The canvas panel's font; bundled with @fontsource-variable/jetbrains-mono. |
 | `--font-family-handjet` | `"Handjet Variable", monospace` | — | Label font option: a dot-matrix display face; bundled with @fontsource-variable/handjet (weights 100–900). |
 | `--font-family-instrument-serif` | `"Instrument Serif", ui-serif, Georgia, serif` | — | Label font option: a condensed display serif; bundled with @fontsource/instrument-serif (regular weight only, so heavier weights are synthesized). |
 | `--font-size-xs` | `11px` | — | Tags and badges. |
@@ -815,6 +824,12 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--spinner-track` | `var(--color-border) → #4a4a45` | follows alias | The faint full ring the arc runs along. |
 | `--spinner-duration` | `800ms` | — | One turn. |
 
+#### `component.canvas-text`
+
+| CSS variable | Value | Dark | Use |
+| --- | --- | --- | --- |
+| `--canvas-text-font` | `var(--font-family-jetbrains-mono) → "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace` | follows alias | Every piece of text on the canvas: text boxes and the reader, notes, labels (overriding their own font choice), shape and connector labels, code, link cards and box titles. |
+
 #### `component.canvas-reveal`
 
 | CSS variable | Value | Dark | Use |
@@ -850,6 +865,7 @@ _Generated from `design/tokens.json` by `npm run tokens`. Edit the JSON, not thi
 | `--canvas-panel-shade-hover` | `rgb(0 0 0 / 0.2)` | `rgb(0 0 0 / 0.35)` | Lighter on hover: clicking brings the panel back. |
 | `--canvas-panel-handle-width` | `16px` | — | The tab on the panel's edge that tucks it away and brings it back. |
 | `--canvas-panel-handle-height` | `48px` | — |  |
+| `--canvas-panel-font` | `var(--font-family-jetbrains-mono) → "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace` | follows alias | Everything in the panel (name, intro, canvas titles, buttons) is set in JetBrains Mono. |
 | `--canvas-panel-bg` | `var(--color-surface) → #ffffff` | follows alias |  |
 | `--canvas-panel-border` | `var(--color-border) → #4a4a45` | follows alias | Edge between the panel and the canvas. |
 | `--canvas-panel-padding` | `var(--space-16) → 16px` | follows alias |  |

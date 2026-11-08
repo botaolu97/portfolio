@@ -477,7 +477,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--font-family-mono);
+  font-family: var(--canvas-text-font);
   font-weight: var(--font-weight-medium);
 }
 
@@ -512,12 +512,14 @@
   overflow: auto;
   /* A swipe that reaches the edge stops here instead of chaining to the page. */
   overscroll-behavior: contain;
-  font-family: var(--font-family-mono);
+  font-family: var(--canvas-text-font);
   font-size: var(--code-font-size);
   line-height: var(--code-line-height);
 }
 
 .codeHtml pre {
+  /* Browsers give <pre> their own monospace; use the block's font instead. */
+  font-family: inherit;
   min-width: max-content;
   margin: 0;
   padding: var(--code-padding);

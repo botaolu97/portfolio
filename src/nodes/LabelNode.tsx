@@ -18,7 +18,8 @@ const FONT_FAMILIES: Record<LabelFont, string> = {
 };
 
 export const labelStyle = (data: NodeDataOf<'label'>): CSSProperties => ({
-  fontFamily: FONT_FAMILIES[data.font],
+  // The canvas-wide typeface wins over the label's own font choice (which is kept in the map).
+  fontFamily: `var(--canvas-text-font, ${FONT_FAMILIES[data.font]})`,
   fontSize: data.size,
   fontWeight: data.weight,
 });
