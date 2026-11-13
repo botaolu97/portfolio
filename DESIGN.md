@@ -154,13 +154,19 @@ canvas area creeps toward the end (`--loading-bar-creep`), then finishes and fad
 the images inside the visible canvas area have loaded (at most 2.5 s; boxes React Flow draws just off-screen are ignored, since their lazy images never load until scrolled to). Images, videos and embedded players show a
 `--spinner-*` ring, circling over them until they've loaded (a gentle pulse with reduced motion).
 
-**Last view and snapshots.** The editor saves where each canvas was last panned and zoomed
-(`viewport` in the map file), and the canvas opens there, for visitors too; a canvas without one
-fits everything. After each save (once things are quiet for a moment, and when you leave a canvas)
+**Last view, start view and snapshots.** The editor saves where each canvas was last panned and
+zoomed (`viewport` in the map file); it reopens there in the editor, and the snapshot shows it.
+A control at the bottom-left of the canvas (`src/editor/StartViewControl.tsx`) sets where
+visitors start (`startView`, the current view; "Go to it" jumps back). Visitors start at
+`startView`, else at `viewport`, else everything fits; after that each visitor's own view is
+remembered per canvas in their browser (`mubu.view.<slug>`, `src/canvas/visitorView.ts`), so
+switching away and back, or reloading, returns them to where they were. When you leave a canvas in the editor (switching), if anything was saved while it was open,
 the dev server pictures the canvas: it opens the app in snapshot mode (`?snapshot`: only the
 canvas, nothing editable) in headless Chromium at the size of the editor's canvas area, once per
-theme, and saves `public/content/thumbs/<slug>-light.jpg` and `-dark.jpg` (480px wide). The panel
-shows the one for the current theme, cache-busted by `thumbAt` in the canvas index. A canvas
+theme, and saves `public/content/thumbs/<slug>-light.jpg` and `-dark.jpg` (480px wide). In both modes, the moment you switch away the panel shows
+a static copy of the canvas exactly as you left it (`src/app/liveSnapshots.ts`, live DOM, so it
+follows the theme) until the page reloads; otherwise it shows the published snapshot for the
+current theme, cache-busted by `thumbAt` in the canvas index. A canvas
 without a snapshot yet shows its initial. The old bottom-left switcher
 (`src/app/CanvasSwitcher.tsx`) now appears only on the empty start page.
 

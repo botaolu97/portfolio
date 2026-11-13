@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "title": "MATLAB Agentic Desktop",
+  "title": "MATLAB ADE (incoming...)",
   "nodes": [
     {
       "id": "ae9ec989",
@@ -21,8 +21,13 @@
   ],
   "edges": [],
   "viewport": {
-    "x": -921.1,
-    "y": 290.8,
+    "x": -696.6,
+    "y": 199.3,
+    "zoom": 1.0028
+  },
+  "startView": {
+    "x": -696.6,
+    "y": 199.3,
     "zoom": 1.0028
   }
 }

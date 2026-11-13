@@ -14,17 +14,18 @@ export const CANVAS_LAYER_ATTR = 'data-canvas-layer';
 
 let pending: { ghost: HTMLElement; direction: SlideDirection } | null = null;
 
-/** Freezes the current canvas into a snapshot that covers it until the next one is ready. */
-export function beginCanvasSlide(direction: SlideDirection) {
-  pending?.ghost.remove();
-  pending = null;
-  const layer = document.querySelector<HTMLElement>(`[${CANVAS_LAYER_ATTR}]`);
-  if (!layer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const rect = layer.getBoundingClientRect();
-  const ghost = layer.cloneNode(true) as HTMLElement;
-  ghost.removeAttribute(CANVAS_LAYER_ATTR);
-  // Live media would reload in the copy: swap in plain blocks of the same size and place.
-  for (const media of ghost.querySelectorAll<HTMLElement>('iframe, video')) {
+let copies = 0;
+
+/**
+ * A static copy of the live canvas (its DOM), for the slide and for the canvas panel's picture of
+ * the view you just left. Live media would reload in a copy, so iframes and videos become plain
+ * blocks of the same size and place; drawing layers are dropped; ids are made unique (and the
+ * references to them updated) so the copy's dot grid and arrowheads don't borrow the live ones.
+ */
+export function copyCanvas(layer: HTMLElement): HTMLElement {
+  const copy = layer.cloneNode(true) as HTMLElement;
+  copy.removeAttribute(CANVAS_LAYER_ATTR);
+  for (const media of copy.querySelectorAll<HTMLElement>('iframe, video')) {
     const block = document.createElement('div');
     block.style.cssText = media.style.cssText;
     block.className = media.className;
@@ -32,6 +33,47 @@ export function beginCanvasSlide(direction: SlideDirection) {
       media.tagName === 'VIDEO' ? 'var(--video-backdrop)' : 'var(--demo-page-bg)';
     media.replaceWith(block);
   }
+  for (const canvas of copy.querySelectorAll('canvas')) canvas.remove();
+  const suffix = `-copy${++copies}`;
+  const renamed = new Map<string, string>();
+  for (const el of copy.querySelectorAll<Element>('[id]')) {
+    renamed.set(el.id, el.id + suffix);
+    el.id += suffix;
+  }
+  if (renamed.size) {
+    for (const el of copy.querySelectorAll<Element>('*')) {
+      for (const attr of ['fill', 'stroke', 'marker-start', 'marker-end', 'href', 'xlink:href']) {
+        const value = el.getAttribute(attr);
+        if (!value?.includes('#')) continue;
+        el.setAttribute(
+          attr,
+          value.replace(/#([^)\s'"]+)/g, (m, id: string) =>
+            renamed.has(id) ? `#${renamed.get(id)}` : m,
+          ),
+        );
+      }
+      const style = el.getAttribute('style');
+      if (style?.includes('url(')) {
+        el.setAttribute(
+          'style',
+          style.replace(/url\(["']?#([^)"']+)["']?\)/g, (m, id: string) =>
+            renamed.has(id) ? `url(#${renamed.get(id)})` : m,
+          ),
+        );
+      }
+    }
+  }
+  return copy;
+}
+
+/** Freezes the current canvas into a snapshot that covers it until the next one is ready. */
+export function beginCanvasSlide(direction: SlideDirection) {
+  pending?.ghost.remove();
+  pending = null;
+  const layer = document.querySelector<HTMLElement>(`[${CANVAS_LAYER_ATTR}]`);
+  if (!layer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rect = layer.getBoundingClientRect();
+  const ghost = copyCanvas(layer);
   // Inside the canvas area, which clips: the sliding canvases and their shadows never reach the
   // canvas panel.
   const area = overlayRect();

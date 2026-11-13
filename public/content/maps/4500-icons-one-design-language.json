@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "title": "Largest Technical Icon Systems",
+  "title": "Technical Icon Systems",
   "nodes": [
     {
       "id": "036c1581",
@@ -50,8 +50,13 @@
   ],
   "edges": [],
   "viewport": {
-    "x": 96.6,
-    "y": 207.8,
+    "x": 76.6,
+    "y": 134.3,
+    "zoom": 0.565
+  },
+  "startView": {
+    "x": 76.6,
+    "y": 134.3,
     "zoom": 0.565
   }
 }

@@ -282,12 +282,12 @@ test('published site is read-only and demos still run', async ({ page }) => {
     }, dir);
   await expect.poll(() => firstFrame('in')).toBe('translateY(100%)');
   expect(await firstFrame('out')).toBe('translateY(-100%)');
-  await expect.poll(() => page.locator('.react-flow').count()).toBe(1);
+  await expect.poll(() => page.locator('main .react-flow').count()).toBe(1);
   await expect(canvasLink('Other canvas')).toHaveAttribute('aria-current', 'page');
   await expect(page.getByText('Other note')).toBeVisible();
 
   // And back (2 → 1) slides down.
   await canvasLink('E2E fixture').click();
   await expect.poll(() => firstFrame('in')).toBe('translateY(-100%)');
-  await expect.poll(() => page.locator('.react-flow').count()).toBe(1);
+  await expect.poll(() => page.locator('main .react-flow').count()).toBe(1);
 });

@@ -10,6 +10,7 @@ import styles from './CanvasPanel.module.css';
 import { useCanvasIndex } from './canvasIndex';
 import { beginCanvasSlide } from './canvasTransition';
 import { CONTACT_LINKS } from './contactLinks';
+import { rememberCanvas, useLiveSnapshots } from './liveSnapshots';
 import { useProfile } from './profile';
 
 const STATUS_LABEL: Record<SaveStatus, string> = {
@@ -25,6 +26,33 @@ function uniqueSlug(title: string, taken: Set<string>) {
   let slug = base;
   for (let i = 2; taken.has(slug); i++) slug = `${base}-${i}`;
   return slug;
+}
+
+/**
+ * A canvas's picture as you left it in this visit (a static copy of its DOM), scaled to fill the
+ * frame like the published snapshots.
+ */
+function LiveThumb({ slug }: { slug: string }) {
+  const snap = useLiveSnapshots((s) => s[slug]);
+  const frame = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = frame.current;
+    if (!el || !snap) return;
+    const node = snap.node.cloneNode(true) as HTMLElement;
+    el.replaceChildren(node);
+    const fit = () => {
+      const scale = Math.max(el.clientWidth / snap.width, el.clientHeight / snap.height);
+      const dx = (el.clientWidth - snap.width * scale) / 2;
+      const dy = (el.clientHeight - snap.height * scale) / 2;
+      node.style.transformOrigin = '0 0';
+      node.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [snap]);
+  return <span ref={frame} className={styles.liveThumb} aria-hidden="true" inert />;
 }
 
 /** Remembered per browser (a convenience; storage may be unavailable). */
@@ -71,6 +99,7 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
   // The open canvas's title as it's being edited, before the index catches up.
   const liveTitle = useMapStore((s) => (s.slug === slug ? s.title : null));
   const theme = useTheme((s) => s.theme);
+  const live = useLiveSnapshots();
   const saveStatus = useUiStore((s) => s.saveStatus);
   const [, navigate] = useLocation();
   const [creating, setCreating] = useState(false);
@@ -183,6 +212,8 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
 
   const go = (target: string) => {
     if (target === slug) return;
+    // The panel's picture of the canvas being left: exactly the view you're leaving it at.
+    if (slug) rememberCanvas(slug);
     // Slide by position in the list: further down slides up, back up slides down.
     const from = maps.findIndex((m) => m.slug === slug);
     const to = maps.findIndex((m) => m.slug === target);
@@ -354,7 +385,10 @@ export function CanvasPanel({ slug }: { slug: string | null }) {
                       }}
                     >
                       <span className={styles.thumb}>
-                        {src ? (
+                        {/* The view you left it at in this visit, else the published snapshot. */}
+                        {live[map.slug] ? (
+                          <LiveThumb slug={map.slug} />
+                        ) : src ? (
                           <img src={src} alt="" loading="lazy" decoding="async" draggable={false} />
                         ) : (
                           <span className={styles.thumbEmpty} aria-hidden="true">

@@ -52,7 +52,7 @@
         "y": 632
       },
       "data": {
-        "html": "<h1>My inspiration</h1><p></p><h3>- <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://hayyoth.org/\" data-favicon=\"content/assets/9f268d61499ea0ec.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/9f268d61499ea0ec.ico&quot;);\">Hayyoth</a></h3><h3>-</h3><p></p><p>tbd..</p><p></p><p></p>",
+        "html": "<h1>My inspiration</h1><p></p><h3></h3><ul><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://hayyoth.org/\" data-favicon=\"content/assets/9f268d61499ea0ec.ico\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/9f268d61499ea0ec.ico&quot;);\">Hayyoth</a></p></li></ul><ul><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://www.thekumquatery.com/\" data-favicon=\"content/assets/f04a78fdfb414afe.avif\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/f04a78fdfb414afe.avif&quot;);\">The Kumquatery</a></p></li><li><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://andrewtrousdale.com/\" data-favicon=\"content/assets/2fd3638b7dd98d74.png\" data-previewed=\"\" style=\"--_favicon: url(&quot;/content/assets/2fd3638b7dd98d74.png&quot;);\">Andrew Trousdale</a></p></li></ul><p></p><p></p><p></p>",
         "size": "md"
       },
       "width": 456,
@@ -61,8 +61,13 @@
   ],
   "edges": [],
   "viewport": {
-    "x": -687.4,
-    "y": 42.3,
-    "zoom": 0.7043
+    "x": -730.5,
+    "y": -58.1,
+    "zoom": 0.7295
+  },
+  "startView": {
+    "x": -730.5,
+    "y": -58.1,
+    "zoom": 0.7295
   }
 }

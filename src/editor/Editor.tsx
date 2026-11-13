@@ -2,6 +2,7 @@ import { ContextMenu } from './ContextMenu';
 import styles from './Editor.module.css';
 import { Inspector } from './Inspector';
 import { Palette } from './Palette';
+import { StartViewControl } from './StartViewControl';
 import { useAutosave } from './useAutosave';
 
 /** Everything edit-only around the canvas. Lazy-loaded, and absent from the published build. */
@@ -17,6 +18,7 @@ export default function Editor({
   return (
     <>
       <Palette />
+      <StartViewControl />
       <Inspector onError={onError} />
       <ContextMenu />
       {message && (

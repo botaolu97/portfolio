@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "title": "From Code to AI Workflow",
+  "title": "Anomaly Detection App",
   "nodes": [
     {
       "id": "f92bb232",
@@ -46,20 +46,6 @@
       },
       "width": 320,
       "height": 320
-    },
-    {
-      "id": "6e9ce31b",
-      "type": "label",
-      "position": {
-        "x": 216,
-        "y": -384
-      },
-      "data": {
-        "text": "🫶 From code to AI workflow: \nReduce technical complexcity for industrial enginners",
-        "font": "handjet",
-        "size": 44,
-        "weight": 400
-      }
     },
     {
       "id": "43aa77d9",
@@ -609,8 +595,13 @@
     "labelSize": 24
   },
   "viewport": {
-    "x": 54.8,
-    "y": 264.8,
-    "zoom": 0.1336
+    "x": 534.7,
+    "y": 118.4,
+    "zoom": 0.3238
+  },
+  "startView": {
+    "x": 283.1,
+    "y": 211.1,
+    "zoom": 0.308
   }
 }

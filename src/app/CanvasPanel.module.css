@@ -169,6 +169,18 @@
   transition: box-shadow var(--motion-duration-fast) var(--motion-easing-standard);
 }
 
+/* A copy of the canvas as you left it, scaled down (see LiveThumb); never interactive. */
+.thumb {
+  position: relative;
+}
+
+.liveThumb {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .thumb img {
   display: block;
   width: 100%;

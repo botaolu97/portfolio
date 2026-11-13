@@ -36,6 +36,9 @@ export interface MapState {
   /** Where the canvas was last panned and zoomed to (saved; not an undo step). */
   viewport: MapDoc['viewport'];
   setViewport: (viewport: NonNullable<MapDoc['viewport']>) => void;
+  /** Where visitors start (saved; not an undo step). */
+  startView: MapDoc['startView'];
+  setStartView: (view: NonNullable<MapDoc['startView']>) => void;
   load: (slug: string, doc: MapDoc) => void;
   setTitle: (title: string) => void;
   onNodesChange: (changes: NodeChange<FlowNode>[]) => void;
@@ -102,7 +105,7 @@ export function connectorStyleOf(edge: ConnectorStyle): ConnectorStyle {
 
 export function toDoc(
   state: Pick<MapState, 'title' | 'nodes' | 'edges'> &
-    Partial<Pick<MapState, 'connector' | 'viewport'>>,
+    Partial<Pick<MapState, 'connector' | 'viewport' | 'startView'>>,
 ): MapDoc {
   const doc: MapDoc = {
     version: MAP_VERSION,
@@ -113,6 +116,7 @@ export function toDoc(
   const connector = connectorStyleOf(state.connector ?? {});
   if (Object.keys(connector).length) doc.connector = connector;
   if (state.viewport) doc.viewport = state.viewport;
+  if (state.startView) doc.startView = state.startView;
   return doc;
 }
 
@@ -155,6 +159,12 @@ export function cloneSubgraph(nodes: FlowNode[], edges: FlowEdge[], offset: numb
   return { nodes: clonedNodes, edges: clonedEdges };
 }
 
+/** A view rounded for saving (tenths of a pixel, 4 decimals of zoom). */
+export function roundViewport(v: { x: number; y: number; zoom: number }) {
+  const round = (n: number, places: number) => Number(n.toFixed(places));
+  return { x: round(v.x, 1), y: round(v.y, 1), zoom: round(v.zoom, 4) };
+}
+
 /** Calls fn on the first call of a burst, then ignores calls until `ms` of quiet. */
 function leadingDebounce<A extends unknown[]>(fn: (...args: A) => void, ms: number) {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -176,6 +186,7 @@ export const useMapStore = create<MapState>()(
       edges: [],
       connector: {},
       viewport: undefined,
+      startView: undefined,
 
       load: (slug, doc) => {
         // Paused so loading neither records a step nor swallows the first real edit in the debounce.
@@ -188,6 +199,7 @@ export const useMapStore = create<MapState>()(
           edges: doc.edges,
           connector: doc.connector ?? {},
           viewport: doc.viewport,
+          startView: doc.startView,
         });
         history.resume();
         history.clear();
@@ -196,18 +208,20 @@ export const useMapStore = create<MapState>()(
       setTitle: (title) => set({ title }),
 
       setViewport: (viewport) => {
-        const round = (n: number, places: number) => Number(n.toFixed(places));
-        const next = {
-          x: round(viewport.x, 1),
-          y: round(viewport.y, 1),
-          zoom: round(viewport.zoom, 4),
-        };
+        const next = roundViewport(viewport);
         const prev = get().viewport;
         if (prev && prev.x === next.x && prev.y === next.y && prev.zoom === next.zoom) return;
         // Panning is not an edit: it never becomes an undo step.
         const history = useMapStore.temporal.getState();
         history.pause();
         set({ viewport: next });
+        history.resume();
+      },
+
+      setStartView: (view) => {
+        const history = useMapStore.temporal.getState();
+        history.pause();
+        set({ startView: roundViewport(view) });
         history.resume();
       },
 

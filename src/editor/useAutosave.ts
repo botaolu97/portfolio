@@ -6,8 +6,8 @@ import { toDoc, useMapStore } from '../store/mapStore';
 import { type SaveStatus, useUiStore } from '../store/uiStore';
 
 const DELAY_MS = 500;
-/** Quiet time after a save before the canvas panel's snapshot is retaken. */
-const SNAPSHOT_DELAY_MS = 1500;
+/** A canvas with no snapshot gets its first one this long after opening (once it's drawn). */
+const FIRST_SNAPSHOT_DELAY_MS = 1500;
 
 /** The canvas area's size on screen: snapshots are taken at this size. */
 function canvasSize() {
@@ -27,7 +27,7 @@ function retakeSnapshot(slug: string, size = canvasSize()) {
 
 /**
  * Writes the open map to disk shortly after each change (dev server only), then has the canvas
- * panel's snapshot retaken once things are quiet.
+ * panel's snapshot retaken when you leave the canvas.
  */
 export function useAutosave() {
   const [status, setStatus] = useState<SaveStatus>('saved');
@@ -43,21 +43,16 @@ export function useAutosave() {
     lastSaved.current = snapshot()?.json ?? null;
     const slug = useMapStore.getState().slug;
     const index = useCanvasIndex.getState();
-    let snapTimer: ReturnType<typeof setTimeout> | undefined;
-    let snapDue = false;
-    const scheduleSnapshot = (target: string) => {
-      snapDue = true;
-      clearTimeout(snapTimer);
-      snapTimer = setTimeout(() => {
-        snapDue = false;
-        retakeSnapshot(target);
-      }, SNAPSHOT_DELAY_MS);
-    };
-    // A canvas with no snapshot yet, or edited since its last one (e.g. by hand), gets one now.
+    // Snapshots are retaken when you leave the canvas (switching), if anything was saved while it
+    // was open (edits or moving the view). A canvas with no snapshot at all gets one right away.
+    let changed = false;
+    let firstSnap: ReturnType<typeof setTimeout> | undefined;
+    let disposed = false;
     void (index.loaded ? Promise.resolve(index.maps) : index.refresh()).then((maps) => {
+      if (disposed) return;
       const entry = maps.find((m) => m.slug === slug);
-      if (slug && entry && (!entry.thumbAt || entry.thumbAt < Date.parse(entry.updatedAt))) {
-        scheduleSnapshot(slug);
+      if (slug && entry && !entry.thumbAt) {
+        firstSnap = setTimeout(() => retakeSnapshot(slug), FIRST_SNAPSHOT_DELAY_MS);
       }
     });
 
@@ -71,7 +66,7 @@ export function useAutosave() {
         try {
           useCanvasIndex.getState().setMaps(await saveMap(current.slug, JSON.parse(current.json)));
           lastSaved.current = current.json;
-          scheduleSnapshot(current.slug);
+          changed = true;
           setStatus(snapshot()?.json === current.json ? 'saved' : 'pending');
           setError(null);
         } catch (err) {
@@ -82,10 +77,11 @@ export function useAutosave() {
     });
     return () => {
       clearTimeout(timer);
-      clearTimeout(snapTimer);
+      disposed = true;
+      clearTimeout(firstSnap);
       unsubscribe();
-      // Leaving the canvas (e.g. switching) with a save still waiting: write it now, while the
-      // store still holds this canvas, then retake its snapshot (at the size measured now).
+      // Leaving the canvas (switching): write any save still waiting, while the store still holds
+      // this canvas, then retake its snapshot (at the size measured now).
       const size = canvasSize();
       const last = snapshot();
       if (last && last.json !== lastSaved.current) {
@@ -95,7 +91,7 @@ export function useAutosave() {
             retakeSnapshot(last.slug, size);
           })
           .catch(() => {});
-      } else if (snapDue && slug) {
+      } else if (changed && slug) {
         retakeSnapshot(slug, size);
       }
     };

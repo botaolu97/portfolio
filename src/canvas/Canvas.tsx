@@ -32,6 +32,7 @@ import { CanvasReveal } from './CanvasReveal';
 import { addNodesFromFiles } from './fileDrop';
 import { usePageZoomGuard } from './usePageZoomGuard';
 import { useShortcuts } from './useShortcuts';
+import { readVisitorView, writeVisitorView } from './visitorView';
 import { MAX_ZOOM, MIN_ZOOM } from './zoom';
 
 // Edit-only; checked inline so the production build drops it.
@@ -90,8 +91,14 @@ function ShortcutsHost({ onPasteImages }: { onPasteImages: (files: File[]) => vo
 }
 
 export function Canvas({ onError }: { onError?: (message: string) => void }) {
-  // The canvas opens where it was last left in the editor (read once); otherwise it fits everything.
-  const [initialViewport] = useState(() => useMapStore.getState().viewport);
+  // Where the canvas opens (read once). The editor (and its snapshots): where you last left it.
+  // Visitors: where they last left it themselves, else the start view you set, else your last view.
+  // With none of these it fits everything.
+  const [initialViewport] = useState(() => {
+    const { slug, viewport, startView } = useMapStore.getState();
+    if (EDITABLE || SNAPSHOT || !slug) return viewport;
+    return readVisitorView(slug) ?? startView ?? viewport;
+  });
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } = useMapStore(
     useShallow((s) => ({
       nodes: s.nodes,
@@ -235,11 +242,16 @@ export function Canvas({ onError }: { onError?: (message: string) => void }) {
         defaultViewport={initialViewport}
         fitView={!initialViewport}
         fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
-        // The editor remembers the view, so the canvas (and its snapshot) open where you left off.
+        // The view is remembered: in the map file in the editor (for its snapshot), in the visitor's
+        // own browser in view mode.
         onMoveEnd={
-          EDITABLE && !SNAPSHOT
-            ? (_, viewport) => useMapStore.getState().setViewport(viewport)
-            : undefined
+          SNAPSHOT
+            ? undefined
+            : (_, viewport) => {
+                const { slug, setViewport } = useMapStore.getState();
+                if (EDITABLE) setViewport(viewport);
+                else if (slug) writeVisitorView(slug, viewport);
+              }
         }
         colorMode={theme}
         attributionPosition="bottom-center"

@@ -214,6 +214,9 @@ export const mapNode = z.discriminatedUnion('type', [
   z.object({ ...nodeBase, type: z.literal('link'), data: linkData }),
 ]);
 
+export const viewport = z.object({ x: z.number(), y: z.number(), zoom: z.number().positive() });
+export type Viewport = z.infer<typeof viewport>;
+
 export const mapDoc = z.object({
   version: z.literal(MAP_VERSION),
   title: z.string(),
@@ -221,8 +224,13 @@ export const mapDoc = z.object({
   edges: z.array(mapEdge),
   /** The look new connectors get on this canvas (set by "Apply to all connectors"). */
   connector: connectorStyle.optional(),
-  /** Where the canvas was last panned and zoomed to in the editor; it opens there. */
-  viewport: z.object({ x: z.number(), y: z.number(), zoom: z.number().positive() }).optional(),
+  /** Where the canvas was last panned and zoomed to in the editor (and what its snapshot shows). */
+  viewport: viewport.optional(),
+  /**
+   * Where visitors start on this canvas, set in the editor ("Set as viewers' start"). Without it
+   * they start at `viewport`. After that, each visitor's own view is remembered in their browser.
+   */
+  startView: viewport.optional(),
 });
 
 export const mapIndexEntry = z.object({

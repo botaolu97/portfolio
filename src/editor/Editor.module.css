@@ -321,3 +321,44 @@
   flex: none;
   width: 36px;
 }
+
+/* Bottom-left of the canvas: set and revisit where visitors start (StartViewControl). */
+.startView {
+  margin: 0;
+  min-width: 0;
+  left: var(--space-16);
+  bottom: var(--space-16);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.startViewButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  height: var(--size-control-sm);
+  padding: 0 var(--space-10);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.startViewButton:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+}
+
+.startViewButton:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.startViewButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
